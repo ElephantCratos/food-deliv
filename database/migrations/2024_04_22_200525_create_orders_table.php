@@ -15,10 +15,12 @@ return new class extends Migration
 
         Schema::create('order_position', function (Blueprint $table) {
             $table->id();
+
             $table->foreignId('selected_ingredients_id')->references('id')->on('ingredients');
             $table->foreignId('dish_id')->references('id')->on('dish');
+
             $table->decimal('price', 10 , 2);
-            $table->integer('quanity');
+            $table->integer('quantity');
         });
 
         Schema::create('dish', function (Blueprint $table) {
