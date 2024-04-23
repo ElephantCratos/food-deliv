@@ -11,9 +11,10 @@ class OrderPosition extends Model
 
     protected $fillable = [
         'description',
-        'extra_ingredients_id',
-        'description',
+        'selected_ingredients_id',
+        'dish_id',
         'price',
+        'quantity',
     ];
 
     public function orders()
@@ -23,6 +24,10 @@ class OrderPosition extends Model
     public function ingredients()
     {
         return $this->belongsToMany(Ingredient::class);
+    }
+    public function dish()
+    {
+        return $this->belongsToMany(Dish::class);
     }
 
 }
