@@ -7,9 +7,14 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-    * Run the migrations.*/
-  public function up(): void{Schema::create('ingredients', function (Blueprint $table) {$table->id();$table->string('name');$table->string('description');$table->decimal('price', 10 , 2);
-
+     * Run the migrations.*/
+    public function up(): void
+    {
+        Schema::create('ingredients', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('description');
+            $table->decimal('price', 10, 2);
         });
 
         Schema::create('dish', function (Blueprint $table) {
@@ -17,7 +22,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('image_path');
             $table->foreignId('extra_ingredients_id')->references('id')->on('ingredients');
-            $table->decimal('price', 10 , 2);
+            $table->decimal('price', 10, 2);
         });
 
         Schema::create('order_position', function (Blueprint $table) {
@@ -26,17 +31,16 @@ return new class extends Migration
             $table->foreignId('selected_ingredients_id')->references('id')->on('ingredients');
             $table->foreignId('dish_id')->references('id')->on('dish');
 
-            $table->decimal('price', 10 , 2);
+            $table->decimal('price', 10, 2);
             $table->integer('quantity');
         });
 
-        
+
 
 
         Schema::create('status', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-
         });
 
 
@@ -54,6 +58,9 @@ return new class extends Migration
         });
     }
 
-     
-  public function down(): void{Schema::dropIfExists('orders');}
+
+    public function down(): void
+    {
+        Schema::dropIfExists('orders');
+    }
 };
