@@ -23,6 +23,14 @@ Route::get('/Edit_menu', function () {
     return view('Edit_menu');
 })->middleware(['auth', 'verified'])->name('Edit_menu');
 
+Route::get('/Courier_Orders', function () {
+    return view('Courier_Orders');
+})->middleware(['auth', 'verified'])->name('Courier_Orders');
+
+Route::get('/All_Orders', function () {
+    return view('All_Orders');
+})->middleware(['auth', 'verified'])->name('All_Orders');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

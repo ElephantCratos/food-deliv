@@ -22,12 +22,12 @@
                     </x-nav-link>
                 </div>
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                    <x-nav-link :href="route('All_Orders')" :active="request()->routeIs('All_Orders')">
                         {{ __('All Orders') }}
                     </x-nav-link>
                 </div>
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                    <x-nav-link :href="route('Courier_Orders')" :active="request()->routeIs('Courier_Orders')">
                         {{ __('Orders for courier') }}
                     </x-nav-link>
                 </div>
