@@ -20,5 +20,9 @@ class OrderPosition extends Model
     {
         return $this->belongsToMany(Order::class);
     }
+    public function ingredients()
+    {
+        return $this->belongsToMany(Ingredient::class);
+    }
 
 }
