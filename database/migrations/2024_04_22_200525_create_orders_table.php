@@ -23,6 +23,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('extra_ingredients_id')->references('id')->on('ingredients');
             $table->string('description');
+            $table->string('image_path');
             $table->decimal('price', 10 , 2);
         });
 
