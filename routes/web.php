@@ -19,6 +19,10 @@ Route::get('/Kitchen_Orders', function () {
     return view('Kitchen_Orders');
 })->middleware(['auth', 'verified'])->name('Kitchen_Orders');
 
+Route::get('/Manager_Menu', function () {
+    return view('Manager_Menu');
+})->middleware(['auth', 'verified'])->name('Manager_Menu');
+
 Route::get('/Edit_menu', function () {
     return view('Edit_menu');
 })->middleware(['auth', 'verified'])->name('Edit_menu');
