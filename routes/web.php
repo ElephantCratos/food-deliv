@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Dish_controller;
+use App\Http\Controllers\Ingridient_controller;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -19,13 +21,9 @@ Route::get('/Kitchen_Orders', function () {
     return view('Kitchen_Orders');
 })->middleware(['auth', 'verified'])->name('Kitchen_Orders');
 
-Route::get('/Manager_Menu', function () {
-    return view('Manager_Menu');
-})->middleware(['auth', 'verified'])->name('Manager_Menu');
+Route::get('/Manager_Menu',[Dish_controller::class, 'index'])->name('Manager_Menu')->middleware(['auth', 'verified']);
 
-Route::get('/Edit_menu', function () {
-    return view('Edit_menu');
-})->middleware(['auth', 'verified'])->name('Edit_menu');
+Route::get('/Edit_menu',[Ingridient_controller::class, 'index'])->name('Edit_menu')->middleware(['auth', 'verified']);
 
 Route::get('/Courier_Orders', function () {
     return view('Courier_Orders');
@@ -44,5 +42,7 @@ Route::middleware('auth')->group(function () {
 Route::get('/catalog', function () {
     return view('catalog');
 });
+
+Route::get('/catalog',[Dish_controller::class, 'index1'])->name('catalog');
 
 require __DIR__.'/auth.php';

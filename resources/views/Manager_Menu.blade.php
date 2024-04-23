@@ -1,3 +1,4 @@
+<x-app-layout>
 <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 justify-center items-center " style="display:flex;">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg items-center p-5 w-full"     >
@@ -16,15 +17,18 @@
                     @foreach ($Dish as $dish)
                         <tr class="items-center">
                             <td class="border-2 border-slate-300 p-5 text-white text-center">{{ $dish->id }}</td>
-                            <td class="border-2 border-slate-300 p-5 text-white text-center">{{ $dish->description }}</td>
-                            <td class="border-2 border-slate-300 p-5 text-white text-center">{{ $dish->event_date }}</td>
-                            <td class="border-2 border-slate-300 p-5 text-white text-center">{{ $dish->event_time }}</td>
-                                <a href="{{ route('Edit_menu', $post->id) }}" class="text-blue-500 underline">Изменить</a>
-                                <form action="{{ route('delete-post-home', $post->id) }}" method="post">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-500 underline">Удалить</button>
-                                </form></td>
+                            <td class="border-2 border-slate-300 p-5 text-white text-center">{{ $dish->name }}</td>
+                            <td class="border-2 border-slate-300 p-5 text-white text-center">{{ $dish->image_path }}</td>
+                            <td class="border-2 border-slate-300 p-5 text-white text-center"> @if ($dish->ingredients->isNotEmpty())
+                @foreach ($dish->ingredients as $ingredient)
+                    {{ $ingredient->name }}@if (!$loop->last), @endif
+                @endforeach
+            @else
+                <em>No ingredients found</em>
+            @endif</td>
+                            <td class="border-2 border-slate-300 p-5 text-white text-center">{{ $dish->price }}</td>
+                                <a href="{{ route('Edit_menu', $dish->id) }}" class="text-blue-500 underline">Изменить</a>
+                                </td>
                         </tr>
                     @endforeach
                     </tbody>
@@ -35,3 +39,4 @@
             </div>
         </div>
     </div>
+</x-app-layout>

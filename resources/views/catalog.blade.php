@@ -155,6 +155,27 @@ footer p {
     </div>
     <button>Add to Cart</button>
 </div>
+
+    @foreach ($Dish as $dish)
+    <div class="item">
+        <img src="food1.jpg" alt="Food Item 1">
+        <h3>{{$dish->name}}</h3>
+        <p>${{$dish->price}}</p>
+        <label for="toppings">Choose Toppings:</label>
+    <div id="toppings">
+        @if ($dish->ingredients->isNotEmpty())
+                @foreach ($dish->ingredients as $ingredient)
+                  <label><input type="checkbox" name="topping" value="cheese">{{ $ingredient->name }}</label>
+                    @if (!$loop->last), @endif
+                @endforeach
+            @else
+                <em>No ingredients found</em>
+            @endif</td>
+    </div>
+    <button>Add to Cart</button>
+    </div>
+    @endforeach
+
         
     </section>
 

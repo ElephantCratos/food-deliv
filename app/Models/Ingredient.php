@@ -22,6 +22,6 @@ class Ingredient extends Model
 
     public function dish()
     {
-        return $this->belongsToMany(Dish::class);
+        return $this->belongsToMany(Dish::class, 'dish_and_ingredients',  'dish_id', 'ingredients_id');
     }
 }
