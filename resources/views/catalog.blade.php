@@ -157,6 +157,30 @@ footer p {
 </div>
         
     </section>
+
+    <!-- новое
+    <section id="menu">
+        @foreach(menu_position as $index => $position)
+        
+        <div class="item">
+        @if ($position->image_path)
+            <div class="screensaver" style="background:url({{ $position->image_path) }})"></div>
+        @else
+            <div class="screensaver" style="background:url({{ images/screensaver.jpg) }})"></div>
+        @endif
+
+        <h3>{{position -> name}}</h3>
+        <p>{{position -> description}}</p>
+        <p>{{position -> price}}</p>
+        <label for="toppings">Choose Toppings:</label>
+    <div id="toppings">
+        как чекбоксы делать хз
+    </div>
+    <button>Add to Cart</button>
+</div>
+        
+    </section>
+    -->
     
     <section id="cart">
         <h2>Your Cart</h2>
