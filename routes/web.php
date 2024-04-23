@@ -11,10 +11,26 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::get('/Customer_Orders', function () {
+    return view('Customer_Orders');
+})->middleware(['auth', 'verified'])->name('Customer_Orders');
+
+Route::get('/Kitchen_Orders', function () {
+    return view('Kitchen_Orders');
+})->middleware(['auth', 'verified'])->name('Kitchen_Orders');
+
+Route::get('/Edit_menu', function () {
+    return view('Edit_menu');
+})->middleware(['auth', 'verified'])->name('Edit_menu');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+Route::get('/catalog', function () {
+    return view('catalog');
 });
 
 require __DIR__.'/auth.php';
