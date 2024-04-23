@@ -12,6 +12,13 @@ return new class extends Migration
 
         });
 
+        Schema::create('dish', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('image_path');
+            $table->foreignId('extra_ingredients_id')->references('id')->on('ingredients');
+            $table->decimal('price', 10 , 2);
+        });
 
         Schema::create('order_position', function (Blueprint $table) {
             $table->id();
@@ -23,13 +30,7 @@ return new class extends Migration
             $table->integer('quantity');
         });
 
-        Schema::create('dish', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('image_path');
-            $table->foreignId('extra_ingredients_id')->references('id')->on('ingredients');
-            $table->decimal('price', 10 , 2);
-        });
+        
 
 
         Schema::create('status', function (Blueprint $table) {

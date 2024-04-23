@@ -5,23 +5,25 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Ingredient extends Model
+class Dish extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'name',
-        'description',
+        'image_path',
+        'extra_ingredients_id',
         'price',
     ];
 
-    public function order_positions()
+    public function order_position()
     {
         return $this->belongsToMany(OrderPosition::class);
     }
 
-    public function dish()
+    public function ingredients()
     {
-        return $this->belongsToMany(Dish::class);
+        return $this->belongsToMany(Ingredient::class);
     }
+
 }
