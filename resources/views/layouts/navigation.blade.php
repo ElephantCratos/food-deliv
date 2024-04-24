@@ -11,31 +11,42 @@
                 </div>
 
                 <!-- Navigation Links -->
+                @if(auth()->check() && auth()->user()->can('access to user panel'))
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('Customer_Orders')" :active="request()->routeIs('Customer_Orders')">
                         {{ __('Orders') }}
                     </x-nav-link>
                 </div>
+                @endif
+                @if(auth()->check() && auth()->user()->can('access to kitchen panel'))
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('Kitchen_Orders')" :active="request()->routeIs('Kitchen_Orders')">
                         {{ __('Orders for kitchen') }}
                     </x-nav-link>
                 </div>
+                @endif
+                @if(auth()->check() && auth()->user()->can('access to manager panel'))
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('All_Orders')" :active="request()->routeIs('All_Orders')">
                         {{ __('All Orders') }}
                     </x-nav-link>
                 </div>
+                @endif
+                @if(auth()->check() && auth()->user()->can('access to courier panel'))
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('Courier_Orders')" :active="request()->routeIs('Courier_Orders')">
                         {{ __('Orders for courier') }}
                     </x-nav-link>
                 </div>
+                @endif
+                @if(auth()->check() && auth()->user()->can('access to manager panel'))
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('Manager_Menu')" :active="request()->routeIs('Manager_Menu')">
                         {{ __('Menu red') }}
                     </x-nav-link>
                 </div>
+                @endif
+                @if(auth()->check() && auth()->user()->can('access to chat'))
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('Manager_Ingredients')" :active="request()->routeIs('Manager_Ingredients')">
                         {{ __('Ingredients red') }}
@@ -43,9 +54,10 @@
                 </div>
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('maneger/courier chat') }}
+                        {{ __('manager/courier chat') }}
                     </x-nav-link>
                 </div>
+                @endif
             </div>
 
             <!-- Settings Dropdown -->
@@ -72,8 +84,7 @@
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
 
-                            <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
+                            <x-dropdown-link :href="route('logout')" onclick="event.preventDefault();
                                                 this.closest('form').submit();">
                                 {{ __('Log Out') }}
                             </x-dropdown-link>
@@ -118,8 +129,7 @@
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
 
-                    <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault();
+                    <x-responsive-nav-link :href="route('logout')" onclick="event.preventDefault();
                                         this.closest('form').submit();">
                         {{ __('Log Out') }}
                     </x-responsive-nav-link>
