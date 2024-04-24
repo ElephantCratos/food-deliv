@@ -23,7 +23,7 @@
     </tbody>
 </table>
 <div class="mt-4">
-    <a href="" class="text-green-500 underline">Добавить новый блок</a>
+    <a href="{{ route('Add_ingredient') }}" class="text-green-500 underline">Добавить новый блок</a>
 </div>
             </div>
         </div>

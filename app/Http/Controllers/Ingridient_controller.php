@@ -30,6 +30,16 @@ class Ingridient_controller extends Controller
        ]));
     }
 
+    public function index2()
+    {
+        $ingredient = Ingredient::OrderBy('name')
+            ->get();
+
+       return view('Add_ingredient',compact([
+           'ingredient'
+       ]));
+    }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -43,7 +53,19 @@ class Ingridient_controller extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+        ]);
+
+        $ingredient = Ingredient::create([
+            'name' => $request->name,
+            'description' => $request->description,
+            'price' => $request->price,
+        ]);
+
+        return redirect()->route('dashboard')->with('success', 'Dish created successfully.');
     }
 
     /**
