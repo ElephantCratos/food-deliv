@@ -1,9 +1,10 @@
 {
   "ExpandedNodes": [
     "",
-    "\\database",
-    "\\database\\migrations",
-    "\\database\\seeders",
+    "\\app",
+    "\\app\\Http",
+    "\\app\\Http\\Controllers",
+    "\\app\\Models",
     "\\public",
     "\\public\\Images",
     "\\resources",
@@ -11,6 +12,6 @@
     "\\resources\\views\\layouts",
     "\\routes"
   ],
-  "SelectedNode": "\\database\\migrations\\2024_04_22_200525_create_orders_table.php",
+  "SelectedNode": "\\app\\Http\\Controllers\\Ingridient_controller.php",
   "PreviewInSolutionExplorer": false
 }

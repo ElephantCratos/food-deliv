@@ -56,6 +56,7 @@ class Dish_controller extends Controller
         $dish = Dish::create([
             'name' => $request->name,
             'image_path' => $request->image_path ? Storage::putFile('public/images', $request->file('image_path')) : null,
+            'extra_ingredients_id' => 1,
             'price' => $request->price,
         ]);
 
@@ -77,27 +78,31 @@ class Dish_controller extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Dish $dish)
+    public function edit($id)
 {
-    return view('dish.edit', ['dish' => $dish]);
+    $dish=Dish::findOrFail($id);
+    $ingredients = Ingredient::OrderBy('name')
+            ->get();
+    return view('Edit_dish_menu',compact([
+           'dish', 'ingredients'
+       ]));
 }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Dish $dish)
+    public function update($id, Request $request)
 {
-    $request->validate([
+    
+    $validatedData = $request->validate([
         'name' => 'required|string|max:255',
         'image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         'price' => 'required|numeric|min:0',
     ]);
 
-    $dish->update([
-        'name' => $request->name,
-        'image_path' => $request->image_path ? Storage::putFile('public/images', $request->file('image_path')) : $dish->image_path,
-        'price' => $request->price,
-    ]);
+    $dish = Dish::findOrFail($id);
+
+    $dish->update($validatedData);
 
     $ingredients = Ingredient::whereIn('id', $request->input('ingredients', []))->get();
 

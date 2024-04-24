@@ -59,6 +59,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/Manager_Menu',[Dish_controller::class, 'index'])->name('Manager_Menu');
 
         Route::get('/Edit_menu',[Ingridient_controller::class, 'index'])->name('Edit_menu');
+
+        Route::get('/dish/{id}/edit', [Dish_controller::class, 'edit'])->name('dish.edit');
+
+        Route::put('/dish/{id}', [Dish_controller::class, 'update'])->name('dish.update');
     });
 });
 
