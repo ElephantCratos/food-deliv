@@ -37,6 +37,11 @@
                     </x-nav-link>
                 </div>
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('Manager_Ingredients')" :active="request()->routeIs('Manager_Ingredients')">
+                        {{ __('Ingredients red') }}
+                    </x-nav-link>
+                </div>
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('maneger/courier chat') }}
                     </x-nav-link>

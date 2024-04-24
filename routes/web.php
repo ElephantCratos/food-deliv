@@ -22,8 +22,10 @@ Route::get('/Kitchen_Orders', function () {
 })->middleware(['auth', 'verified'])->name('Kitchen_Orders');
 
 Route::get('/Manager_Menu',[Dish_controller::class, 'index'])->name('Manager_Menu')->middleware(['auth', 'verified']);
+Route::get('/Manager_Ingredients',[Ingridient_controller::class, 'index1'])->name('Manager_Ingredients')->middleware(['auth', 'verified']);
 
 Route::get('/Edit_menu',[Ingridient_controller::class, 'index'])->name('Edit_menu')->middleware(['auth', 'verified']);
+Route::post('/dish', [Dish_controller::class, 'store'])->name('dish.store');
 
 Route::get('/Courier_Orders', function () {
     return view('Courier_Orders');

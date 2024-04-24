@@ -2,16 +2,15 @@
   "ExpandedNodes": [
     "",
     "\\app",
+    "\\app\\Http",
     "\\app\\Http\\Controllers",
-    "\\database",
-    "\\database\\migrations",
+    "\\app\\Models",
     "\\public",
     "\\public\\Images",
     "\\resources",
     "\\resources\\views",
-    "\\resources\\views\\profile",
-    "\\routes"
+    "\\resources\\views\\layouts"
   ],
-  "SelectedNode": "\\app\\Models\\Ingredient.php",
+  "SelectedNode": "\\resources\\views",
   "PreviewInSolutionExplorer": false
 }

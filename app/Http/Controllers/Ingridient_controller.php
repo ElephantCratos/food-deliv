@@ -20,6 +20,16 @@ class Ingridient_controller extends Controller
        ]));
     }
 
+    public function index1()
+    {
+        $ingredient = Ingredient::OrderBy('name')
+            ->get();
+
+       return view('Manager_Ingredients',compact([
+           'ingredient'
+       ]));
+    }
+
     /**
      * Show the form for creating a new resource.
      */
