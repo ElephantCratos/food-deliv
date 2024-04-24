@@ -16,7 +16,12 @@
             <td class="border-2 border-slate-300 p-5 text-white text-center">{{ $Ingredient->description }}</td>
             <td class="border-2 border-slate-300 p-5 text-white text-center">{{ $Ingredient->price }}</td>
             <td class="border-2 border-slate-300 p-5 text-white text-center">
-                <a href=""class="text-blue-500 underline">Изменить</a>
+                <a href="{{ route('ingredient.edit', $Ingredient->id) }}"class="text-blue-500 underline">Изменить</a>
+                <form method="POST" action="{{ route('Ingridient.delete', $Ingredient->id) }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-blue-500 underline">Удалить</button>
+                                </form>
             </td>
         </tr>
     @endforeach

@@ -60,6 +60,11 @@ return new class extends Migration
             $table->string('comment');
             $table->timestamps();
         });
+
+        Schema::table('dish', function (Blueprint $table) {
+    $table->dropForeign(['extra_ingredients_id']);
+    $table->dropColumn('extra_ingredients_id');
+});
     }
 
 

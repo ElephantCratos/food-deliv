@@ -63,6 +63,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/dish/{id}/edit', [Dish_controller::class, 'edit'])->name('dish.edit');
 
         Route::put('/dish/{id}', [Dish_controller::class, 'update'])->name('dish.update');
+
+        Route::get('/ingredient/{id}/edit', [Ingridient_controller::class, 'edit'])->name('ingredient.edit');
+        Route::put('/ingredient/{id}', [Ingridient_controller::class, 'update'])->name('ingredient.update');
+
+        Route::delete('/dish/delete/{id}', [Dish_controller::class, 'delete'])->name('dish.delete');
+        Route::delete('/ingredient/delete/{id}', [Ingridient_controller::class, 'delete'])->name('Ingridient.delete');
     });
 });
 

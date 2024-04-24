@@ -29,6 +29,11 @@
                                 <form method="get" action="{{ route('dish.edit', $dish->id) }}">
                                         <button type="submit" class="text-blue-500 underline">Изменить</button>
                                 </form>
+                                <form method="POST" action="{{ route('dish.delete', $dish->id) }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-blue-500 underline">Удалить</button>
+                                </form>
                             </td>
                         </tr>
                     @endforeach

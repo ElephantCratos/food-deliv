@@ -2,9 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\app",
-    "\\app\\Http",
-    "\\app\\Http\\Controllers",
     "\\app\\Models",
+    "\\database",
+    "\\database\\migrations",
     "\\public",
     "\\public\\Images",
     "\\resources",
@@ -12,6 +12,6 @@
     "\\resources\\views\\layouts",
     "\\routes"
   ],
-  "SelectedNode": "\\app\\Http\\Controllers\\Ingridient_controller.php",
+  "SelectedNode": "\\routes\\web.php",
   "PreviewInSolutionExplorer": false
 }

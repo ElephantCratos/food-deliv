@@ -56,7 +56,6 @@ class Dish_controller extends Controller
         $dish = Dish::create([
             'name' => $request->name,
             'image_path' => $request->image_path ? Storage::putFile('public/images', $request->file('image_path')) : null,
-            'extra_ingredients_id' => 1,
             'price' => $request->price,
         ]);
 
@@ -114,8 +113,21 @@ class Dish_controller extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
-        //
+    public function delete($id)
+{
+    $dish = Dish::findOrFail($id);
+
+    // Delete the associated image if it exists
+    if ($dish->image_path) {
+        Storage::delete($dish->image_path);
     }
+
+    // Detach any associated ingredients
+    $dish->ingredients()->detach();
+
+    // Delete the dish
+    $dish->delete();
+
+    return redirect()->route('dashboard')->with('success', 'Блюдо удалено успешно.');
+}
 }
