@@ -21,8 +21,11 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('image_path');
-            $table->foreignId('extra_ingredients_id')->references('id')->on('ingredients');
-            $table->decimal('price', 10, 2);
+
+            $table->foreignId('extra_ingredients_id')->references('id')->on('ingredients')->nullable();
+            $table->decimal('price', 10 , 2);
+            $table->timestamps();
+
         });
 
         Schema::create('order_position', function (Blueprint $table) {

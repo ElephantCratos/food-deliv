@@ -9,6 +9,8 @@ class Dish extends Model
 {
     use HasFactory;
 
+    protected $table = 'dish';
+
     protected $fillable = [
         'name',
         'image_path',
@@ -23,7 +25,7 @@ class Dish extends Model
 
     public function ingredients()
     {
-        return $this->belongsToMany(Ingredient::class);
+        return $this->belongsToMany(Ingredient::class, 'dish_and_ingredients', 'dish_id', 'ingredients_id');
     }
 
 }

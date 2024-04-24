@@ -24,6 +24,20 @@ return new class extends Migration
             $table->primary(['order_id', 'position_id']);
 
         });
+
+         Schema::create('dish_and_ingredients', function (Blueprint $table) {
+            $table->unsignedBigInteger('dish_id');
+            $table->unsignedBigInteger('ingredients_id');
+            $table->timestamps();
+
+
+            $table->foreign('dish_id')->references('id')->on('dish')->onDelete('cascade');
+            $table->foreign('ingredients_id')->references('id')->on('ingredients')->onDelete('cascade');
+
+
+            $table->primary(['dish_id', 'ingredients_id']);
+
+        });
     }
 
 
@@ -33,5 +47,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('order_and_order_position');
+
+        Schema::dropIfExists('dish_and_ingredients');
     }
 };

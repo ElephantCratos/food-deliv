@@ -1,15 +1,19 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Dish_controller;
+use App\Http\Controllers\Ingridient_controller;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/catalog', function () {
-    return view('catalog');
-});
+//Route::get('/catalog', function () {
+//    return view('catalog');
+//});
+
+
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
@@ -36,13 +40,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     Route::middleware(['can:access to manager panel'])->group(function () {
-        Route::get('/Edit_menu', function () {
-            return view('Edit_menu');
-        })->name('Edit_menu');
+        //Route::get('/Edit_menu', function () {
+        //    return view('Edit_menu');
+        //})->name('Edit_menu');
 
         Route::get('/All_Orders', function () {
             return view('All_Orders');
         })->name('All_Orders');
+      
+        Route::get('/Manager_Ingredients',[Ingridient_controller::class, 'index1'])->name('Manager_Ingredients')
+          
+        Route::post('/dish', [Dish_controller::class, 'store'])->name('dish.store');
+      
+        Route::get('/Manager_Menu',[Dish_controller::class, 'index'])->name('Manager_Menu')->middleware(['auth', 'verified']);
+      
+        Route::get('/Edit_menu',[Ingridient_controller::class, 'index'])->name('Edit_menu')->middleware(['auth', 'verified']);
     });
 });
 
@@ -51,5 +63,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+Route::get('/catalog',[Dish_controller::class, 'index1'])->name('catalog');
 
 require __DIR__ . '/auth.php';
