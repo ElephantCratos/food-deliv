@@ -35,16 +35,21 @@ class StatusSeeder extends Seeder
 
         $status = Status::create([
             'id' => '5',
-            'name' => 'The courier is on the way',
+            'name' => 'Given to the courier',
         ]);
 
         $status = Status::create([
             'id' => '6',
-            'name' => 'completed',
+            'name' => 'The courier is on the way',
         ]);
 
         $status = Status::create([
             'id' => '7',
+            'name' => 'completed',
+        ]);
+
+        $status = Status::create([
+            'id' => '8',
             'name' => 'declined',
         ]);
     }
