@@ -1,11 +1,11 @@
 <x-app-layout>
-   <form method="POST" action="{{ route('dish.update', $dish->id) }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ route('dish.update', $dish->id)}}" enctype="multipart/form-data">
         @csrf
         @method('PUT')
         <div class="item">
             <div class="form-group">
                 <label for="image" class="text-white">Image</label>
-                <<input type="file" name="image_path" id="image" class="text-white">
+                <input type="file" name="image_path" id="image" class="text-white">
             </div>
             <h3 class="text-white">
                 <label for="foodName">Food Name:</label>
@@ -19,7 +19,7 @@
             <div id="toppings" class="text-white">
                 @foreach ($ingredients as $ingredient)
                     <div class="topping">
-                        <label><input type="checkbox" name="ingredients[]" value="{{ $ingredient->id }}" {{ $dish->ingredients->contains($ingredient->id) ? 'checked' : '' }}>{{ $ingredient->name }}</label>
+                        <label><input type="checkbox" name="ingredients[]" value="{{ $ingredient->id }}" @if($dish->ingredients->contains($ingredient)) checked @endif>{{ $ingredient->name }}</label>
                     </div>
                 @endforeach
             </div>

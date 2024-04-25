@@ -16,14 +16,19 @@
             <td class="border-2 border-slate-300 p-5 text-white text-center">{{ $Ingredient->description }}</td>
             <td class="border-2 border-slate-300 p-5 text-white text-center">{{ $Ingredient->price }}</td>
             <td class="border-2 border-slate-300 p-5 text-white text-center">
-                <a href=""class="text-blue-500 underline">Изменить</a>
+                <a href="{{ route('ingredient.edit', $Ingredient->id) }}"class="text-blue-500 underline">Изменить</a>
+                <form method="POST" action="{{ route('Ingridient.delete', $Ingredient->id) }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-blue-500 underline">Удалить</button>
+                                </form>
             </td>
         </tr>
     @endforeach
     </tbody>
 </table>
 <div class="mt-4">
-    <a href="" class="text-green-500 underline">Добавить новый блок</a>
+    <a href="{{ route('Add_ingredient') }}" class="text-green-500 underline">Добавить новый блок</a>
 </div>
             </div>
         </div>

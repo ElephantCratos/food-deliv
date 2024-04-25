@@ -77,27 +77,31 @@ class Dish_controller extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Dish $dish)
+    public function edit($id)
 {
-    return view('dish.edit', ['dish' => $dish]);
+    $dish=Dish::findOrFail($id);
+    $ingredients = Ingredient::OrderBy('name')
+            ->get();
+    return view('Edit_dish_menu',compact([
+           'dish', 'ingredients'
+       ]));
 }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Dish $dish)
+    public function update($id, Request $request)
 {
-    $request->validate([
+    
+    $validatedData = $request->validate([
         'name' => 'required|string|max:255',
-        'image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        'image_path' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         'price' => 'required|numeric|min:0',
     ]);
 
-    $dish->update([
-        'name' => $request->name,
-        'image_path' => $request->image_path ? Storage::putFile('public/images', $request->file('image_path')) : $dish->image_path,
-        'price' => $request->price,
-    ]);
+    $dish = Dish::findOrFail($id);
+
+    $dish->update($validatedData);
 
     $ingredients = Ingredient::whereIn('id', $request->input('ingredients', []))->get();
 
@@ -109,8 +113,21 @@ class Dish_controller extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
-        //
+    public function delete($id)
+{
+    $dish = Dish::findOrFail($id);
+
+    // Delete the associated image if it exists
+    if ($dish->image_path) {
+        Storage::delete($dish->image_path);
     }
+
+    // Detach any associated ingredients
+    $dish->ingredients()->detach();
+
+    // Delete the dish
+    $dish->delete();
+
+    return redirect()->route('dashboard')->with('success', 'Блюдо удалено успешно.');
+}
 }

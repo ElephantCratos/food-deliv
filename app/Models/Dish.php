@@ -14,7 +14,6 @@ class Dish extends Model
     protected $fillable = [
         'name',
         'image_path',
-        'extra_ingredients_id',
         'price',
     ];
 

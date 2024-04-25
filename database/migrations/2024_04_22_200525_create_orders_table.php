@@ -15,6 +15,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('description');
             $table->decimal('price', 10, 2);
+            $table->timestamps();
         });
 
         Schema::create('dish', function (Blueprint $table) {
@@ -31,7 +32,6 @@ return new class extends Migration
         Schema::create('order_position', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('selected_ingredients_id')->references('id')->on('ingredients');
             $table->foreignId('dish_id')->references('id')->on('dish');
 
             $table->decimal('price', 10, 2);
@@ -44,6 +44,7 @@ return new class extends Migration
         Schema::create('status', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->timestamps();
         });
 
 
@@ -59,6 +60,11 @@ return new class extends Migration
             $table->string('comment');
             $table->timestamps();
         });
+
+        Schema::table('dish', function (Blueprint $table) {
+    $table->dropForeign(['extra_ingredients_id']);
+    $table->dropColumn('extra_ingredients_id');
+});
     }
 
 

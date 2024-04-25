@@ -11,7 +11,6 @@ class OrderPosition extends Model
 
     protected $fillable = [
         'description',
-        'selected_ingredients_id',
         'dish_id',
         'price',
         'quantity',

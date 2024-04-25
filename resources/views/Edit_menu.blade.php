@@ -8,11 +8,11 @@
             </div>
             <h3 class="text-white">
                 <label for="foodName">Food Name:</label>
-                <input type="text" id="foodName" name="name" value="Food Item 1" required>
+                <input type="text" id="foodName" name="name" value="" required>
             </h3>
             <p class="text-white">
                 <label for="foodPrice">Price:</label>
-                <input type="text" id="foodPrice" name="price" value="$10.99" required>
+                <input type="text" id="foodPrice" name="price" value="" required>
             </p>
             <label for="toppings" class="text-white">Choose Toppings:</label>
             <div id="toppings" class="text-white">
