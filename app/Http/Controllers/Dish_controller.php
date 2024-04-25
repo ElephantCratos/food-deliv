@@ -61,25 +61,32 @@ class Dish_controller extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'price' => 'required|numeric|min:0',
-        ]);
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        'price' => 'required|numeric|min:0',
+    ]);
 
-        $dish = Dish::create([
-            'name' => $request->name,
-            'image_path' => $request->image_path ? Storage::putFile('public/images', $request->file('image_path')) : null,
-            'price' => $request->price,
-        ]);
-
-        $ingredients = Ingredient::whereIn('id', $request->input('ingredients', []))->get();
-
-        $dish->ingredients()->attach($ingredients);
-
-        return redirect()->route('dashboard')->with('success', 'Dish created successfully.');
+     $imagePath = null;
+    if ($request->hasFile('image_path')) {
+        $image = $request->file('image_path');
+        $imagePath = 'images/' . time() . '.' . $image->getClientOriginalExtension();
+        $image->move(public_path('images'), $imagePath);
     }
+
+    $dish = Dish::create([
+        'name' => $request->name,
+        'image_path' => $imagePath,
+        'price' => $request->price,
+    ]);
+
+    $ingredients = Ingredient::whereIn('id', $request->input('ingredients', []))->get();
+
+    $dish->ingredients()->attach($ingredients);
+
+    return redirect()->route('dashboard')->with('success', 'Dish created successfully.');
+}
 
     /**
      * Display the specified resource.
@@ -115,6 +122,13 @@ class Dish_controller extends Controller
     ]);
 
     $dish = Dish::findOrFail($id);
+
+     if ($request->hasFile('image_path')) {
+        $image = $request->file('image_path');
+        $imagePath = 'images/' . time() . '.' . $image->getClientOriginalExtension();
+        $image->move(public_path('images'), $imagePath);
+        $validatedData['image_path'] = $imagePath;
+    }
 
     $dish->update($validatedData);
 

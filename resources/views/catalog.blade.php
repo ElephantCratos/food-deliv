@@ -25,7 +25,7 @@ Food Delivery Catalog
         @foreach ($Dish as $dish)
         <div class="w-full sm:w-1/2 md:w-1/3 px-4 mb-8">
             <div class="bg-white border border-gray-300 rounded p-6 h-full flex flex-col justify-between">
-                <img src="food1.jpg" alt="Food Item 1" class="w-full mb-4">
+                <img src="{{ asset($dish->image_path) }}" alt="{{ $dish->name }}" class="w-full mb-4">
                 <h3 class="text-xl font-semibold mb-2">{{ $dish->name }}</h3>
                 <p class="text-gray-700 mb-2">Price: ${{ $dish->price }}</p>
                 <label for="toppings" class="text-gray-700">Choose Toppings:</label>
