@@ -81,4 +81,32 @@ class OrderController extends Controller
     {
         //
     }
+
+    public function acceptOrder($id)
+{
+    $order = Order::find($id);
+
+    if ($order) {
+        $order->status_id = 2;
+        $order->save();
+        
+        return redirect()->back()->with('success', 'Order status updated successfully.');
+    }
+
+    return redirect()->back()->with('error', 'Order not found.');
+}
+
+public function declineOrder($id)
+{
+    $order = Order::find($id);
+
+    if ($order) {
+        $order->status_id = 7;
+        $order->save();
+        
+        return redirect()->back()->with('success', 'Order status updated successfully.');
+    }
+
+    return redirect()->back()->with('error', 'Order not found.');
+}
 }

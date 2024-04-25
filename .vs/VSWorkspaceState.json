@@ -2,16 +2,15 @@
   "ExpandedNodes": [
     "",
     "\\app",
-    "\\app\\Http",
-    "\\app\\Http\\Controllers",
     "\\app\\Models",
     "\\database",
     "\\database\\migrations",
+    "\\database\\seeders",
     "\\resources",
     "\\resources\\views",
     "\\resources\\views\\components_fb",
     "\\routes"
   ],
-  "SelectedNode": "\\database\\migrations\\2024_04_22_200525_create_orders_table.php",
+  "SelectedNode": "\\database\\seeders\\StatusSeeder.php",
   "PreviewInSolutionExplorer": false
 }
