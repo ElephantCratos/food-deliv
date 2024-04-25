@@ -6,6 +6,8 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\Ingridient_controller;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderPositionController;
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -21,6 +23,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+
+    Route::post('/add_to_cart', [OrderPositionController::class, 'store']) -> name('add_to_cart');
 
     Route::middleware(['can:access to kitchen panel'])->group(function () {
         Route::get('/Kitchen_Orders', function () {

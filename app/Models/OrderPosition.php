@@ -9,6 +9,7 @@ class OrderPosition extends Model
 {
     use HasFactory;
 
+    protected $table = 'order_position';
     protected $fillable = [
         'description',
         'dish_id',

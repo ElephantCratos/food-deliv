@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <title>Food Delivery Catalog</title>
     <style>
        body {
@@ -138,10 +139,10 @@ footer p {
             </ul>
         </nav>
     </header>
-    
+
     <section id="menu">
-        
-        <div class="item">
+
+        <div class="item ">
         <img src="food1.jpg" alt="Food Item 1">
         <h3>Food Item 1</h3>
         <p>Description of Food Item 1</p>
@@ -153,34 +154,39 @@ footer p {
         <label><input type="checkbox" name="topping" value="mushrooms"> Mushrooms</label>
         <label><input type="checkbox" name="topping" value="olives"> Olives</label>
     </div>
+            <label for="quantity">Quantity:</label><br>
     <button>Add to Cart</button>
 </div>
 
     @foreach ($Dish as $dish)
-    <div class="item">
+    <div class="item ">
         <img src="food1.jpg" alt="Food Item 1">
         <h3>{{$dish->name}}</h3>
         <p>${{$dish->price}}</p>
         <label for="toppings">Choose Toppings:</label>
-    <div id="toppings">
+        <form method="POST" action="{{ route('add_to_cart')}}">
+            @csrf
+    <div id="toppings" >
         @if ($dish->ingredients->isNotEmpty())
                 @foreach ($dish->ingredients as $ingredient)
-                  <label><input type="checkbox" name="topping" value="cheese">{{ $ingredient->name }}</label>
+                  <label><input type="checkbox" name="topping{{$ingredient->id}}"  value="{{$ingredient->id}}">{{ $ingredient->name }}</label>
                     @if (!$loop->last), @endif
                 @endforeach
             @else
                 <em>No ingredients found</em>
-            @endif</td>
+            @endif
     </div>
-    <button>Add to Cart</button>
-    </div>
+            <input type="hidden" name="dish_id" value="{{$dish->id}}">
+            <input type="number" id="quantity" name="quantity" min="1" value="1"><br>
+            <button type="submit">Add to Cart</button>
+            </form>
     @endforeach
 
-        
+
     </section>
 
-   
-    
+
+
     <section id="cart">
         <h2>Your Cart</h2>
         <ul>
@@ -188,7 +194,7 @@ footer p {
         <p>Total: $0.00</p>
         <button>Checkout</button>
     </section>
-    
+
     <footer>
         <p>&copy; 2024 Food Delivery Catalog. All rights reserved.</p>
     </footer>
