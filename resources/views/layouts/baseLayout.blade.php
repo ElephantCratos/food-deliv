@@ -16,9 +16,8 @@
                 <ul class="flex">
                     @section('nav')
                     <li class="mx-4"><a href="{{ route('profile.edit') }}" class="text-white">Profile</a></li>
-                    <li class="mx-4"><a href="#" class="text-white">Menu</a></li>
-                    <li class="mx-4"><a href="#" class="text-white">Order Now</a></li>
-                    <li class="mx-4"><a href="#" class="text-white">Contact Us</a></li>
+                    <li class="mx-4"><a href="{{ route('catalog') }}" class="text-white">Catalog</a></li>
+                    <li class="mx-4"><a href="{{ route('Cart') }}" class="text-white">Order Now</a></li>
                     @show
                 </ul>
             </nav>
