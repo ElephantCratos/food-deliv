@@ -75,7 +75,7 @@ class OrderController extends Controller
            
             return redirect()->route('Cart');
         }
-        
+
         $lastOrder -> status_id = 1;
 
         $lastOrder->save();

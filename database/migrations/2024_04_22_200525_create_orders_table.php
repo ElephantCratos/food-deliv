@@ -57,11 +57,6 @@ return new class extends Migration
             $table->decimal('price', 10, 2);
             $table->string('address')->nullable();
             $table->string('comment')->nullable();
-<<<<<<< HEAD
-            $table->time('expected_at')->nullable();
-=======
-            $table->time('expected_at') -> nullable();
->>>>>>> 2eea807ba6944433254e639104101f0e911bff9c
             $table->timestamps();
         });
 
