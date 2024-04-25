@@ -8,9 +8,11 @@
     "\\database\\seeders",
     "\\resources",
     "\\resources\\views",
+    "\\resources\\views\\custom_components",
     "\\resources\\views\\layouts",
+    "\\resources\\views\\profile",
     "\\routes"
   ],
-  "SelectedNode": "\\database\\seeders\\DatabaseSeeder.php",
+  "SelectedNode": "\\resources\\views\\layouts\\navigation.blade.php",
   "PreviewInSolutionExplorer": false
 }

@@ -41,7 +41,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     Route::middleware(['can:access to chat'])->group(function() {
-        Route::get('/users', [ChatController::class, 'showUsers']);
+        Route::get('/users', [ChatController::class, 'showUsers'])->name('Users_list');
         Route::get('/chat/{userId}', [ChatController::class, 'showChat']);
         Route::post('/chat/{userId}', [ChatController::class, 'sendMessage']);
     });
