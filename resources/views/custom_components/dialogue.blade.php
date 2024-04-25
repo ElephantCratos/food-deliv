@@ -17,7 +17,7 @@
 <body>
 <h1>Чат с {{ $user->name }}</h1>
 <div>
-    <?php echo $user ?>
+
     @forelse ($messages as $message)
         <div class="message">
             <span class="sender">{{ $message->sender_id === auth()->user()->id ? 'Вы' : $user->name }}</span>

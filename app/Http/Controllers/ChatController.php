@@ -5,13 +5,20 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Message;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 
 class ChatController extends Controller
 {
     public function showUsers()
     {
-        $users = User::all();
+        $userId = Auth::id();
+
+        $users = User::where('id', '<>', $userId)
+            ->whereHas('roles', function ($query) {
+                $query->whereIn('role_id', [2, 4]);
+            })
+            ->get();
         return view('custom_components.user-list', compact('users'));
     }
 
