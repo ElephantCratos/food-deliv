@@ -4,15 +4,14 @@
     "\\app",
     "\\app\\Http",
     "\\app\\Http\\Controllers",
+    "\\app\\Models",
     "\\database",
-    "\\database\\seeders",
+    "\\database\\migrations",
     "\\resources",
     "\\resources\\views",
-    "\\resources\\views\\custom_components",
-    "\\resources\\views\\layouts",
-    "\\resources\\views\\profile",
+    "\\resources\\views\\components_fb",
     "\\routes"
   ],
-  "SelectedNode": "\\resources\\views\\layouts\\navigation.blade.php",
+  "SelectedNode": "\\database\\migrations\\2024_04_22_200525_create_orders_table.php",
   "PreviewInSolutionExplorer": false
 }

@@ -52,7 +52,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         //})->name('Edit_menu');
 
 
-        Route::get('/All_Orders', [OrderController::class, 'index'])->name('All_Orders');
+        Route::get('/All_Orders/{category?}', [OrderController::class, 'index'])->name('All_Orders');
 
 
         Route::get('/Manager_Ingredients',[Ingridient_controller::class, 'index1'])->name('Manager_Ingredients');
