@@ -1,12 +1,12 @@
 <x-app-layout>
-    <div class="py-12 flex justify-center items-center" style="margin: 50px;">
+    <div class="py-12 flex justify-center items-center" style="margin: 200px;">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 w-full">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-5 w-full"> <!-- Added a white background container for messages -->
+            <div class="bg-yellow-500 overflow-hidden shadow-sm sm:rounded-lg p-5 w-full text-gray-900"> 
                 <div class="flex justify-center items-center">
-                    <h1 class="text-xl p-4 text-white">Чат с {{ $user->name }}</h1>
+                    <h1 class="text-xl p-4">Чат с {{ $user->name }}</h1>
                 </div>
-                <div style="text-align: left;"> <!-- Centered messages to the left -->
-                    <div class="bg-white p-5" style="margin: 10px; border-radius: 10px;"> <!-- Added a white background for messages -->
+                <div class="text-left">
+                    <div class="bg-white p-5 rounded-lg">
                         @forelse ($messages as $message)
                             <div class="message">
                                 <span class="sender">{{ $message->sender_id === auth()->user()->id ? 'Вы' : $user->name }}:</span>
@@ -17,12 +17,12 @@
                         @endforelse
                     </div>
                 </div>
-                <div style="text-align: center;">
+                <div class="text-center">
                     <form class="p-4" method="post" action="/chat/{{ $user->id }}">
                         @csrf
                         <input type="hidden" name="receiver_id" value="{{ $user->id }}">
-                        <input type="text" name="content" placeholder="Введите сообщение" style="margin-top: 10px;">
-                        <button class="text-white" type="submit" style="margin-top: 10px;">Отправить</button>
+                        <input type="text" name="content" placeholder="Введите сообщение" style="margin-top: 10px;" class="w-">
+                        <button class="bg-white text-yellow-500 py-2 px-4 rounded-lg hover:bg-yellow-400" type="submit" style="margin-top: 10px;">Отправить</button> 
                     </form>
                 </div>
             </div>
