@@ -1,12 +1,15 @@
 <?php
 
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderPositionController;
+use App\Http\Controllers\KitchenController;
+use App\Http\Controllers\CourierController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Dish_controller;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\Ingridient_controller;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\OrderController;
-use App\Http\Controllers\OrderPositionController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -30,9 +33,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('send_cart', [OrderController::class, 'sendOrder'])->name('send_order');
 
     Route::middleware(['can:access to kitchen panel'])->group(function () {
-        Route::get('/Kitchen_Orders', function () {
-            return view('Kitchen_Orders');
-        })->name('Kitchen_Orders');
+        Route::get('/Kitchen_Orders', [KitchenController::class, 'index'])->name('Kitchen_Orders');
+        Route::post('/Kitchen_Orders/{id}/confirm', [KitchenController::class, 'confirmPreparation'])->name('kitchen.confirm');
+        Route::post('/Kitchen_Orders{id}/transfer', [KitchenController::class, 'transferToCourier'])->name('kitchen.transfer');
+        Route::post('/Kitchen_Orders{id}/courier-arrived', [KitchenController::class, 'courierArrived'])->name('kitchen.courier-arrived');
     });
 
     Route::middleware(['can:access to user panel'])->group(function () {
@@ -43,14 +47,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     Route::middleware(['can:access to courier panel'])->group(function () {
-        Route::get('/Courier_Orders', function () {
-            return view('Courier_Orders');
-        })->name('Courier_Orders');
+        Route::get('/Courier_Orders', [CourierController::class, 'index'])->name('Courier_Orders');
+        Route::post('/Courier_Orders/{id}/confirm-delivery', [CourierController::class, 'confirmDelivery'])->name('courier.confirm');
+        Route::post('Courier_Orders/{id}/get-order', [CourierController::class, 'acceptOrder']) -> name('courier.accept-order');
+        Route::post('Courier_Orders/{id}/delivered', [CourierController::class, 'orderHasDelivered']) -> name('courier.delivered');
     });
 
     Route::middleware(['can:access to chat'])->group(function() {
         Route::get('/users', [ChatController::class, 'showUsers'])->name('Users_list');
-        Route::get('/chat/{userId}', [ChatController::class, 'showChat']);
+        Route::get('/chat/{userId}', [ChatController::class, 'showChat'])->name('showChat');
         Route::post('/chat/{userId}', [ChatController::class, 'sendMessage']);
     });
 

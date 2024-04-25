@@ -54,14 +54,15 @@ class OrderController extends Controller
 
         $positions = $lastOrder ? $lastOrder->positions : null;
 
-
-
-
         return view('cart',compact('positions','lastOrder'));
     }
 
-    public function sendOrder()
+    public function sendOrder(Request $request)
     {
+        $validatedData = $request->validate([
+            'adress' => 'required|string|max:255',
+            'comment'=> '|string|max:255'
+        ]);
 
         $userId = Auth::user()->id;
 
@@ -69,16 +70,17 @@ class OrderController extends Controller
             ->orderBy('created_at', 'desc')
             ->first();
 
-        if ((int)$lastOrder->price == 0) 
+        if ((int)$lastOrder->price == 0)
         {
-            redirect()->route('Cart');
+           
+            return redirect()->route('Cart');
         }
         
         $lastOrder -> status_id = 1;
 
         $lastOrder->save();
 
-        return redirect()->route('Cart')->with('status','Заказ успешно оформлен');
+        return redirect()->route('Cart')->with('status', 'Заказ успешно оформлен');
     }
     public function create()
     {
@@ -132,7 +134,7 @@ class OrderController extends Controller
     if ($order) {
         $order->status_id = 2;
         $order->save();
-        
+
         return redirect()->back()->with('success', 'Order status updated successfully.');
     }
 
@@ -146,7 +148,7 @@ public function declineOrder($id)
     if ($order) {
         $order->status_id = 7;
         $order->save();
-        
+
         return redirect()->back()->with('success', 'Order status updated successfully.');
     }
 
