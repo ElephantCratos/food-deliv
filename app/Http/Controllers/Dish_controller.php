@@ -113,4 +113,66 @@ class Dish_controller extends Controller
     {
         //
     }
+
+    public function dishCart()
+    {
+        return view('Cart');
+    }
+
+    public function addDishToCart(Request $request)
+    {
+        $dishId = $request->input('dish_id');
+        $count = $request->input('count', 1);
+        $cartDishID = $request->input('cart_dish_id');
+
+        $dish = Dish::find($dishId);
+
+        if(!$dish) {
+            return response()->json(['error' => 
+            'Dish is not found'], 404);
+        }
+
+        $cart = session()->get('cart', []);
+
+        if(isset($cart[$dishId]))
+        {
+            $cart[$dishId]['count'] += $count;
+        }
+        else
+        {
+            $cart[$dishId] = [
+                'id' => $dish->id,
+                'name' => $dish->name,
+                'image_path' => $dish->image_path,
+                'extra_ingredients_id' => $dish->extra_ingredients_id,
+                'price' => $dish->price,
+                'count' => $count
+            ];
+        }
+
+        session()->put('cart', $cart);
+        $totalCount = 0;
+        foreach ($cart as $item)
+        {
+            $totalCount += $item['count'];
+        }
+        return response()->json(['message' => 
+        'Cart updated', 'cartCount' => $totalCount], 200);
+    }
+
+    public function deleteDishFromCart(Request $request) {
+        
+        if ($request->id)
+        {
+            $cart = session()->get('cart');
+
+            if(isset($cart[$request->id])) 
+            {
+                unset($cart[$request->id]);
+                session()->put('cart', $cart);
+            }
+
+            session()->flash('success', 'Dish deleted.');
+        }
+    }
 }

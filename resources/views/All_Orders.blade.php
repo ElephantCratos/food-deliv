@@ -5,7 +5,7 @@
         </h2>
     </x-slot>
     <div class="flex justify-center p-4">
-    <div class="order-block bg-white border border-gray-200 rounded-lg p-4 shadow-md" style="width: 70%;>
+    <div class="order-block bg-white border border-gray-200 rounded-lg p-4 shadow-md" style="width: 70%;">
     <h3 class="text-lg font-semibold text-gray-800">Order #12345</h3>
     <p class="text-gray-600">Status: In Progress</p>
     <ul class="list-disc list-inside text-gray-600">

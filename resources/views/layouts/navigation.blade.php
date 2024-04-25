@@ -13,6 +13,11 @@
                 <!-- Navigation Links -->
                 @if(auth()->check() && auth()->user()->can('access to user panel'))
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('catalog')" :active="request()->routeIs('catalog')">
+                        {{ __('Catalog') }}
+                    </x-nav-link>
+                </div>
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('Customer_Orders')" :active="request()->routeIs('Customer_Orders')">
                         {{ __('Orders') }}
                     </x-nav-link>

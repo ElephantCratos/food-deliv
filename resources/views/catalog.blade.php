@@ -1,131 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Food Delivery Catalog</title>
     <style>
-       body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-}
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
 
-header {
-    background-color: #f1c40f;
-    padding: 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+        header {
+            background-color: #f1c40f;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-header h1 {
-    margin: 0;
-    color: #fff;
-}
+        header h1 {
+            margin: 0;
+            color: #fff;
+        }
 
-nav ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-}
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
 
-nav ul li {
-    margin: 0 1rem;
-}
+        nav ul li {
+            margin: 0 1rem;
+        }
 
-nav ul li a {
-    color: #fff;
-    text-decoration: none;
-}
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+        }
 
-section#menu {
-    display: flex;
-    flex-wrap: wrap;
-    padding: 1rem;
-    justify-content: space-between;
-}
+        section#menu {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 1rem;
+            justify-content: space-between;
+        }
 
-.item {
-    background-color: #fff;
-    border: 1px solid #ddd;
-    padding: 1rem;
-    margin: 1rem 0;
-    width: calc(33.33% - 2rem);
-    text-align: center;
-}
+        .item {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 1rem;
+            margin: 1rem 0;
+            width: calc(33.33% - 2rem);
+            text-align: center;
+        }
 
-.item img {
-    width: 100%;
-}
+        .item img {
+            width: 100%;
+        }
 
-.item h3 {
-    margin: 1rem 0;
-}
+        .item h3 {
+            margin: 1rem 0;
+        }
 
-.item p {
-    margin: 0;
-    color: #777;
-}
+        .item p {
+            margin: 0;
+            color: #777;
+        }
 
-.item button {
-    background-color: #f1c40f;
-    border: none;
-    color: #fff;
-    padding: 0.5rem;
-    margin: 1rem 0;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
+        .item button {
+            background-color: #f1c40f;
+            border: none;
+            color: #fff;
+            padding: 0.5rem;
+            margin: 1rem 0;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
 
-.item button:hover {
-    background-color: #e0b90f;
-}
+        .item button:hover {
+            background-color: #e0b90f;
+        }
 
-section#cart {
-    background-color: #f1c40f;
-    padding: 1rem;
-    color: #fff;
-    text-align: center;
-}
+        section#cart {
+            background-color: #f1c40f;
+            padding: 1rem;
+            color: #fff;
+            text-align: center;
+        }
 
-section#cart ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
+        section#cart ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
 
-section#cart li {
-    margin: 1rem 0;
-}
+        section#cart li {
+            margin: 1rem 0;
+        }
 
-section#cart button {
-    background-color: #fff;
-    border: none;
-    color: #f1c40f;
-    padding: 0.5rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
+        section#cart button {
+            background-color: #fff;
+            border: none;
+            color: #f1c40f;
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
 
-section#cart button:hover {
-    background-color: #e0b90f;
-}
+        section#cart button:hover {
+            background-color: #e0b90f;
+        }
 
-footer {
-    background-color: #f1c40f;
-    padding: 1rem;
-    text-align: center;
-}
+        footer {
+            background-color: #f1c40f;
+            padding: 1rem;
+            text-align: center;
+        }
 
-footer p {
-    margin: 0;
-    color: #fff;
-}
+        footer p {
+            margin: 0;
+            color: #fff;
+        }
     </style>
 </head>
+
 <body>
     <header>
         <h1>Welcome to Our Food Delivery Catalog</h1>
@@ -138,59 +140,95 @@ footer p {
             </ul>
         </nav>
     </header>
-    
+
     <section id="menu">
-        
+
         <div class="item">
-        <img src="food1.jpg" alt="Food Item 1">
-        <h3>Food Item 1</h3>
-        <p>Description of Food Item 1</p>
-        <p>Price: $10.99</p>
-        <label for="toppings">Choose Toppings:</label>
-    <div id="toppings">
-        <label><input type="checkbox" name="topping" value="cheese"> Cheese</label>
-        <label><input type="checkbox" name="topping" value="pepperoni"> Pepperoni</label>
-        <label><input type="checkbox" name="topping" value="mushrooms"> Mushrooms</label>
-        <label><input type="checkbox" name="topping" value="olives"> Olives</label>
-    </div>
-    <button>Add to Cart</button>
-</div>
+            <img src="food1.jpg" alt="Food Item 1">
+            <h3>Food Item 1</h3>
+            <p>Description of Food Item 1</p>
+            <p>Price: $10.99</p>
+            <label for="toppings">Choose Toppings:</label>
+            <div id="toppings">
+                <label><input type="checkbox" name="topping" value="cheese"> Cheese</label>
+                <label><input type="checkbox" name="topping" value="pepperoni"> Pepperoni</label>
+                <label><input type="checkbox" name="topping" value="mushrooms"> Mushrooms</label>
+                <label><input type="checkbox" name="topping" value="olives"> Olives</label>
+            </div>
+            <button>Add to Cart</button>
+        </div>
 
-    @foreach ($Dish as $dish)
-    <div class="item">
-        <img src="food1.jpg" alt="Food Item 1">
-        <h3>{{$dish->name}}</h3>
-        <p>${{$dish->price}}</p>
-        <label for="toppings">Choose Toppings:</label>
-    <div id="toppings">
-        @if ($dish->ingredients->isNotEmpty())
+        @foreach ($Dish as $dish)
+        <div class="item">
+            <img src="food1.jpg" alt="Food Item 1">
+            <h3>{{$dish->name}}</h3>
+            <p>${{$dish->price}}</p>
+            <label for="toppings">Choose Toppings:</label>
+            <div id="toppings">
+                @if ($dish->ingredients->isNotEmpty())
                 @foreach ($dish->ingredients as $ingredient)
-                  <label><input type="checkbox" name="topping" value="cheese">{{ $ingredient->name }}</label>
-                    @if (!$loop->last), @endif
+                <label><input type="checkbox" name="topping" value="cheese">{{ $ingredient->name }}</label>
+                @if (!$loop->last), @endif
                 @endforeach
-            @else
+                @else
                 <em>No ingredients found</em>
-            @endif</td>
-    </div>
-    <button>Add to Cart</button>
-    </div>
-    @endforeach
+                @endif</td>
+            </div>
+            <p class="btn-holder">
+                <button class="btn btn-outline-danger addDishToCart" data-product-id="{{ $dish->id }}">Add to cart</button>
+            </p>
+        </div>
+        @endforeach
 
-        
+
     </section>
+    @section('scripts')
 
-   
-    
+    <script type="text/javascript">
+        $(".addDishToCart").click(function(e) {
+            e.preventDefault();
+
+            var productId = $(this).data("product-id");
+            var productQuantity = $(this).siblings(".product-quantity").val();
+            var cartItemId = $(this).data("cart-item-id");
+
+            $.ajax({
+                url: "{{ route('addDishToCart') }}",
+                method: "POST",
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    product_id: productId,
+                    quantity: productQuantity,
+                    cart_item_id: cartItemId
+                },
+                success: function(response) {
+                    $('#cart-quantity').text(response.cartCount);
+                    alert('Cart Updated');
+                    console.log(response);
+                },
+                error: function(xhr, status, error) {
+                    // Handle errors (e.g., display an error message)
+                    console.error(xhr.responseText);
+                }
+            });
+        });
+    </script>
+
+
+    @endsection
+
+
     <section id="cart">
         <h2>Your Cart</h2>
         <ul>
         </ul>
         <p>Total: $0.00</p>
-        <button>Checkout</button>
+        <a href="{{ route('Cart')}}"> <button type="button" class="btn btn-outline-primary float-right">CheckOut</button></a>
     </section>
-    
+
     <footer>
         <p>&copy; 2024 Food Delivery Catalog. All rights reserved.</p>
     </footer>
 </body>
+
 </html>
