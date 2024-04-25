@@ -69,11 +69,11 @@ class OrderController extends Controller
             ->orderBy('created_at', 'desc')
             ->first();
 
-        if ((int)$lastOrder->price == 0) 
+        if ((int)$lastOrder->price == 0)
         {
             redirect()->route('Cart');
         }
-        
+
         $lastOrder -> status_id = 1;
 
         $lastOrder->save();
@@ -132,7 +132,7 @@ class OrderController extends Controller
     if ($order) {
         $order->status_id = 2;
         $order->save();
-        
+
         return redirect()->back()->with('success', 'Order status updated successfully.');
     }
 
@@ -146,7 +146,7 @@ public function declineOrder($id)
     if ($order) {
         $order->status_id = 7;
         $order->save();
-        
+
         return redirect()->back()->with('success', 'Order status updated successfully.');
     }
 
