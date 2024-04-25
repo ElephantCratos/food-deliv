@@ -65,7 +65,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::get('/Cart', function () {
+Route::get('/cart', function () {
     return view('Cart');
 })->name('Cart');
 
