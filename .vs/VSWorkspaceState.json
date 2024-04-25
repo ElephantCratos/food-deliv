@@ -11,6 +11,6 @@
     "\\resources\\views\\components_fb",
     "\\routes"
   ],
-  "SelectedNode": "\\database\\seeders\\StatusSeeder.php",
+  "SelectedNode": "\\resources\\views\\All_Orders.blade.php",
   "PreviewInSolutionExplorer": false
 }
