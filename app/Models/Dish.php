@@ -12,6 +12,7 @@ class Dish extends Model
     protected $table = 'dish';
 
     protected $fillable = [
+        'id',
         'name',
         'image_path',
         'price',

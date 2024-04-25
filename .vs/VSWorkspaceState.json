@@ -8,9 +8,10 @@
     "\\database\\seeders",
     "\\resources",
     "\\resources\\views",
-    "\\resources\\views\\components_fb",
-    "\\routes"
+    "\\storage",
+    "\\storage\\app",
+    "\\storage\\app\\public"
   ],
-  "SelectedNode": "\\database\\seeders\\StatusSeeder.php",
+  "SelectedNode": "\\public\\Images\\1703351039_mykaleidoscope-ru-p-zelenaya-pitstsa-krasivo-62.jpg",
   "PreviewInSolutionExplorer": false
 }

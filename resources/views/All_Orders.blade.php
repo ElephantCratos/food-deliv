@@ -4,19 +4,36 @@
             {{ __('Your orders') }}
         </h2>
     </x-slot>
-    <div class="menu">
-    <div class="menu__frm1">
-        <a href="{{ route('All_Orders', 1) }}" style="text-decoration: none;"><p class="textOff">in progress</p></a>
-        <a href="{{ route('All_Orders', 2) }}" style="text-decoration: none;"><p class="textOff">awaiting acceptance into the kitchen</p></a>
-        <a href="{{ route('All_Orders', 3) }}" style="text-decoration: none;"><p class="textOff">in the kitchen</p></a>
-        <a href="{{ route('All_Orders', 4) }}" style="text-decoration: none;"><p class="textOff">Waiting for the courier</p></a>
-        <a href="{{ route('All_Orders', 5) }}" style="text-decoration: none;"><p class="textOff">The courier is on the way</p></a>
-        <a href="{{ route('All_Orders', 6) }}" style="text-decoration: none;"><p class="textOff">completed</p></a>
-        <a href="{{ route('All_Orders', 7) }}" style="text-decoration: none;"><p class="textOff">declined</p></a>
-        <a href="{{ route('All_Orders') }}" style="text-decoration: none;"><p class="textOff">All</p></a>
+    <div class="flex justify-center items-center h-screen mt-4">
+    <div class="menu flex justify-center my-8">
+        <div class="menu__frm1 flex justify-around w-full">
+            <a href="{{ route('All_Orders', 1) }}" class="text-decoration-none bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded mx-4">
+                <p class="textOff">in progress</p>
+            </a>
+            <a href="{{ route('All_Orders', 2) }}" class="text-decoration-none bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded mx-4">
+                <p class="textOff">awaiting acceptance into the kitchen</p>
+            </a>
+            <a href="{{ route('All_Orders', 3) }}" class="text-decoration-none bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded mx-4">
+                <p class="textOff">in the kitchen</p>
+            </a>
+            <a href="{{ route('All_Orders', 4) }}" class="text-decoration-none bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded mx-4">
+                <p class="textOff">Waiting for the courier</p>
+            </a>
+            <a href="{{ route('All_Orders', 5) }}" class="text-decoration-none bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded mx-4">
+                <p class="textOff">The courier is on the way</p>
+            </a>
+            <a href="{{ route('All_Orders', 6) }}" class="text-decoration-none bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded mx-4">
+                <p class="textOff">completed</p>
+            </a>
+            <a href="{{ route('All_Orders', 7) }}" class="text-decoration-none bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded mx-4">
+                <p class="textOff">declined</p>
+            </a>
+            <a href="{{ route('All_Orders') }}" class="text-decoration-none bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded mx-4">
+                <p class="textOff">All</p>
+            </a>
+        </div>
     </div>
 </div>
-
     <section>
     @foreach ($Order as $order)
         @if($order->status_id == 1)
