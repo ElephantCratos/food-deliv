@@ -61,6 +61,8 @@ class OrderPositionController extends Controller
 
 
 
+
+
         $OrderPosition->ingredients()->attach($ingredients);
 
 
@@ -72,12 +74,19 @@ class OrderPositionController extends Controller
 
 
         if (empty($lastOrder) || $lastOrder->status_id != null) {
-            
+
             $newOrder = new Order();
             $newOrder->customer_id = $userId;
             $newOrder->status_id = null;
             $newOrder->courier_id = null;
-            $newOrder->price = $dish->price;
+
+            $dishPrice = (float) $dish->price;
+            $dishQuantity = $OrderPosition->quantity;
+
+            $priceIncrease = $dishPrice * $dishQuantity;
+
+
+            $newOrder->price = $newOrder->price + $priceIncrease;
 
             $newOrder->save();
 
@@ -86,8 +95,19 @@ class OrderPositionController extends Controller
         }
         else
         {
-            $lastOrder->price+=$dish->price;
+            $dishPrice = (float) $dish->price;
+            $dishQuantity = $OrderPosition->quantity;
+
+            $priceIncrease = $dishPrice * $dishQuantity;
+
+
+            $lastOrder->price = $lastOrder->price + $priceIncrease;
+
+
             $lastOrder->positions()->attach($OrderPosition);
+            $lastOrder->save();
+
+
         }
 
 
@@ -124,6 +144,29 @@ class OrderPositionController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $orderPosition = OrderPosition::findOrFail($id);
+
+        $userId = Auth::id();
+
+        $lastOrder = Order::where('customer_id', $userId)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+
+        $dish = Dish::findOrFail($orderPosition->dish_id);
+
+        $lastOrder->price -= (float)$dish->price * (float)$orderPosition->quantity;
+        $lastOrder->save();
+
+
+        $orderPosition->ingredients()->detach();
+
+        $orderPosition->delete();
+
+
+
+
+        return redirect()->route('Cart')->with('success', 'Блюдо убрано из заказа');
+
     }
 }

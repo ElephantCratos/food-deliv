@@ -24,7 +24,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return view('dashboard');
     })->name('dashboard');
 
+    Route::delete('/order_position/delete/{id}',[OrderPositionController::class, 'destroy']) ->name('delete-order-position');
     Route::post('/add_to_cart', [OrderPositionController::class, 'store']) -> name('add_to_cart');
+    Route::get('/Cart', [OrderController::class,'showCart'])->name('Cart');
+    Route::post('send_cart', [OrderController::class, 'sendOrder'])->name('send_order');
 
     Route::middleware(['can:access to kitchen panel'])->group(function () {
         Route::get('/Kitchen_Orders', function () {
@@ -92,12 +95,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::get('/Cart', function () {
-    return view('Cart');
-})->name('Cart');
+
 
 Route::get('/catalog', [Dish_controller::class, 'index1'])->name('catalog');
-//Route::get('/Cart', [Dish_controller::class, 'dishCart']);
-Route::post('addToCart', [Dish_controller::class, 'addDishToCart'])->name('addDishToCart');
-Route::delete('/deleteDishFromCart', [Dish_controller::class, 'deleteDishFromCart'])->name('delete.cart.dish');
+
 require __DIR__ . '/auth.php';

@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use Illuminate\Http\Request;
 use App\Models\Dish;
 use App\Models\Ingredient;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class Dish_controller extends Controller
 {
@@ -14,25 +16,38 @@ class Dish_controller extends Controller
      */
    public function index()
     {
+
         $Dish = Dish::OrderBy('name')
             ->get();
 
+
+
        return view('Manager_Menu',compact([
-           'Dish'
+           'Dish',
        ]));
 
 
     }
 
     public function index1()
-{
-    $Dish = Dish::orderBy('name')
-        ->get();
+    {
+        $lastOrder = null;
+        $Dish = Dish::orderBy('name')->get();
 
-   return view('catalog',compact([
-       'Dish'
-   ]));
-}
+        if (Auth::check()) {
+            $userId = Auth::user()->id;
+
+            $lastOrder = Order::where('customer_id', $userId)
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            if ($lastOrder && $lastOrder->status_id != null) {
+                $lastOrder = null;
+            }
+        }
+
+        return view('catalog', compact('Dish', 'lastOrder'));
+    }
 
     /**
      * Show the form for creating a new resource.

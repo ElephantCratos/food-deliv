@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\Status;
+use Illuminate\Support\Facades\Auth;
 
 
 class OrderController extends Controller
@@ -37,6 +38,46 @@ class OrderController extends Controller
     /**
      * Show the form for creating a new resource.
      */
+
+    public function showCart()
+    {
+        $userId = Auth::user()->id;
+
+
+        $lastOrder = Order::where('customer_id', $userId)
+            ->orderBy('created_at', 'desc')
+            ->first();
+        if ($lastOrder->status_id != null)
+        {
+            $lastOrder = null;
+        }
+
+        $positions = $lastOrder ? $lastOrder->positions : null;
+
+
+
+
+        return view('cart',compact('positions','lastOrder'));
+    }
+
+    public function sendOrder()
+    {
+
+        $userId = Auth::user()->id;
+
+        $lastOrder = Order::where('customer_id', $userId)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        $lastOrder -> status_id = 1;
+
+        $lastOrder->save();
+
+
+
+
+        return redirect()->route('Cart')->with('status','Заказ успешно оформлен');
+    }
     public function create()
     {
         //

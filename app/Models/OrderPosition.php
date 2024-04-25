@@ -27,7 +27,7 @@ class OrderPosition extends Model
     }
     public function dish()
     {
-        return $this->belongsToMany(Dish::class);
+        return $this->belongsTo(Dish::class);
     }
 
 }
