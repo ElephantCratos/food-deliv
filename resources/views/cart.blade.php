@@ -16,7 +16,7 @@
 @parent
 @endsection
 @section('content')
-<div class="container mx-auto mt-10">
+<div class="container mx-auto mt-10 mb-10">
     <h1 class="text-2xl font-bold mb-4">Корзина</h1>
 
     <div class="flex flex-col">
@@ -106,6 +106,14 @@
                     <tr>
                         <td><label for="adress">Адресс</label></td>
                         <td><input type="text" name="adress"></input></td>
+                    </tr>
+                    <tr>
+                        <td><label for="fast">Как можно скорее</label></td>
+                        <td><input type="checkbox" name="fast"></input></td>
+                    </tr>
+                    <tr>
+                        <td><label for="time">Время доставки</label></td>
+                        <td><input type="time" name="time" value="{{ now()->addHour()->format('H:i') }}" min="{{ now()->addHour()->format('H:i') }}"></input></td>
                     </tr>
                     <tr>
                         <td><label for="comment">Комментарии к заказу</label></td>

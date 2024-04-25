@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\Status;
+use Illuminate\Contracts\Support\ValidatedData;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -17,22 +18,22 @@ class OrderController extends Controller
     {
         if ($Id) {
             $Order = Order::where('status_id', $Id)->OrderBy('id')->get();
-        }else {
+        } else {
 
-        $Order = Order::OrderBy('id')
-            ->get();
+            $Order = Order::OrderBy('id')
+                ->get();
         }
 
         $Status = Status::OrderBy('id')
             ->get();
 
         foreach ($Order as $order) {
-        $order->status_name = $Status->where('id', $order->status_id)->first()->name;
-    }
+            $order->status_name = $Status->where('id', $order->status_id)->first()->name;
+        }
 
-       return view('All_Orders',compact([
-           'Order'
-       ]));
+        return view('All_Orders', compact([
+            'Order'
+        ]));
     }
 
     /**
@@ -47,21 +48,22 @@ class OrderController extends Controller
         $lastOrder = Order::where('customer_id', $userId)
             ->orderBy('created_at', 'desc')
             ->first();
-        if ($lastOrder != null && $lastOrder->status_id != null)
-        {
+        if ($lastOrder != null && $lastOrder->status_id != null) {
             $lastOrder = null;
         }
 
         $positions = $lastOrder ? $lastOrder->positions : null;
 
-        return view('cart',compact('positions','lastOrder'));
+        return view('cart', compact('positions', 'lastOrder'));
     }
 
     public function sendOrder(Request $request)
     {
         $validatedData = $request->validate([
             'adress' => 'required|string|max:255',
-            'comment'=> '|string|max:255'
+            'comment' => '|string|max:255',
+            'time' => '|date_format:H:i|',
+            'fast' => '|string|'
         ]);
 
         $userId = Auth::user()->id;
@@ -70,13 +72,20 @@ class OrderController extends Controller
             ->orderBy('created_at', 'desc')
             ->first();
 
-        if ((int)$lastOrder->price == 0)
-        {
-           
+        if ((int)$lastOrder->price == 0) {
+
             return redirect()->route('Cart');
         }
 
-        $lastOrder -> status_id = 1;
+        $lastOrder->status_id = 1;
+        $lastOrder->address = $validatedData['adress'];
+        $lastOrder->comment = $validatedData['comment'];
+
+        if (!isset($validatedData['fast']) || $validatedData['fast'] === 'off') {
+            $lastOrder->expected_at = $validatedData['time'];
+        } else {
+            $lastOrder->expected_at = null;
+        }
 
         $lastOrder->save();
 
@@ -128,30 +137,30 @@ class OrderController extends Controller
     }
 
     public function acceptOrder($id)
-{
-    $order = Order::find($id);
+    {
+        $order = Order::find($id);
 
-    if ($order) {
-        $order->status_id = 2;
-        $order->save();
+        if ($order) {
+            $order->status_id = 2;
+            $order->save();
 
-        return redirect()->back()->with('success', 'Order status updated successfully.');
+            return redirect()->back()->with('success', 'Order status updated successfully.');
+        }
+
+        return redirect()->back()->with('error', 'Order not found.');
     }
 
-    return redirect()->back()->with('error', 'Order not found.');
-}
+    public function declineOrder($id)
+    {
+        $order = Order::find($id);
 
-public function declineOrder($id)
-{
-    $order = Order::find($id);
+        if ($order) {
+            $order->status_id = 7;
+            $order->save();
 
-    if ($order) {
-        $order->status_id = 7;
-        $order->save();
+            return redirect()->back()->with('success', 'Order status updated successfully.');
+        }
 
-        return redirect()->back()->with('success', 'Order status updated successfully.');
+        return redirect()->back()->with('error', 'Order not found.');
     }
-
-    return redirect()->back()->with('error', 'Order not found.');
-}
 }
