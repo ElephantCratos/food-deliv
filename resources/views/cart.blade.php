@@ -36,10 +36,15 @@
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Цена
                                     </th>
-                                    <th scope="col" class="relative px-6 py-3"></th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Топинги
+                                    </th>
+                                    <th scope="col" class="relative px-6 py-3 "></th>
                                 </tr>
                             </thead>
                             <tbody>
+                            @if($positions != null)
+                            @forelse ($positions as $position)
 
                                 <tr class="bg-white">
                                     <td class="px-6 py-4 whitespace-nowrap">
@@ -47,37 +52,69 @@
                                             <div class="ml-4">
                                                 <div class="text-sm font-medium text-gray-900">
 
+                                                    {{$position->dish->name}}
                                                 </div>
                                             </div>
                                         </div>
                                     </td>
+
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-gray-900"></div>
+                                        {{$position->quantity}}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-gray-900"></div>
+                                        {{$position->price * $position->quantity}}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900"></div>
+                                        @foreach ($position->ingredients as $ingredient)
+                                            <p>{{ $ingredient->name }}</p>
+                                        @endforeach
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-gray-900"></div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <button class="text-white bg-red-500 hover:bg-red-700 font-bold py-2 px-3 rounded">Удалить</button>
+                                        <form action="{{route('delete-order-position',$position -> id)}}" method="post">
+                                            @csrf
+                                            @method('DELETE')
+                                        <button class="text-white bg-red-500 hover:bg-red-700 font-bold py-2 px-3 rounded" type="submit">Удалить</button>
+                                        </form>
+
                                     </td>
                                 </tr>
+                            @empty
+                                <p>Ваша корзина пуста</p>
+                            @endforelse
 
+                            @else
+                                <p>Ваша корзина пуста</p>
+
+                                @endif
                             </tbody>
                         </table>
+
                     </div>
                 </div>
             </div>
 
             <div class="mt-4 flex justify-end">
                 <div class="bg-blue-500 text-white font-bold py-2 px-4 mx-2 rounded">
-                    Итого:
+                    @if($lastOrder!=null)
+                    Итого:{{$lastOrder->price}}
+                    @else
+                    Итого:0
+                        @endif
                 </div>
-                <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                    <form action="{{route('send_order')}}" method="POST">
+                        @csrf
+                <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" type="submit">
                     Оформить заказ
                 </button>
+                    </form>
+
+
             </div>
         </div>
     </div>

@@ -193,7 +193,11 @@
         <h2>Your Cart</h2>
         <ul>
         </ul>
-        <p>Total: $0.00</p>
+        @if($lastOrder!=null)
+            Итого:{{$lastOrder->price}}
+        @else
+            Итого:0
+        @endif
         <a href="{{ route('Cart')}}"> <button type="button" class="btn btn-outline-primary float-right">CheckOut</button></a>
     </section>
 
