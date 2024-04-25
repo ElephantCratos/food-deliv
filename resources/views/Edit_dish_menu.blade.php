@@ -8,15 +8,15 @@
                 <input type="file" name="image_path" id="image" class="text-white">
             </div>
             <h3 class="text-white">
-                <label for="foodName">Food Name:</label>
+                <label for="foodName" class="text-white">Food Name:</label>
                 <input type="text" id="foodName" name="name" value="{{ $dish->name }}" required>
             </h3>
-            <p class="text-white">
-                <label for="foodPrice">Price:</label>
+            <p>
+                <label for="foodPrice" class="text-white">Price:</label>
                 <input type="text" id="foodPrice" name="price" value="{{ $dish->price }}" required>
             </p>
             <label for="toppings" class="text-white">Choose Toppings:</label>
-            <div id="toppings" class="text-white">
+            <div id="toppings"class="text-white">
                 @foreach ($ingredients as $ingredient)
                     <div class="topping">
                         <label><input type="checkbox" name="ingredients[]" value="{{ $ingredient->id }}" @if($dish->ingredients->contains($ingredient)) checked @endif>{{ $ingredient->name }}</label>
