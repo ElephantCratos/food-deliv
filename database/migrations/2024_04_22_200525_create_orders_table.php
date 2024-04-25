@@ -15,6 +15,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('description');
             $table->decimal('price', 10, 2);
+            $table->timestamps();
         });
 
         Schema::create('dish', function (Blueprint $table) {
@@ -31,11 +32,11 @@ return new class extends Migration
         Schema::create('order_position', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('selected_ingredients_id')->references('id')->on('ingredients');
             $table->foreignId('dish_id')->references('id')->on('dish');
 
             $table->decimal('price', 10, 2);
             $table->integer('quantity');
+            $table->timestamps();
         });
 
 
@@ -44,21 +45,26 @@ return new class extends Migration
         Schema::create('status', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->timestamps();
         });
 
 
 
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('products_id')->references('id')->on('order_position');
-            $table->foreignId('customer_id')->references('id')->on('users');
-            $table->foreignId('courier_id')->references('id')->on('users');
-            $table->foreignId('status_id')->references('id')->on('status');
+            $table->foreignId('customer_id')->nullable()->references('id')->on('users');
+            $table->foreignId('courier_id')->nullable()->references('id')->on('users');
+            $table->foreignId('status_id')->nullable()->references('id')->on('status');
             $table->decimal('price', 10, 2);
-            $table->string('address');
-            $table->string('comment');
+            $table->string('address')->nullable();
+            $table->string('comment')->nullable();
             $table->timestamps();
         });
+
+        Schema::table('dish', function (Blueprint $table) {
+    $table->dropForeign(['extra_ingredients_id']);
+    $table->dropColumn('extra_ingredients_id');
+});
     }
 
 

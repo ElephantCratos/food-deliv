@@ -9,9 +9,9 @@ class OrderPosition extends Model
 {
     use HasFactory;
 
+    protected $table = 'order_position';
     protected $fillable = [
         'description',
-        'selected_ingredients_id',
         'dish_id',
         'price',
         'quantity',

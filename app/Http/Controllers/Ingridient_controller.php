@@ -30,6 +30,16 @@ class Ingridient_controller extends Controller
        ]));
     }
 
+    public function index2()
+    {
+        $ingredient = Ingredient::OrderBy('name')
+            ->get();
+
+       return view('Add_ingredient',compact([
+           'ingredient'
+       ]));
+    }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -43,7 +53,19 @@ class Ingridient_controller extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+        ]);
+
+        $ingredient = Ingredient::create([
+            'name' => $request->name,
+            'description' => $request->description,
+            'price' => $request->price,
+        ]);
+
+        return redirect()->route('dashboard')->with('success', 'Dish created successfully.');
     }
 
     /**
@@ -57,24 +79,37 @@ class Ingridient_controller extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
-    {
-        //
-    }
+    public function edit($id)
+{
+    $ingredient = Ingredient::findOrFail($id);
+    return view('edit_ingredient', compact('ingredient'));
+}
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+    public function update($id, Request $request)
+{
+    $validatedData = $request->validate([
+        'name' => 'required|string|max:255',
+        'description' => 'required|string',
+        'price' => 'required|numeric|min:0',
+    ]);
+
+    $ingredient = Ingredient::findOrFail($id);
+    $ingredient->update($validatedData);
+
+    return redirect()->route('dashboard')->with('success', 'Ingredient updated successfully.');
+}
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function delete($id)
     {
-        //
+        $ingredient = Ingredient::findOrFail($id);
+    $ingredient->delete();
+
+    return redirect()->route('dashboard')->with('success', 'Dish deleted successfully.');
     }
 }

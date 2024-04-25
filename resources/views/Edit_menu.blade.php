@@ -6,13 +6,13 @@
                 <label for="image" class="text-white">Image</label>
                 <input type="file" name="image_path" id="image" class="text-white">
             </div>
-            <h3 class="text-white">
-                <label for="foodName">Food Name:</label>
-                <input type="text" id="foodName" name="name" value="Food Item 1" required>
+            <h3>
+                <label class="text-white" for="foodName">Food Name:</label>
+                <input type="text" id="foodName" name="name" value="" required>
             </h3>
-            <p class="text-white">
-                <label for="foodPrice">Price:</label>
-                <input type="text" id="foodPrice" name="price" value="$10.99" required>
+            <p>
+                <label class="text-white" for="foodPrice">Price:</label>
+                <input type="text" id="foodPrice" name="price" value="" required>
             </p>
             <label for="toppings" class="text-white">Choose Toppings:</label>
             <div id="toppings" class="text-white">

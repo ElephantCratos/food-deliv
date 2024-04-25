@@ -11,17 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('order_and_order_position', function (Blueprint $table) {
+        Schema::create('order_order_position', function (Blueprint $table) {
             $table->unsignedBigInteger('order_id');
-            $table->unsignedBigInteger('position_id');
+            $table->unsignedBigInteger('order_position_id');
             $table->timestamps();
 
 
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
-            $table->foreign('position_id')->references('id')->on('order_position')->onDelete('cascade');
+            $table->foreign('order_position_id')->references('id')->on('order_position')->onDelete('cascade');
 
 
-            $table->primary(['order_id', 'position_id']);
 
         });
 
@@ -38,6 +37,20 @@ return new class extends Migration
             $table->primary(['dish_id', 'ingredients_id']);
 
         });
+
+        Schema::create('order_position_and_ingredients', function (Blueprint $table) {
+            $table->unsignedBigInteger('order_position_id');
+            $table->unsignedBigInteger('ingredients_id');
+            $table->timestamps();
+
+
+            $table->foreign('order_position_id')->references('id')->on('order_position')->onDelete('cascade');
+            $table->foreign('ingredients_id')->references('id')->on('ingredients')->onDelete('cascade');
+
+
+            $table->primary(['order_position_id', 'ingredients_id']);
+
+        });
     }
 
 
@@ -49,5 +62,7 @@ return new class extends Migration
         Schema::dropIfExists('order_and_order_position');
 
         Schema::dropIfExists('dish_and_ingredients');
+
+        Schema::dropIfExists('order_position_and_ingredients');
     }
 };

@@ -26,7 +26,14 @@
                                 @endif</td>
                             <td class="border-2 border-slate-300 p-5 text-white text-center">{{ $dish->price }}</td>
                             <td class="border-2 border-slate-300 p-5 text-white text-center">
-                                <a href=""class="text-blue-500 underline">Изменить</a>
+                                <form method="get" action="{{ route('dish.edit', $dish->id) }}">
+                                        <button type="submit" class="text-blue-500 underline">Изменить</button>
+                                </form>
+                                <form method="POST" action="{{ route('dish.delete', $dish->id) }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-blue-500 underline">Удалить</button>
+                                </form>
                             </td>
                         </tr>
                     @endforeach
