@@ -92,10 +92,10 @@ class Dish_controller extends Controller
      */
     public function update($id, Request $request)
 {
-    
+
     $validatedData = $request->validate([
         'name' => 'required|string|max:255',
-        'image_path' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        'image_path' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         'price' => 'required|numeric|min:0',
     ]);
 

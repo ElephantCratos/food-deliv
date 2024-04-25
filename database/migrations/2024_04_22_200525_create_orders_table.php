@@ -36,6 +36,7 @@ return new class extends Migration
 
             $table->decimal('price', 10, 2);
             $table->integer('quantity');
+            $table->timestamps();
         });
 
 
@@ -51,13 +52,12 @@ return new class extends Migration
 
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('products_id')->references('id')->on('order_position');
-            $table->foreignId('customer_id')->references('id')->on('users');
-            $table->foreignId('courier_id')->references('id')->on('users');
-            $table->foreignId('status_id')->references('id')->on('status');
+            $table->foreignId('customer_id')->nullable()->references('id')->on('users');
+            $table->foreignId('courier_id')->nullable()->references('id')->on('users');
+            $table->foreignId('status_id')->nullable()->references('id')->on('status');
             $table->decimal('price', 10, 2);
-            $table->string('address');
-            $table->string('comment');
+            $table->string('address')->nullable();
+            $table->string('comment')->nullable();
             $table->timestamps();
         });
 

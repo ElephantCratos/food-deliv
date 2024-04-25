@@ -11,17 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('order_and_order_position', function (Blueprint $table) {
+        Schema::create('order_order_position', function (Blueprint $table) {
             $table->unsignedBigInteger('order_id');
-            $table->unsignedBigInteger('position_id');
+            $table->unsignedBigInteger('order_position_id');
             $table->timestamps();
 
 
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
-            $table->foreign('position_id')->references('id')->on('order_position')->onDelete('cascade');
+            $table->foreign('order_position_id')->references('id')->on('order_position')->onDelete('cascade');
 
 
-            $table->primary(['order_id', 'position_id']);
 
         });
 
