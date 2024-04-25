@@ -3,35 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Order;
-use App\Models\Status;
 
-
-class OrderController extends Controller
+class StatusController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index($Id = null)
+    public function index()
     {
-        if ($Id) {
-            $Order = Order::where('status_id', $Id)->OrderBy('id')->get();
-        }else {
-
-        $Order = Order::OrderBy('id')
-            ->get();
-        }
-
-        $Status = Status::OrderBy('id')
-            ->get();
-
-        foreach ($Order as $order) {
-        $order->status_name = $Status->where('id', $order->status_id)->first()->name;
-    }
-
-       return view('All_Orders',compact([
-           'Order'
-       ]));
+        //
     }
 
     /**
