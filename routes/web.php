@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Dish_controller;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\Ingridient_controller;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OrderController;
@@ -39,12 +40,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
         })->name('Courier_Orders');
     });
 
+    Route::middleware(['can:access to chat'])->group(function() {
+        Route::get('/users', [ChatController::class, 'showUsers']);
+        Route::get('/chat/{userId}', [ChatController::class, 'showChat']);
+        Route::post('/chat/{userId}', [ChatController::class, 'sendMessage']);
+    });
+
     Route::middleware(['can:access to manager panel'])->group(function () {
         //Route::get('/Edit_menu', function () {
         //    return view('Edit_menu');
         //})->name('Edit_menu');
 
+
         Route::get('/All_Orders', [OrderController::class, 'index'])->name('All_Orders');
+
 
         Route::get('/Manager_Ingredients',[Ingridient_controller::class, 'index1'])->name('Manager_Ingredients');
 
