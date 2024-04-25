@@ -58,7 +58,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
         Route::get('/All_Orders/{category?}', [OrderController::class, 'index'])->name('All_Orders');
-
+        Route::post('/orders/{id}/accept', [OrderController::class, 'acceptOrder'])->name('orders.accept');
+        Route::post('/orders/{id}/decline', [OrderController::class, 'declineOrder'])->name('orders.decline');
 
         Route::get('/Manager_Ingredients', [Ingridient_controller::class, 'index1'])->name('Manager_Ingredients');
 
