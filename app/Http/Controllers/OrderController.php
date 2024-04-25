@@ -47,7 +47,7 @@ class OrderController extends Controller
         $lastOrder = Order::where('customer_id', $userId)
             ->orderBy('created_at', 'desc')
             ->first();
-        if ($lastOrder->status_id != null)
+        if ($lastOrder != null && $lastOrder->status_id != null)
         {
             $lastOrder = null;
         }
@@ -69,12 +69,14 @@ class OrderController extends Controller
             ->orderBy('created_at', 'desc')
             ->first();
 
+        if ((int)$lastOrder->price == 0) 
+        {
+            redirect()->route('Cart');
+        }
+        
         $lastOrder -> status_id = 1;
 
         $lastOrder->save();
-
-
-
 
         return redirect()->route('Cart')->with('status','Заказ успешно оформлен');
     }

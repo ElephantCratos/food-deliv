@@ -1,22 +1,21 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+@extends('layouts.baseLayout')
 
-<head>
-    <meta charset="utf-8">
+@section('head')
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
-
+    @section('title')
+    {{ config('app.name', 'Laravel') }}
+    @endsection
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+@endsection
 
-    <!-- Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-
-<body>
+@section('nav')
+    @parent
+@endsection
+@section('content')
     <div class="container mx-auto mt-10">
         <h1 class="text-2xl font-bold mb-4">Корзина</h1>
 
@@ -43,8 +42,8 @@
                                 </tr>
                             </thead>
                             <tbody>
-                            @if($positions != null)
-                            @forelse ($positions as $position)
+                                @if($positions != null)
+                                @forelse ($positions as $position)
 
                                 <tr class="bg-white">
                                     <td class="px-6 py-4 whitespace-nowrap">
@@ -69,7 +68,7 @@
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-gray-900"></div>
                                         @foreach ($position->ingredients as $ingredient)
-                                            <p>{{ $ingredient->name }}</p>
+                                        <p>{{ $ingredient->name }}</p>
                                         @endforeach
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
@@ -79,16 +78,16 @@
                                         <form action="{{route('delete-order-position',$position -> id)}}" method="post">
                                             @csrf
                                             @method('DELETE')
-                                        <button class="text-white bg-red-500 hover:bg-red-700 font-bold py-2 px-3 rounded" type="submit">Удалить</button>
+                                            <button class="text-white bg-red-500 hover:bg-red-700 font-bold py-2 px-3 rounded" type="submit">Удалить</button>
                                         </form>
 
                                     </td>
                                 </tr>
-                            @empty
+                                @empty
                                 <p>Ваша корзина пуста</p>
-                            @endforelse
+                                @endforelse
 
-                            @else
+                                @else
                                 <p>Ваша корзина пуста</p>
 
                                 @endif
@@ -102,24 +101,23 @@
             <div class="mt-4 flex justify-end">
                 <div class="bg-blue-500 text-white font-bold py-2 px-4 mx-2 rounded">
                     @if($lastOrder!=null)
-                    Итого:{{$lastOrder->price}}
+                    Итого: {{$lastOrder->price}}
                     @else
-                    Итого:0
-                        @endif
+                    Итого: 0
+                    @endif
                 </div>
-                    <form action="{{route('send_order')}}" method="POST">
-                        @csrf
-                <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" type="submit">
-                    Оформить заказ
-                </button>
-                    </form>
+                <form action="{{route('send_order')}}" method="POST">
+                    @csrf
+                    <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" type="submit">
+                        Оформить заказ
+                    </button>
+                </form>
 
 
             </div>
         </div>
     </div>
-
-
-</body>
-
-</html>
+@endsection
+@section('footer')
+    2024 Food Delivery Catalog. All rights reserved.
+@endsection
