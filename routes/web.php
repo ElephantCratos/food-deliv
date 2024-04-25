@@ -7,7 +7,8 @@ use App\Http\Controllers\Ingridient_controller;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderPositionController;
-
+use App\Http\Controllers\KitchenController;
+use App\Http\Controllers\CourierController;
 Route::get('/', function () {
     return view('welcome');
 });
@@ -18,19 +19,24 @@ Route::get('/', function () {
 
 
 
+//kithunes
+
+
 Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
 
-    Route::post('/add_to_cart', [OrderPositionController::class, 'store']) -> name('add_to_cart');
+    Route::post('/add_to_cart', [OrderPositionController::class, 'store'])->name('add_to_cart');
 
     Route::middleware(['can:access to kitchen panel'])->group(function () {
-        Route::get('/Kitchen_Orders', function () {
-            return view('Kitchen_Orders');
-        })->name('Kitchen_Orders');
+        Route::get('/Kitchen_Orders', [KitchenController::class, 'index'])->name('Kitchen_Orders');
+        Route::post('/Kitchen_Orders/{id}/confirm', [KitchenController::class, 'confirmPreparation'])->name('kitchen.confirm');
+        Route::post('/Kitchen_Orders{id}/transfer', [KitchenController::class, 'transferToCourier'])->name('kitchen.transfer');
+
     });
+
 
     Route::middleware(['can:access to user panel'])->group(function () {
 
@@ -39,10 +45,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         })->name('Customer_Orders');
     });
 
-    Route::middleware(['can:access to courier panel'])->group(function () {
-        Route::get('/Courier_Orders', function () {
-            return view('Courier_Orders');
-        })->name('Courier_Orders');
+    Route::middleware(['auth', 'verified'])->group(function () {
+        Route::middleware(['can:access to courier panel'])->group(function () {
+            Route::get('/Courier_Orders', [CourierController::class, 'index'])->name('Courier_Orders');
+            Route::post('/Courier_Orders/{id}/confirm-delivery', [CourierController::class, 'confirmDelivery'])->name('courier.confirm');
+        });
     });
 
     Route::middleware(['can:access to chat'])->group(function() {

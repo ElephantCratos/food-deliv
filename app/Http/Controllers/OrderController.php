@@ -16,23 +16,24 @@ class OrderController extends Controller
     {
         if ($Id) {
             $Order = Order::where('status_id', $Id)->OrderBy('id')->get();
-        }else {
-
-        $Order = Order::OrderBy('id')
-            ->get();
+        } else {
+            $Order = Order::OrderBy('id')->get();
         }
 
-        $Status = Status::OrderBy('id')
-            ->get();
+        $Status = Status::OrderBy('id')->get();
 
         foreach ($Order as $order) {
-        $order->status_name = $Status->where('id', $order->status_id)->first()->name;
+            $status = $Status->where('id', $order->status_id)->first();
+            if ($status) {
+                $order->status_name = $status->name;
+            } else {
+                $order->status_name = 'Unknown';
+            }
+        }
+
+        return view('All_Orders', compact('Order'));
     }
 
-       return view('All_Orders',compact([
-           'Order'
-       ]));
-    }
 
     /**
      * Show the form for creating a new resource.
