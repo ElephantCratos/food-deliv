@@ -3,17 +3,21 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Ingredient;
-use App\Models\Dish;
+use App\Models\Order;
 
-class OrderPositionController extends Controller
+class OrderController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
+        $Order = Order::OrderBy('id')
+            ->get();
 
+       return view('All_Orders',compact([
+           'Order'
+       ]));
     }
 
     /**
@@ -21,29 +25,15 @@ class OrderPositionController extends Controller
      */
     public function create()
     {
-
+        //
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store($id, $price, Request $request)
+    public function store(Request $request)
     {
-        $request->validate([
-            'quantity'=>'required|numeric|min:0',
-        ]);
-
-        $OrderPosition = OrderPosition::create([
-            'dish_id' => $id,
-            'price' => $price,
-            'quantity' => $request->quantity,
-        ]);
-
-        $ingredients = Ingredient::whereIn('id', $request->input('ingredients', []))->get();
-
-        $OrderPosition->ingredients()->attach($ingredients);
-
-        return redirect()->route('dashboard')->with('success', 'Dish created successfully.');
+        //
     }
 
     /**
@@ -65,7 +55,7 @@ class OrderPositionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request)
+    public function update(Request $request, string $id)
     {
         //
     }

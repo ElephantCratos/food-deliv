@@ -4,7 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Dish_controller;
 use App\Http\Controllers\Ingridient_controller;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\OrderController;
 Route::get('/', function () {
     return view('welcome');
 });
@@ -44,9 +44,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         //    return view('Edit_menu');
         //})->name('Edit_menu');
 
-        Route::get('/All_Orders', function () {
-            return view('All_Orders');
-        })->name('All_Orders');
+        Route::get('/All_Orders', [OrderController::class, 'index'])->name('All_Orders');
 
         Route::get('/Manager_Ingredients',[Ingridient_controller::class, 'index1'])->name('Manager_Ingredients');
 
