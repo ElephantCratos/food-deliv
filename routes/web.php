@@ -2,8 +2,11 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Dish_controller;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\Ingridient_controller;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderPositionController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -20,6 +23,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+
+    Route::post('/add_to_cart', [OrderPositionController::class, 'store']) -> name('add_to_cart');
 
     Route::middleware(['can:access to kitchen panel'])->group(function () {
         Route::get('/Kitchen_Orders', function () {
@@ -40,22 +45,44 @@ Route::middleware(['auth', 'verified'])->group(function () {
         })->name('Courier_Orders');
     });
 
+    Route::middleware(['can:access to chat'])->group(function() {
+        Route::get('/users', [ChatController::class, 'showUsers'])->name('Users_list');
+        Route::get('/chat/{userId}', [ChatController::class, 'showChat']);
+        Route::post('/chat/{userId}', [ChatController::class, 'sendMessage']);
+    });
+
     Route::middleware(['can:access to manager panel'])->group(function () {
         //Route::get('/Edit_menu', function () {
         //    return view('Edit_menu');
         //})->name('Edit_menu');
 
-        Route::get('/All_Orders', function () {
-            return view('All_Orders');
-        })->name('All_Orders');
+
+        Route::get('/All_Orders/{category?}', [OrderController::class, 'index'])->name('All_Orders');
+
 
         Route::get('/Manager_Ingredients', [Ingridient_controller::class, 'index1'])->name('Manager_Ingredients');
 
         Route::post('/dish', [Dish_controller::class, 'store'])->name('dish.store');
 
-        Route::get('/Manager_Menu', [Dish_controller::class, 'index'])->name('Manager_Menu');
 
-        Route::get('/Edit_menu', [Ingridient_controller::class, 'index'])->name('Edit_menu');
+        Route::post('/ingredient', [ingridient_controller::class, 'store'])->name('ingredient.store');
+
+        Route::get('/Add_ingredient', [ingridient_controller::class, 'index2'])->name('Add_ingredient');
+
+        Route::get('/Manager_Menu',[Dish_controller::class, 'index'])->name('Manager_Menu');
+
+        Route::get('/Edit_menu',[Ingridient_controller::class, 'index'])->name('Edit_menu');
+
+        Route::get('/dish/{id}/edit', [Dish_controller::class, 'edit'])->name('dish.edit');
+
+        Route::put('/dish/{id}', [Dish_controller::class, 'update'])->name('dish.update');
+
+        Route::get('/ingredient/{id}/edit', [Ingridient_controller::class, 'edit'])->name('ingredient.edit');
+        Route::put('/ingredient/{id}', [Ingridient_controller::class, 'update'])->name('ingredient.update');
+
+        Route::delete('/dish/delete/{id}', [Dish_controller::class, 'delete'])->name('dish.delete');
+        Route::delete('/ingredient/delete/{id}', [Ingridient_controller::class, 'delete'])->name('Ingridient.delete');
+
     });
 });
 

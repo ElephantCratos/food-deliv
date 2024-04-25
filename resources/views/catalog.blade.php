@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <title>Food Delivery Catalog</title>
     <style>
         body {
@@ -143,79 +144,49 @@
 
     <section id="menu">
 
-        <div class="item">
-            <img src="food1.jpg" alt="Food Item 1">
-            <h3>Food Item 1</h3>
-            <p>Description of Food Item 1</p>
-            <p>Price: $10.99</p>
-            <label for="toppings">Choose Toppings:</label>
-            <div id="toppings">
-                <label><input type="checkbox" name="topping" value="cheese"> Cheese</label>
-                <label><input type="checkbox" name="topping" value="pepperoni"> Pepperoni</label>
-                <label><input type="checkbox" name="topping" value="mushrooms"> Mushrooms</label>
-                <label><input type="checkbox" name="topping" value="olives"> Olives</label>
-            </div>
-            <button>Add to Cart</button>
-        </div>
 
-        @foreach ($Dish as $dish)
-        <div class="item">
-            <img src="food1.jpg" alt="Food Item 1">
-            <h3>{{$dish->name}}</h3>
-            <p>${{$dish->price}}</p>
-            <label for="toppings">Choose Toppings:</label>
-            <div id="toppings">
-                @if ($dish->ingredients->isNotEmpty())
+        <div class="item ">
+        <img src="food1.jpg" alt="Food Item 1">
+        <h3>Food Item 1</h3>
+        <p>Description of Food Item 1</p>
+        <p>Price: $10.99</p>
+        <label for="toppings">Choose Toppings:</label>
+    <div id="toppings">
+        <label><input type="checkbox" name="topping" value="cheese"> Cheese</label>
+        <label><input type="checkbox" name="topping" value="pepperoni"> Pepperoni</label>
+        <label><input type="checkbox" name="topping" value="mushrooms"> Mushrooms</label>
+        <label><input type="checkbox" name="topping" value="olives"> Olives</label>
+    </div>
+            <label for="quantity">Quantity:</label><br>
+    <button>Add to Cart</button>
+</div>
+
+    @foreach ($Dish as $dish)
+    <div class="item ">
+        <img src="food1.jpg" alt="Food Item 1">
+        <h3>{{$dish->name}}</h3>
+        <p>${{$dish->price}}</p>
+        <label for="toppings">Choose Toppings:</label>
+        <form method="POST" action="{{ route('add_to_cart')}}">
+            @csrf
+    <div id="toppings" >
+        @if ($dish->ingredients->isNotEmpty())
                 @foreach ($dish->ingredients as $ingredient)
-                <label><input type="checkbox" name="topping" value="cheese">{{ $ingredient->name }}</label>
-                @if (!$loop->last), @endif
+                  <label><input type="checkbox" name="topping{{$ingredient->id}}"  value="{{$ingredient->id}}">{{ $ingredient->name }}</label>
+                    @if (!$loop->last), @endif
+
                 @endforeach
                 @else
                 <em>No ingredients found</em>
-                @endif</td>
-            </div>
-            <p class="btn-holder">
-                <button class="btn btn-outline-danger addDishToCart" data-product-id="{{ $dish->id }}">Add to cart</button>
-            </p>
-        </div>
-        @endforeach
 
+            @endif
+    </div>
+            <input type="hidden" name="dish_id" value="{{$dish->id}}">
+            <input type="number" id="quantity" name="quantity" min="1" value="1"><br>
+            <button type="submit">Add to Cart</button>
+            </form>
+    @endforeach
 
-    </section>
-    @section('scripts')
-
-    <script type="text/javascript">
-        $(".addDishToCart").click(function(e) {
-            e.preventDefault();
-
-            var productId = $(this).data("product-id");
-            var productQuantity = $(this).siblings(".product-quantity").val();
-            var cartItemId = $(this).data("cart-item-id");
-
-            $.ajax({
-                url: "{{ route('addDishToCart') }}",
-                method: "POST",
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    product_id: productId,
-                    quantity: productQuantity,
-                    cart_item_id: cartItemId
-                },
-                success: function(response) {
-                    $('#cart-quantity').text(response.cartCount);
-                    alert('Cart Updated');
-                    console.log(response);
-                },
-                error: function(xhr, status, error) {
-                    // Handle errors (e.g., display an error message)
-                    console.error(xhr.responseText);
-                }
-            });
-        });
-    </script>
-
-
-    @endsection
 
 
     <section id="cart">

@@ -22,7 +22,9 @@ class DatabaseSeeder extends Seeder
             ManagerSeeder::class,
             KitchenSeeder::class,
             CourierSeeder::class,
-            UserSeeder::class
+            UserSeeder::class,
+            StatusSeeder::class,
+            IngredientSeeder::class
 
         ]);
     }

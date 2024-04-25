@@ -5,12 +5,13 @@
     "\\app\\Http",
     "\\app\\Http\\Controllers",
     "\\app\\Models",
-    "\\public",
-    "\\public\\Images",
+    "\\database",
+    "\\database\\migrations",
     "\\resources",
     "\\resources\\views",
-    "\\resources\\views\\layouts"
+    "\\resources\\views\\components_fb",
+    "\\routes"
   ],
-  "SelectedNode": "\\resources\\views",
+  "SelectedNode": "\\database\\migrations\\2024_04_22_200525_create_orders_table.php",
   "PreviewInSolutionExplorer": false
 }

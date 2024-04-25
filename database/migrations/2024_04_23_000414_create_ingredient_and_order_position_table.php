@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ingredient_and_order_position', function (Blueprint $table) {
+        Schema::create('ingredient_order_position', function (Blueprint $table) {
             $table->unsignedBigInteger('order_position_id');
             $table->unsignedBigInteger('ingredient_id');
             $table->timestamps();
@@ -21,7 +21,7 @@ return new class extends Migration
             $table->foreign('ingredient_id')->references('id')->on('ingredients')->onDelete('cascade');
 
 
-            $table->primary(['order_position_id', 'ingredient_id']);
+
 
         });
     }
