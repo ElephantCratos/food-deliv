@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,126 +8,127 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <title>Food Delivery Catalog</title>
     <style>
-       body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-}
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
 
-header {
-    background-color: #f1c40f;
-    padding: 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+        header {
+            background-color: #f1c40f;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-header h1 {
-    margin: 0;
-    color: #fff;
-}
+        header h1 {
+            margin: 0;
+            color: #fff;
+        }
 
-nav ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-}
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
 
-nav ul li {
-    margin: 0 1rem;
-}
+        nav ul li {
+            margin: 0 1rem;
+        }
 
-nav ul li a {
-    color: #fff;
-    text-decoration: none;
-}
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+        }
 
-section#menu {
-    display: flex;
-    flex-wrap: wrap;
-    padding: 1rem;
-    justify-content: space-between;
-}
+        section#menu {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 1rem;
+            justify-content: space-between;
+        }
 
-.item {
-    background-color: #fff;
-    border: 1px solid #ddd;
-    padding: 1rem;
-    margin: 1rem 0;
-    width: calc(33.33% - 2rem);
-    text-align: center;
-}
+        .item {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 1rem;
+            margin: 1rem 0;
+            width: calc(33.33% - 2rem);
+            text-align: center;
+        }
 
-.item img {
-    width: 100%;
-}
+        .item img {
+            width: 100%;
+        }
 
-.item h3 {
-    margin: 1rem 0;
-}
+        .item h3 {
+            margin: 1rem 0;
+        }
 
-.item p {
-    margin: 0;
-    color: #777;
-}
+        .item p {
+            margin: 0;
+            color: #777;
+        }
 
-.item button {
-    background-color: #f1c40f;
-    border: none;
-    color: #fff;
-    padding: 0.5rem;
-    margin: 1rem 0;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
+        .item button {
+            background-color: #f1c40f;
+            border: none;
+            color: #fff;
+            padding: 0.5rem;
+            margin: 1rem 0;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
 
-.item button:hover {
-    background-color: #e0b90f;
-}
+        .item button:hover {
+            background-color: #e0b90f;
+        }
 
-section#cart {
-    background-color: #f1c40f;
-    padding: 1rem;
-    color: #fff;
-    text-align: center;
-}
+        section#cart {
+            background-color: #f1c40f;
+            padding: 1rem;
+            color: #fff;
+            text-align: center;
+        }
 
-section#cart ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
+        section#cart ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
 
-section#cart li {
-    margin: 1rem 0;
-}
+        section#cart li {
+            margin: 1rem 0;
+        }
 
-section#cart button {
-    background-color: #fff;
-    border: none;
-    color: #f1c40f;
-    padding: 0.5rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
+        section#cart button {
+            background-color: #fff;
+            border: none;
+            color: #f1c40f;
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
 
-section#cart button:hover {
-    background-color: #e0b90f;
-}
+        section#cart button:hover {
+            background-color: #e0b90f;
+        }
 
-footer {
-    background-color: #f1c40f;
-    padding: 1rem;
-    text-align: center;
-}
+        footer {
+            background-color: #f1c40f;
+            padding: 1rem;
+            text-align: center;
+        }
 
-footer p {
-    margin: 0;
-    color: #fff;
-}
+        footer p {
+            margin: 0;
+            color: #fff;
+        }
     </style>
 </head>
+
 <body>
     <header>
         <h1>Welcome to Our Food Delivery Catalog</h1>
@@ -141,6 +143,7 @@ footer p {
     </header>
 
     <section id="menu">
+
 
         <div class="item ">
         <img src="food1.jpg" alt="Food Item 1">
@@ -171,9 +174,11 @@ footer p {
                 @foreach ($dish->ingredients as $ingredient)
                   <label><input type="checkbox" name="topping{{$ingredient->id}}"  value="{{$ingredient->id}}">{{ $ingredient->name }}</label>
                     @if (!$loop->last), @endif
+
                 @endforeach
-            @else
+                @else
                 <em>No ingredients found</em>
+
             @endif
     </div>
             <input type="hidden" name="dish_id" value="{{$dish->id}}">
@@ -183,20 +188,18 @@ footer p {
     @endforeach
 
 
-    </section>
-
-
 
     <section id="cart">
         <h2>Your Cart</h2>
         <ul>
         </ul>
         <p>Total: $0.00</p>
-        <button>Checkout</button>
+        <a href="{{ route('Cart')}}"> <button type="button" class="btn btn-outline-primary float-right">CheckOut</button></a>
     </section>
 
     <footer>
         <p>&copy; 2024 Food Delivery Catalog. All rights reserved.</p>
     </footer>
 </body>
+
 </html>

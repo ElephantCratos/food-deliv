@@ -33,6 +33,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     Route::middleware(['can:access to user panel'])->group(function () {
+
         Route::get('/Customer_Orders', function () {
             return view('Customer_Orders');
         })->name('Customer_Orders');
@@ -59,9 +60,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/All_Orders/{category?}', [OrderController::class, 'index'])->name('All_Orders');
 
 
-        Route::get('/Manager_Ingredients',[Ingridient_controller::class, 'index1'])->name('Manager_Ingredients');
+        Route::get('/Manager_Ingredients', [Ingridient_controller::class, 'index1'])->name('Manager_Ingredients');
 
         Route::post('/dish', [Dish_controller::class, 'store'])->name('dish.store');
+
 
         Route::post('/ingredient', [ingridient_controller::class, 'store'])->name('ingredient.store');
 
@@ -80,6 +82,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::delete('/dish/delete/{id}', [Dish_controller::class, 'delete'])->name('dish.delete');
         Route::delete('/ingredient/delete/{id}', [Ingridient_controller::class, 'delete'])->name('Ingridient.delete');
+
     });
 });
 
@@ -89,6 +92,12 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::get('/catalog',[Dish_controller::class, 'index1'])->name('catalog');
+Route::get('/Cart', function () {
+    return view('Cart');
+})->name('Cart');
 
+Route::get('/catalog', [Dish_controller::class, 'index1'])->name('catalog');
+//Route::get('/Cart', [Dish_controller::class, 'dishCart']);
+Route::post('addToCart', [Dish_controller::class, 'addDishToCart'])->name('addDishToCart');
+Route::delete('/deleteDishFromCart', [Dish_controller::class, 'deleteDishFromCart'])->name('delete.cart.dish');
 require __DIR__ . '/auth.php';

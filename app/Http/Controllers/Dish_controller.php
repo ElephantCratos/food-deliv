@@ -122,6 +122,7 @@ class Dish_controller extends Controller
         Storage::delete($dish->image_path);
     }
 
+
     // Detach any associated ingredients
     $dish->ingredients()->detach();
 
@@ -130,4 +131,5 @@ class Dish_controller extends Controller
 
     return redirect()->route('dashboard')->with('success', 'Блюдо удалено успешно.');
 }
+
 }
