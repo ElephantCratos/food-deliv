@@ -55,7 +55,7 @@ PHP 8.2 REQUIRED
     php artisan migrate -seed
  
     
-** OOOPS something went wrong commands **
+**OOOPS something went wrong commands**
         
      php artisan config:clear
      php artisan cache:clear
