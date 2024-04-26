@@ -30,12 +30,12 @@ PHP 8.2 REQUIRED
 
 Копировать .env.example файлик и заполнить в новый файл .env. Под себя требуется поменять DATABASE поля  
 
-  DB_CONNECTION=mysql
-  DB_HOST=127.0.0.1
-  DB_PORT=3306
-  DB_DATABASE=food-delivery
-  DB_USERNAME=root
-  DB_PASSWORD=
+  * DB_CONNECTION=mysql
+  * DB_HOST=127.0.0.1
+  * DB_PORT=3306
+  * DB_DATABASE=food-delivery
+  * DB_USERNAME=root
+  * DB_PASSWORD=
 
 Запустить миграции и сидеры ( env файл перед этим шагом мастхев!!!)
 
