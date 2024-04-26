@@ -17,7 +17,8 @@ class Order extends Model
             'price',
             'status_id',
             'address',
-            'comment'
+            'comment',
+            'expected_at'
         ];
 
     public function positions()

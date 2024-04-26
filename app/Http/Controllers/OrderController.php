@@ -61,7 +61,7 @@ class OrderController extends Controller
     {
         $validatedData = $request->validate([
             'adress' => 'required|string|max:255',
-            'comment' => '|string|max:255',
+            'comment' => 'nullable|string|max:255',
             'time' => '|date_format:H:i|',
             'fast' => '|string|'
         ]);
@@ -90,6 +90,23 @@ class OrderController extends Controller
         $lastOrder->save();
 
         return redirect()->route('Cart')->with('status', 'Заказ успешно оформлен');
+    }
+
+    function showOwnOrders()
+    {
+        $userId = Auth::user()->id;
+
+        $Orders = Order::where('customer_id', $userId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        foreach ($Orders as $order) {
+        if ($order->expected_at === null) {
+            $order->expected_at = 'As soon as possible';
+        }
+    }
+
+        return view('Customer_Orders', compact( 'Orders'));
     }
     public function create()
     {
@@ -155,7 +172,21 @@ class OrderController extends Controller
         $order = Order::find($id);
 
         if ($order) {
-            $order->status_id = 7;
+            $order->status_id = 8;
+            $order->save();
+
+            return redirect()->back()->with('success', 'Order status updated successfully.');
+        }
+
+        return redirect()->back()->with('error', 'Order not found.');
+    }
+
+    public function declineByCustomer($id)
+    {
+        $order = Order::find($id);
+
+        if ($order) {
+            $order->status_id = 9;
             $order->save();
 
             return redirect()->back()->with('success', 'Order status updated successfully.');
