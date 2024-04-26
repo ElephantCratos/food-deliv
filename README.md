@@ -5,10 +5,10 @@
 * Плосков Артур 1521б
 
 Stack: 
-*Laravel 11
-*tailwind css
-*laravel blade templates
-*alpine js
+* Laravel 11
+* tailwind css
+* laravel blade templates
+* alpine js
 
 
 
