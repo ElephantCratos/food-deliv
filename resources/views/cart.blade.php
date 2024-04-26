@@ -109,7 +109,10 @@
                     </tr>
                     <tr>
                         <td><label for="fast">Как можно скорее</label></td>
-                        <td><input type="checkbox" name="fast"></input></td>
+                        <td>
+                            <input type="checkbox" name="fast" id="fast">
+                            <input type="hidden" name="fast_value" id="fast_value" value="0">
+                        </td>
                     </tr>
                     <tr>
                         <td><label for="time">Время доставки</label></td>
@@ -140,6 +143,18 @@
         </div>
     </div>
 </div>
+<script>
+    const checkbox = document.getElementById('fast');
+    const hiddenInput = document.getElementById('fast_value');
+
+
+    hiddenInput.value = checkbox.checked ? '1' : '0';
+
+
+    checkbox.addEventListener('change', function() {
+        hiddenInput.value = this.checked ? '1' : '0';
+    });
+</script>
 @endsection
 @section('footer')
 2024 Food Delivery Catalog. All rights reserved.

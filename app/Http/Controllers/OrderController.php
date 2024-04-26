@@ -65,11 +65,12 @@ class OrderController extends Controller
 
     public function sendOrder(Request $request)
     {
+
         $validatedData = $request->validate([
             'adress' => 'required|string|max:255',
             'comment' => 'nullable|string|max:255',
             'time' => '|date_format:H:i|',
-            'fast' => '|string|'
+
         ]);
 
         $userId = Auth::user()->id;
@@ -87,7 +88,7 @@ class OrderController extends Controller
         $lastOrder->address = $validatedData['adress'];
         $lastOrder->comment = $validatedData['comment'];
 
-        if (!isset($validatedData['fast']) || $validatedData['fast'] === 'off') {
+        if ($request->input('fast_value') == "0") {
             $lastOrder->expected_at = $validatedData['time'];
         } else {
             $lastOrder->expected_at = null;
