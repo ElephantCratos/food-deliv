@@ -91,6 +91,17 @@ class OrderController extends Controller
 
         return redirect()->route('Cart')->with('status', 'Заказ успешно оформлен');
     }
+
+    function showOwnOrders()
+    {
+        $userId = Auth::user()->id;
+
+        $Orders = Order::where('customer_id', $userId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('Customer_Orders', compact( 'Orders'));
+    }
     public function create()
     {
         //

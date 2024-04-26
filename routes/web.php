@@ -39,12 +39,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/Kitchen_Orders{id}/courier-arrived', [KitchenController::class, 'courierArrived'])->name('kitchen.courier-arrived');
     });
 
-    Route::middleware(['can:access to user panel'])->group(function () {
+   
 
-        Route::get('/Customer_Orders', function () {
-            return view('Customer_Orders');
-        })->name('Customer_Orders');
-    });
+        Route::get('/Customer_Orders', [OrderController::class, 'showOwnOrders'])
+            ->name('Customer_Orders');
+
 
     Route::middleware(['can:access to courier panel'])->group(function () {
         Route::get('/Courier_Orders', [CourierController::class, 'index'])->name('Courier_Orders');

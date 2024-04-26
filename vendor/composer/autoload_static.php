@@ -574,6 +574,7 @@ class ComposerStaticInitda9b7a1dc1dd923105198c572cc7df8d
         'App\\Http\\Requests\\Auth\\LoginRequest' => __DIR__ . '/../..' . '/app/Http/Requests/Auth/LoginRequest.php',
         'App\\Http\\Requests\\ProfileUpdateRequest' => __DIR__ . '/../..' . '/app/Http/Requests/ProfileUpdateRequest.php',
         'App\\Models\\Dish' => __DIR__ . '/../..' . '/app/Models/Dish.php',
+        'App\\Models\\DishAndIngredient' => __DIR__ . '/../..' . '/app/Models/DishAndIngredient.php',
         'App\\Models\\Ingredient' => __DIR__ . '/../..' . '/app/Models/Ingredient.php',
         'App\\Models\\Message' => __DIR__ . '/../..' . '/app/Models/Message.php',
         'App\\Models\\Order' => __DIR__ . '/../..' . '/app/Models/Order.php',

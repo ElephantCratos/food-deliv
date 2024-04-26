@@ -18,21 +18,24 @@
                                     <h4 class="font-semibold">Order #{{ $order->id }}</h4>
                                     <p>Status: {{ $order->status->name }}</p>
                                     <!-- Add more details as needed -->
-                                    @if($order->courier_id == auth()->user()->id && $order->status->id == 6)
-                                        <form action="{{ route('courier.delivered', ['id' => $order->id]) }}" method="POST">
-                                            @csrf
-                                            <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Delivered</button>
-                                        </form>
-                                    @endif
+                                @foreach($order->positions as $position)
+                                    <li>{{$position->dish->name}} - ${{$position->price}} - @foreach ($position->ingredients as $pos) {{$pos->name}} @endforeach</li>
+                                @endforeach
+                                @if($order->courier_id == auth()->user()->id && $order->status->id == 6)
+                                    <form action="{{ route('courier.delivered', ['id' => $order->id]) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Delivered</button>
+                                    </form>
+                                @endif
 
-                                    @if($order->courier_id == auth()->user()->id && $order->status->id == 5)
+                                @if($order->courier_id == auth()->user()->id && $order->status->id == 5)
                                     <form action="{{ route('courier.confirm', ['id' => $order->id]) }}" method="POST">
                                         @csrf
                                         <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Order picked up</button>
                                     </form>
-                                    @endif
+                                @endif
 
-                                    @if($order->courier_id == null)
+                                @if($order->courier_id == null)
 
                                     <form action="{{ route('courier.accept-order', ['id' => $order->id]) }}" method="POST">
                                         @csrf
@@ -40,12 +43,12 @@
                                     </form>
                                     @endif
 
-                                </li>
-                            @endforeach
+                                    </li>
+                                    @endforeach
                         </ul>
                     @endif
                 </div>
             </div>
         </div>
-        </div>
+    </div>
 </x-app-layout>
