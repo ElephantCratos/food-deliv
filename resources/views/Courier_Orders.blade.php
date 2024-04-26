@@ -26,6 +26,9 @@
                         <li>{{$position->dish->name}} - ${{$position->price}} - @foreach ($position->ingredients as $pos) {{$pos->name}} @endforeach</li>
                         <li>Количество: {{ $position->quantity }}</li>
                         @endforeach
+                        <p class="text-gray-800 font-semibold">Address: {{ $order->address }}</p>
+                        <p class="text-gray-800 font-semibold">Expected at: {{ $order->expected_at }}</p>
+                        <p class="text-gray-800 font-semibold">Comment: {{ $order->comment }}</p>
                         @if($order->courier_id == auth()->user()->id && $order->status->id == 6)
                         <form action="{{ route('courier.delivered', ['id' => $order->id]) }}" method="POST">
                             @csrf

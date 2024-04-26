@@ -31,6 +31,12 @@ class OrderController extends Controller
             $order->status_name = $Status->where('id', $order->status_id)->first()->name;
         }
 
+        foreach ($Order as $order) {
+            if ($order->expected_at === null) {
+                $order->expected_at = 'As soon as possible';
+            }
+        }
+
         return view('All_Orders', compact([
             'Order'
         ]));

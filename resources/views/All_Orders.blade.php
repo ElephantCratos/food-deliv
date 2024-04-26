@@ -55,7 +55,11 @@
                     @foreach($order->positions as $position)
                     <li>{{$position->dish->name}} - ${{$position->price}} - @foreach ($position->ingredients as $pos) {{$pos->name}} @endforeach</li>
                     <li>Количество: {{ $position->quantity }}</li>
+
                     @endforeach
+                        <p class="text-gray-800 font-semibold">Address: {{ $order->address }}</p>
+                        <p class="text-gray-800 font-semibold">Expected at: {{ $order->expected_at }}</p>
+                        <p class="text-gray-800 font-semibold">Comment: {{ $order->comment }}</p>
 
                 </ul>
                 <p class="text-gray-800 font-semibold">Total Price: {{ $order->price }}</p>

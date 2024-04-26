@@ -29,6 +29,9 @@
                         <li>{{$position->dish->name}} - ${{$position->price}} - @foreach ($position->ingredients as $pos) {{$pos->name}} @endforeach</li>
                         <li>Количество: {{ $position->quantity }}</li>
                         @endforeach
+                                <p class="text-gray-800 font-semibold">Address: {{ $order->address }}</p>
+                                <p class="text-gray-800 font-semibold">Expected at: {{ $order->expected_at }}</p>
+                                <p class="text-gray-800 font-semibold">Comment: {{ $order->comment }}</p>
                         <form action="{{ route('kitchen.confirm', ['id' => $order->id]) }}" method="POST">
                             @csrf
                             <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Confirm Preparation</button>
@@ -39,6 +42,9 @@
                             <li>{{$position->dish->name}} - ${{$position->price}} - @foreach ($position->ingredients as $pos) {{$pos->name}} @endforeach</li>
                             <li>Количество: {{ $position->quantity }}</li>
                         @endforeach
+                            <p class="text-gray-800 font-semibold">Address: {{ $order->address }}</p>
+                            <p class="text-gray-800 font-semibold">Expected at: {{ $order->expected_at }}</p>
+                            <p class="text-gray-800 font-semibold">Comment: {{ $order->comment }}</p>
                         <form action="{{ route('kitchen.transfer', ['id' => $order->id]) }}" method="POST">
                             @csrf
                             <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Call a courier</button>
@@ -50,6 +56,9 @@
                         <li>{{$position->dish->name}} - ${{$position->price}} - @foreach ($position->ingredients as $pos) {{$pos->name}} @endforeach</li>
                         <li>Количество: {{ $position->quantity }}</li>
                         @endforeach
+                            <p class="text-gray-800 font-semibold">Address: {{ $order->address }}</p>
+                            <p class="text-gray-800 font-semibold">Expected at: {{ $order->expected_at }}</p>
+                            <p class="text-gray-800 font-semibold">Comment: {{ $order->comment }}</p>
                         <form action="{{ route('kitchen.courier-arrived', ['id' => $order->id]) }}" method="POST">
                             @csrf
                             <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Have transferred to the courier</button>
@@ -60,6 +69,7 @@
                     </div>
                 </div>
                 @endforeach
+
             </ul>
             @endif
 

@@ -19,6 +19,11 @@ class CourierController extends Controller
             })
             ->orderBy('id')
             ->get();
+        foreach ($orders as $order) {
+            if ($order->expected_at === null) {
+                $order->expected_at = 'As soon as possible';
+            }
+        }
 
         return view('Courier_Orders', compact('orders'));
     }

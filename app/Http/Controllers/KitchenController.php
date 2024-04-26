@@ -14,6 +14,11 @@ class KitchenController extends Controller
         $orders = Order::whereIn('status_id', [2, 3, 4])
             ->orderBy('id')
             ->get();
+        foreach ($orders as $order) {
+            if ($order->expected_at === null) {
+                $order->expected_at = 'As soon as possible';
+            }
+        }
 
         return view('Kitchen_Orders', compact('orders'));
     }

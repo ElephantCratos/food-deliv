@@ -20,6 +20,7 @@
                 @endforeach
                 <p class="text-gray-800 font-semibold">Address: {{ $order->address }}</p>
                 <p class="text-gray-800 font-semibold">Expected at: {{ $order->expected_at }}</p>
+                <p class="text-gray-800 font-semibold">Comment: {{ $order->comment }}</p>
                 <p class="text-gray-800 font-semibold">Total Price: {{ $order->price }}</p>
                 @if($order->status_id == 1)
                 <form action="{{ route('declineByCustomer', ['id' => $order->id]) }}" method="POST">
