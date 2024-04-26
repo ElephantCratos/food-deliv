@@ -3,6 +3,42 @@
   "WorkspaceRootPath": "E:\\OSPanel\\domains\\deliv\\food-deliv\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\OSPanel\\domains\\deliv\\food-deliv\\resources\\views\\Kitchen_Orders.blade.php||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:resources\\views\\Kitchen_Orders.blade.php||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\OSPanel\\domains\\deliv\\food-deliv\\resources\\views\\Courier_Orders.blade.php||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:resources\\views\\Courier_Orders.blade.php||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\OSPanel\\domains\\deliv\\food-deliv\\resources\\views\\Customer_Orders.blade.php||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:resources\\views\\Customer_Orders.blade.php||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\OSPanel\\domains\\deliv\\food-deliv\\database\\seeders\\StatusSeeder.php||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:database\\seeders\\StatusSeeder.php||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\OSPanel\\domains\\deliv\\food-deliv\\database\\migrations\\2024_04_22_200525_create_orders_table.php||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:database\\migrations\\2024_04_22_200525_create_orders_table.php||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\OSPanel\\domains\\deliv\\food-deliv\\routes\\web.php||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:routes\\web.php||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\OSPanel\\domains\\deliv\\food-deliv\\app\\Http\\Controllers\\OrderController.php||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:app\\Http\\Controllers\\OrderController.php||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\OSPanel\\domains\\deliv\\food-deliv\\app\\Models\\Order.php||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:app\\Models\\Order.php||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\OSPanel\\domains\\deliv\\food-deliv\\app\\Models\\DishAndIngredient.php||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:app\\Models\\DishAndIngredient.php||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\OSPanel\\domains\\deliv\\food-deliv\\database\\seeders\\IngredientSeeder.php||{3B902123-F8A7-4915-9F01-361F908088D0}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:database\\seeders\\IngredientSeeder.php||{3B902123-F8A7-4915-9F01-361F908088D0}"
     },
@@ -13,10 +49,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\OSPanel\\domains\\deliv\\food-deliv\\database\\migrations\\2024_04_22_225000_create_order_and_order_position_table.php||{3B902123-F8A7-4915-9F01-361F908088D0}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:database\\migrations\\2024_04_22_225000_create_order_and_order_position_table.php||{3B902123-F8A7-4915-9F01-361F908088D0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\OSPanel\\domains\\deliv\\food-deliv\\app\\Models\\DishAndIngredient.php||{3B902123-F8A7-4915-9F01-361F908088D0}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:app\\Models\\DishAndIngredient.php||{3B902123-F8A7-4915-9F01-361F908088D0}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\OSPanel\\domains\\deliv\\food-deliv\\database\\seeders\\\u0421ourierSeeder.php||{3B902123-F8A7-4915-9F01-361F908088D0}",
@@ -46,7 +78,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Bookmark",
@@ -54,7 +86,111 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Kitchen_Orders.blade.php",
+              "DocumentMoniker": "E:\\OSPanel\\domains\\deliv\\food-deliv\\resources\\views\\Kitchen_Orders.blade.php",
+              "RelativeDocumentMoniker": "resources\\views\\Kitchen_Orders.blade.php",
+              "ToolTip": "E:\\OSPanel\\domains\\deliv\\food-deliv\\resources\\views\\Kitchen_Orders.blade.php",
+              "RelativeToolTip": "resources\\views\\Kitchen_Orders.blade.php",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABAAAAASAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002338|",
+              "WhenOpened": "2024-04-26T01:16:13.39Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Courier_Orders.blade.php",
+              "DocumentMoniker": "E:\\OSPanel\\domains\\deliv\\food-deliv\\resources\\views\\Courier_Orders.blade.php",
+              "RelativeDocumentMoniker": "resources\\views\\Courier_Orders.blade.php",
+              "ToolTip": "E:\\OSPanel\\domains\\deliv\\food-deliv\\resources\\views\\Courier_Orders.blade.php",
+              "RelativeToolTip": "resources\\views\\Courier_Orders.blade.php",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAsAAABDAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002338|",
+              "WhenOpened": "2024-04-26T01:11:27.185Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 3,
+              "Title": "StatusSeeder.php",
+              "DocumentMoniker": "E:\\OSPanel\\domains\\deliv\\food-deliv\\database\\seeders\\StatusSeeder.php",
+              "RelativeDocumentMoniker": "database\\seeders\\StatusSeeder.php",
+              "ToolTip": "E:\\OSPanel\\domains\\deliv\\food-deliv\\database\\seeders\\StatusSeeder.php",
+              "RelativeToolTip": "database\\seeders\\StatusSeeder.php",
+              "ViewState": "AQIAABsAAAAAAAAAAAAAADkAAAAqAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002338|",
+              "WhenOpened": "2024-04-26T01:09:04.445Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "web.php",
+              "DocumentMoniker": "E:\\OSPanel\\domains\\deliv\\food-deliv\\routes\\web.php",
+              "RelativeDocumentMoniker": "routes\\web.php",
+              "ToolTip": "E:\\OSPanel\\domains\\deliv\\food-deliv\\routes\\web.php",
+              "RelativeToolTip": "routes\\web.php",
+              "ViewState": "AQIAABUAAAAAAAAAAAAAAC0AAAA0AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002338|",
+              "WhenOpened": "2024-04-26T00:55:38.265Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Customer_Orders.blade.php",
+              "DocumentMoniker": "E:\\OSPanel\\domains\\deliv\\food-deliv\\resources\\views\\Customer_Orders.blade.php",
+              "RelativeDocumentMoniker": "resources\\views\\Customer_Orders.blade.php",
+              "ToolTip": "E:\\OSPanel\\domains\\deliv\\food-deliv\\resources\\views\\Customer_Orders.blade.php",
+              "RelativeToolTip": "resources\\views\\Customer_Orders.blade.php",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABEAAACEAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002338|",
+              "WhenOpened": "2024-04-26T00:43:31.403Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "OrderController.php",
+              "DocumentMoniker": "E:\\OSPanel\\domains\\deliv\\food-deliv\\app\\Http\\Controllers\\OrderController.php",
+              "RelativeDocumentMoniker": "app\\Http\\Controllers\\OrderController.php",
+              "ToolTip": "E:\\OSPanel\\domains\\deliv\\food-deliv\\app\\Http\\Controllers\\OrderController.php",
+              "RelativeToolTip": "app\\Http\\Controllers\\OrderController.php",
+              "ViewState": "AQIAAJ4AAAAAAAAAAAAiwLwAAAAhAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002338|",
+              "WhenOpened": "2024-04-26T00:49:48.206Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "2024_04_22_200525_create_orders_table.php",
+              "DocumentMoniker": "E:\\OSPanel\\domains\\deliv\\food-deliv\\database\\migrations\\2024_04_22_200525_create_orders_table.php",
+              "RelativeDocumentMoniker": "database\\migrations\\2024_04_22_200525_create_orders_table.php",
+              "ToolTip": "E:\\OSPanel\\domains\\deliv\\food-deliv\\database\\migrations\\2024_04_22_200525_create_orders_table.php",
+              "RelativeToolTip": "database\\migrations\\2024_04_22_200525_create_orders_table.php",
+              "ViewState": "AQIAACEAAAAAAAAAAAAAADsAAAAmAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002338|",
+              "WhenOpened": "2024-04-26T00:48:10.177Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Order.php",
+              "DocumentMoniker": "E:\\OSPanel\\domains\\deliv\\food-deliv\\app\\Models\\Order.php",
+              "RelativeDocumentMoniker": "app\\Models\\Order.php",
+              "ToolTip": "E:\\OSPanel\\domains\\deliv\\food-deliv\\app\\Models\\Order.php",
+              "RelativeToolTip": "app\\Models\\Order.php",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABMAAAAWAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002338|",
+              "WhenOpened": "2024-04-26T00:47:20.258Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
               "Title": "DishAndIngredient.php",
               "DocumentMoniker": "E:\\OSPanel\\domains\\deliv\\food-deliv\\app\\Models\\DishAndIngredient.php",
               "RelativeDocumentMoniker": "app\\Models\\DishAndIngredient.php",
@@ -67,7 +203,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 11,
               "Title": "2024_04_22_225000_create_order_and_order_position_table.php",
               "DocumentMoniker": "E:\\OSPanel\\domains\\deliv\\food-deliv\\database\\migrations\\2024_04_22_225000_create_order_and_order_position_table.php",
               "RelativeDocumentMoniker": "database\\migrations\\2024_04_22_225000_create_order_and_order_position_table.php",
@@ -75,12 +211,11 @@
               "RelativeToolTip": "database\\migrations\\2024_04_22_225000_create_order_and_order_position_table.php",
               "ViewState": "AQIAABgAAAAAAAAAAAAAACYAAAALAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002338|",
-              "WhenOpened": "2024-04-25T22:56:54.902Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-04-25T22:56:54.902Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 12,
               "Title": "\u0421ourierSeeder.php",
               "DocumentMoniker": "E:\\OSPanel\\domains\\deliv\\food-deliv\\database\\seeders\\\u0421ourierSeeder.php",
               "RelativeDocumentMoniker": "database\\seeders\\\u0421ourierSeeder.php",
@@ -88,12 +223,11 @@
               "RelativeToolTip": "database\\seeders\\\u0421ourierSeeder.php",
               "ViewState": "AQIAAAYAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002338|",
-              "WhenOpened": "2024-04-25T22:54:08.06Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-04-25T22:54:08.06Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 10,
               "Title": "Dish.php",
               "DocumentMoniker": "E:\\OSPanel\\domains\\deliv\\food-deliv\\app\\Models\\Dish.php",
               "RelativeDocumentMoniker": "app\\Models\\Dish.php",
@@ -101,12 +235,11 @@
               "RelativeToolTip": "app\\Models\\Dish.php",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAA4AAAAMAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002338|",
-              "WhenOpened": "2024-04-25T22:50:16.204Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-04-25T22:50:16.204Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 9,
               "Title": "IngredientSeeder.php",
               "DocumentMoniker": "E:\\OSPanel\\domains\\deliv\\food-deliv\\database\\seeders\\IngredientSeeder.php",
               "RelativeDocumentMoniker": "database\\seeders\\IngredientSeeder.php",
@@ -119,7 +252,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 13,
               "Title": "Edit_dish_menu.blade.php",
               "DocumentMoniker": "E:\\OSPanel\\domains\\deliv\\food-deliv\\resources\\views\\Edit_dish_menu.blade.php",
               "RelativeDocumentMoniker": "resources\\views\\Edit_dish_menu.blade.php",
@@ -127,12 +260,11 @@
               "RelativeToolTip": "resources\\views\\Edit_dish_menu.blade.php",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAABsAAAASAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002338|",
-              "WhenOpened": "2024-04-25T22:13:02.427Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-04-25T22:13:02.427Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 14,
               "Title": "Edit_menu.blade.php",
               "DocumentMoniker": "E:\\OSPanel\\domains\\deliv\\food-deliv\\resources\\views\\Edit_menu.blade.php",
               "RelativeDocumentMoniker": "resources\\views\\Edit_menu.blade.php",
@@ -144,7 +276,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 15,
               "Title": "Edit_ingredient.blade.php",
               "DocumentMoniker": "E:\\OSPanel\\domains\\deliv\\food-deliv\\resources\\views\\Edit_ingredient.blade.php",
               "RelativeDocumentMoniker": "resources\\views\\Edit_ingredient.blade.php",
@@ -156,7 +288,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 16,
               "Title": "Add_ingredient.blade.php",
               "DocumentMoniker": "E:\\OSPanel\\domains\\deliv\\food-deliv\\resources\\views\\Add_ingredient.blade.php",
               "RelativeDocumentMoniker": "resources\\views\\Add_ingredient.blade.php",

@@ -52,5 +52,10 @@ class StatusSeeder extends Seeder
             'id' => '8',
             'name' => 'declined',
         ]);
+
+        $status = Status::create([
+            'id' => '9',
+            'name' => 'decline by Customer',
+        ]);
     }
 }

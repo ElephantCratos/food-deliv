@@ -7,14 +7,19 @@
     </x-slot>
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-                <div class="p-6 bg-white border-b border-gray-200">
-                    <h3 class="text-lg font-semibold mb-2 text-black">Orders</h3>
+            
+                    
                     @if ($orders->isEmpty())
+                     <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg mb-4">
+                <div class="p-6 bg-white border-b border-gray-200">
                         <p class="text-black">No orders need preparation.</p>
+                        </div>
+            </div>
                     @else
                         <ul>
                             @foreach ($orders as $order)
+                            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg mb-4">
+                <div class="p-6 bg-white border-b border-gray-200">
                                 <li class="text-black">
                                     <h4 class="font-semibold">Order #{{ $order->id }}</h4>
                                     <p>Status: {{ $order->status->name }}</p>
@@ -29,6 +34,9 @@
                                     </form>
                                 @endif
                                 @if($order->status_id == 3)
+                                 @foreach($order->positions as $position)
+                                        <li>{{$position->dish->name}} - ${{$position->price}} - @foreach ($position->ingredients as $pos) {{$pos->name}} @endforeach</li>
+                                    @endforeach
                                     <form action="{{ route('kitchen.transfer', ['id' => $order->id]) }}" method="POST">
                                         @csrf
                                         <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Call a courier</button>
@@ -36,6 +44,9 @@
                                 @endif
 
                                 @if($order->status_id == 4)
+                                 @foreach($order->positions as $position)
+                                        <li>{{$position->dish->name}} - ${{$position->price}} - @foreach ($position->ingredients as $pos) {{$pos->name}} @endforeach</li>
+                                    @endforeach
                                     <form action="{{ route('kitchen.courier-arrived', ['id' => $order->id]) }}" method="POST">
                                         @csrf
                                         <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Have transferred to the courier</button>
@@ -43,10 +54,11 @@
                                     @endif
 
                                     </li>
+                                    </div>
+            </div>
                                     @endforeach
                         </ul>
                     @endif
-                </div>
-            </div>
+                
         </div>
 </x-app-layout>

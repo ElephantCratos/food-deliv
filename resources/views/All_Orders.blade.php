@@ -20,13 +20,19 @@
                     <p class="textOff">Waiting for the courier</p>
                 </a>
                 <a href="{{ route('All_Orders', 5) }}" class="text-decoration-none bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded mx-4">
-                    <p class="textOff">The courier is on the way</p>
+                    <p class="textOff">Given to the courier</p>
                 </a>
                 <a href="{{ route('All_Orders', 6) }}" class="text-decoration-none bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded mx-4">
-                    <p class="textOff">completed</p>
+                    <p class="textOff">The courier is on the way</p>
                 </a>
                 <a href="{{ route('All_Orders', 7) }}" class="text-decoration-none bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded mx-4">
+                    <p class="textOff">completed</p>
+                </a>
+                <a href="{{ route('All_Orders', 8) }}" class="text-decoration-none bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded mx-4">
                     <p class="textOff">declined</p>
+                </a>
+                <a href="{{ route('All_Orders', 9) }}" class="text-decoration-none bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded mx-4">
+                    <p class="textOff">declined by customer</p>
                 </a>
                 <a href="{{ route('All_Orders') }}" class="text-decoration-none bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded mx-4">
                     <p class="textOff">All</p>

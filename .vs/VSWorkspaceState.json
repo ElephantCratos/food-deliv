@@ -2,16 +2,15 @@
   "ExpandedNodes": [
     "",
     "\\app",
-    "\\app\\Models",
-    "\\database",
-    "\\database\\migrations",
-    "\\database\\seeders",
+    "\\app\\Http",
+    "\\app\\Http\\Controllers",
     "\\resources",
     "\\resources\\views",
+    "\\routes",
     "\\storage",
     "\\storage\\app",
     "\\storage\\app\\public"
   ],
-  "SelectedNode": "\\public\\Images\\1703351039_mykaleidoscope-ru-p-zelenaya-pitstsa-krasivo-62.jpg",
+  "SelectedNode": "\\resources\\views\\Kitchen_Orders.blade.php",
   "PreviewInSolutionExplorer": false
 }

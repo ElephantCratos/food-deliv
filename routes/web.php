@@ -43,7 +43,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('/Customer_Orders', [OrderController::class, 'showOwnOrders'])
             ->name('Customer_Orders');
-
+       Route::post('/orders/{id}/decline_by_customer', [OrderController::class, 'declineByCustomer'])->name('declineByCustomer');
 
     Route::middleware(['can:access to courier panel'])->group(function () {
         Route::get('/Courier_Orders', [CourierController::class, 'index'])->name('Courier_Orders');
