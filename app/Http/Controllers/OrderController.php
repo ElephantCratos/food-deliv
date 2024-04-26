@@ -61,7 +61,7 @@ class OrderController extends Controller
     {
         $validatedData = $request->validate([
             'adress' => 'required|string|max:255',
-            'comment' => '|string|max:255',
+            'comment' => 'nullable|string|max:255',
             'time' => '|date_format:H:i|',
             'fast' => '|string|'
         ]);

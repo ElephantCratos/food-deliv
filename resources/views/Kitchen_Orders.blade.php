@@ -43,7 +43,7 @@
                                     </form>
                                 @endif
 
-                                @if($order->status_id == 4)
+                                @if($order->status_id == 4 && $order->courier_id != null)
                                  @foreach($order->positions as $position)
                                         <li>{{$position->dish->name}} - ${{$position->price}} - @foreach ($position->ingredients as $pos) {{$pos->name}} @endforeach</li>
                                     @endforeach
