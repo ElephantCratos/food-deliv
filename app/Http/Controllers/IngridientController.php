@@ -5,12 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Ingredient;
 
-class Ingridient_controller extends Controller
+class IngridientController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function showIngridientsToCustomer()
     {
         $ingredient = Ingredient::OrderBy('name')
             ->get();
@@ -20,7 +20,7 @@ class Ingridient_controller extends Controller
        ]));
     }
 
-    public function index1()
+    public function showIngredientsToManager()
     {
         $ingredient = Ingredient::OrderBy('name')
             ->get();
@@ -30,7 +30,7 @@ class Ingridient_controller extends Controller
        ]));
     }
 
-    public function index2()
+    public function showRedactorIngridients()
     {
         $ingredient = Ingredient::OrderBy('name')
             ->get();

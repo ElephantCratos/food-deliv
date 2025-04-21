@@ -14,7 +14,7 @@ class OrderController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index($Id = null)
+    public function showOrders($Id = null)
     {
         if ($Id) {
             $Order = Order::where('status_id', $Id)->OrderBy('id')->get();

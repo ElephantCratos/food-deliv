@@ -8,7 +8,7 @@ use App\Models\Status;
 
 class KitchenController extends Controller
 {
-    public function index()
+    public function showOrdersToKitchen()
     {
 
         $orders = Order::whereIn('status_id', [2, 3, 4])
