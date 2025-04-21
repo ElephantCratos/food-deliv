@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\app",
+    "\\app\\Http",
+    "\\app\\Http\\Controllers",
+    "\\resources",
+    "\\resources\\views",
+    "\\routes",
+    "\\storage",
+    "\\storage\\app",
+    "\\storage\\app\\public"
+  ],
+  "SelectedNode": "\\resources\\views\\Kitchen_Orders.blade.php",
+  "PreviewInSolutionExplorer": false
+}
