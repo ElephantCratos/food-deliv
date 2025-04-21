@@ -24,26 +24,30 @@ PHP 8.2 REQUIRED
 
     cd food-deliv
 
-Установить все зависимости при помощи композера
+Поднять докер 
 
-    composer install 
+    docker compose up -d 
 
 Копировать .env.example файлик и заполнить в новый файл .env. Под себя требуется поменять DATABASE поля  
 
-  * DB_CONNECTION=mysql
-  * DB_HOST=127.0.0.1
-  * DB_PORT=3306
-  * DB_DATABASE=food-delivery
-  * DB_USERNAME=root
-  * DB_PASSWORD=
+  * DB_CONNECTION=pgsql
+  * DB_HOST=db
+  * DB_PORT=5432
+  * DB_DATABASE=refactorian
+  * DB_USERNAME=refactorian
+  * DB_PASSWORD=refactorian
 
+Перед тем как писать все команды ниже зайти в контейнер
+
+    docker compose exec php bash 
+
+Установить все зависимости при помощи композера
+
+    composer install 
+    
 Запустить миграции и сидеры ( env файл перед этим шагом мастхев!!!)
 
     php artisan migrate -seed
-
-Запустить локальный сервер (OSPanel, artisan serve)
-
-    php artisan serve (как пример)
 
 Теперь проект должен работать.
 
