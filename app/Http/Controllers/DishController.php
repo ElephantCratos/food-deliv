@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Order;
+use App\ReadModel\CatalogList;
 use Illuminate\Http\Request;
 use App\Models\Dish;
 use App\Models\Ingredient;
@@ -27,7 +29,12 @@ class DishController extends Controller
     public function showCatalog()
     {
         $lastOrder = null;
-        $Dish = Dish::orderBy('name')->get();
+        $categories = Category::orderBy('id')->get();
+
+        $categoriesList = [];
+        foreach ($categories as $category) { 
+            array_push($categoriesList, CatalogList::fromModel($category));
+        }
 
         if (Auth::check()) {
             $userId = Auth::user()->id;
@@ -40,17 +47,27 @@ class DishController extends Controller
                 $lastOrder = null;
             }
         }
-        return view('catalog', compact('Dish', 'lastOrder'));
+
+        // Убираем запрос с использованием is_popular и заменяем его на другой запрос
+        // Пример: вы можете просто получить все блюда
+        $dishes = Dish::all(); // Получаем все блюда, или примените другой фильтр, если нужно
+
+        return view('catalog', compact('categoriesList', 'lastOrder', 'dishes'));
     }
+
 
     
     public function store(Request $request)
     {
+
         $request->validate([
             'name' => 'required|string|max:255',
             'image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'price' => 'required|numeric|min:0',
+            'category_id' => 'required'
         ]);
+
+
 
         $imagePath = null;
         if ($request->hasFile('image_path')) {
@@ -63,13 +80,14 @@ class DishController extends Controller
             'name' => $request->name,
             'image_path' => $imagePath,
             'price' => $request->price,
+            'category_id' => (int)$request->category_id,
         ]);
 
         $ingredients = Ingredient::whereIn('id', $request->input('ingredients', []))->get();
 
         $dish->ingredients()->attach($ingredients);
 
-        return redirect()->route('dashboard')->with('success', 'Dish created successfully.');
+        return redirect()->route('Manager_Menu')->with('success', 'Dish created successfully.');
     }
 
     /**
@@ -112,7 +130,7 @@ class DishController extends Controller
 
         $dish->ingredients()->sync($ingredients);
 
-        return redirect()->route('dashboard')->with('success', 'Dish updated successfully.');
+        return redirect()->route('Manager_Menu')->with('success', 'Dish updated successfully.');
     }
 
     /**
@@ -130,7 +148,7 @@ class DishController extends Controller
 
         $dish->delete();
 
-        return redirect()->route('dashboard')->with('success', 'Блюдо удалено успешно.');
+        return redirect()->route('Manager_Menu')->with('success', 'Блюдо удалено успешно.');
     }
 
 }

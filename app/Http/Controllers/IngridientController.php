@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Ingredient;
+use App\Models\Category;
 
 class IngridientController extends Controller
 {
@@ -14,9 +15,11 @@ class IngridientController extends Controller
     {
         $ingredient = Ingredient::OrderBy('name')
             ->get();
+        $categories = Category::OrderBy('name')
+            ->get();
 
        return view('Edit_menu',compact([
-           'ingredient'
+           'ingredient', 'categories'
        ]));
     }
 
@@ -40,8 +43,6 @@ class IngridientController extends Controller
        ]));
     }
 
-    //ЕСЛИ В СЛЕДУЮЩЕМ КОМИТЕ ТУТ БУДЕТ 3 ИНДЕКСА Я НАХУЙ ГОЛОВУ ОТКУШУ/
-    // ┌∩┐(◣_◢)┌∩┐ ┌∩┐(◣_◢)┌∩┐ ┌∩┐(◣_◢)┌∩┐ ┌∩┐(◣_◢)┌∩┐ ┌∩┐(◣_◢)┌∩┐
     /**
      * Store a newly created resource in storage.
      */
