@@ -59,16 +59,13 @@ class DishController extends Controller
     
     public function store(Request $request)
     {
-
         $request->validate([
             'name' => 'required|string|max:255',
             'image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'price' => 'required|numeric|min:0',
             'category_id' => 'required'
         ]);
-
-
-
+        
         $imagePath = null;
         if ($request->hasFile('image_path')) {
             $image = $request->file('image_path');
@@ -98,8 +95,10 @@ class DishController extends Controller
         $dish=Dish::findOrFail($id);
         $ingredients = Ingredient::OrderBy('name')
                 ->get();
+        $categories = Category::OrderBy('name')
+                ->get();
         return view('Edit_dish_menu',compact([
-            'dish', 'ingredients'
+            'dish', 'ingredients',
         ]));
     }
 
@@ -113,6 +112,7 @@ class DishController extends Controller
             'name' => 'required|string|max:255',
             'image_path' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'price' => 'required|numeric|min:0',
+            'category_id' => 'required',
         ]);
 
         $dish = Dish::findOrFail($id);
