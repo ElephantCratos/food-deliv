@@ -1,20 +1,20 @@
 <nav x-data="{ open: false }" class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
-    <!-- Primary Navigation Menu -->
+    <!-- Основное меню навигации -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex">
-                <!-- Logo -->
+                <!-- Логотип -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}">
                         <x-application-logo class="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
                     </a>
                 </div>
 
-                <!-- Navigation Links -->
+                <!-- Ссылки на навигацию -->
                 @if(auth()->check() && auth()->user()->can('access to user panel'))
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('Customer_Orders')" :active="request()->routeIs('Customer_Orders')">
-                        {{ __('Orders') }}
+                        {{ __('Заказы') }}
                     </x-nav-link>
                 </div>
                 @endif
@@ -22,7 +22,7 @@
                 @if(auth()->check() && auth()->user()->can('access to kitchen panel'))
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('Kitchen_Orders')" :active="request()->routeIs('Kitchen_Orders')">
-                        {{ __('Orders for kitchen') }}
+                        {{ __('Заказы для кухни') }}
                     </x-nav-link>
                 </div>
                 @endif
@@ -30,7 +30,7 @@
                 @if(auth()->check() && auth()->user()->can('access to manager panel'))
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('All_Orders')" :active="request()->routeIs('All_Orders')">
-                        {{ __('All Orders') }}
+                        {{ __('Все заказы') }}
                     </x-nav-link>
                 </div>
                 @endif
@@ -38,7 +38,7 @@
                 @if(auth()->check() && auth()->user()->can('access to courier panel'))
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('Courier_Orders')" :active="request()->routeIs('Courier_Orders')">
-                        {{ __('Orders for courier') }}
+                        {{ __('Заказы для курьера') }}
                     </x-nav-link>
                 </div>
                 @endif
@@ -46,13 +46,13 @@
                 @if(auth()->check() && auth()->user()->can('access to manager panel'))
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('Manager_Menu')" :active="request()->routeIs('Manager_Menu')">
-                        {{ __('Menu red') }}
+                        {{ __('Редактировать меню') }}
                     </x-nav-link>
                 </div>
 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('Manager_Ingredients')" :active="request()->routeIs('Manager_Ingredients')">
-                        {{ __('Ingredients red') }}
+                        {{ __('Редактировать ингредиенты') }}
                     </x-nav-link>
                 </div>
                 @endif
@@ -60,13 +60,13 @@
                 @if(auth()->check() && auth()->user()->can('access to chat'))
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('Users_list')" :active="request()->routeIs('dashboard')">
-                        {{ __('manager/courier chat') }}
+                        {{ __('Чат менеджера/курьера') }}
                     </x-nav-link>
                 </div>
                 @endif
             </div>
 
-            <!-- Settings Dropdown -->
+            <!-- Выпадающее меню настроек -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
@@ -83,26 +83,26 @@
 
                     <x-slot name="content">
                         <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
+                            {{ __('Профиль') }}
                         </x-dropdown-link>
                         <x-dropdown-link :href="route('catalog')">
-                            {{ __('Catalog') }}
+                            {{ __('Каталог') }}
                         </x-dropdown-link>
 
-                        <!-- Authentication -->
+                        <!-- Аутентификация -->
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
 
                             <x-dropdown-link :href="route('logout')" onclick="event.preventDefault();
                                                 this.closest('form').submit();">
-                                {{ __('Log Out') }}
+                                {{ __('Выйти') }}
                             </x-dropdown-link>
                         </form>
                     </x-slot>
                 </x-dropdown>
             </div>
 
-            <!-- Hamburger -->
+            <!-- Гамбургер-меню -->
             <div class="-me-2 flex items-center sm:hidden">
                 <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-900 focus:text-gray-500 dark:focus:text-gray-400 transition duration-150 ease-in-out">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
@@ -114,15 +114,15 @@
         </div>
     </div>
 
-    <!-- Responsive Navigation Menu -->
+    <!-- Респонсивное меню навигации -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
+                {{ __('Панель управления') }}
             </x-responsive-nav-link>
         </div>
 
-        <!-- Responsive Settings Options -->
+        <!-- Респонсивные настройки -->
         <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
             <div class="px-4">
                 <div class="font-medium text-base text-gray-800 dark:text-gray-200">{{ Auth::user()->name }}</div>
@@ -131,16 +131,16 @@
 
             <div class="mt-3 space-y-1">
                 <x-responsive-nav-link :href="route('profile.edit')">
-                    {{ __('Profile') }}
+                    {{ __('Профиль') }}
                 </x-responsive-nav-link>
 
-                <!-- Authentication -->
+                <!-- Аутентификация -->
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
 
                     <x-responsive-nav-link :href="route('logout')" onclick="event.preventDefault();
                                         this.closest('form').submit();">
-                        {{ __('Log Out') }}
+                        {{ __('Выйти') }}
                     </x-responsive-nav-link>
                 </form>
             </div>
