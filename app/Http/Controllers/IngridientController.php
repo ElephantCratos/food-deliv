@@ -40,8 +40,6 @@ class IngridientController extends Controller
        ]));
     }
 
-    //ЕСЛИ В СЛЕДУЮЩЕМ КОМИТЕ ТУТ БУДЕТ 3 ИНДЕКСА Я НАХУЙ ГОЛОВУ ОТКУШУ/
-    // ┌∩┐(◣_◢)┌∩┐ ┌∩┐(◣_◢)┌∩┐ ┌∩┐(◣_◢)┌∩┐ ┌∩┐(◣_◢)┌∩┐ ┌∩┐(◣_◢)┌∩┐
     /**
      * Store a newly created resource in storage.
      */

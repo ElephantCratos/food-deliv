@@ -41,6 +41,7 @@ class IngredientSeeder extends Seeder
             'name' =>'Pizza Margaritta',
             'image_path' => 'images/1695870651_gas-kvas-com-p-kartinki-pitstsa-1.jpg',
             'price' => '200',
+            'category_id' => rand(1,3),
         ]);
 
         $dishAndIngredient = DishAndIngredient::create([
@@ -58,6 +59,7 @@ class IngredientSeeder extends Seeder
             'name' =>'Pizza Pepperoni',
             'image_path' => 'images/1703351039_mykaleidoscope-ru-p-zelenaya-pitstsa-krasivo-62.jpg',
             'price' => '250',
+            'category_id' => rand(1,3),
         ]);
 
         $dishAndIngredient = DishAndIngredient::create([
