@@ -16,7 +16,8 @@ class Dish extends Model
         'name',
         'image_path',
         'price',
-        'category_id'
+        'category_id',
+
     ];
 
     public function order_position()

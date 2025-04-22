@@ -33,8 +33,9 @@ class DishController extends Controller
 
         $categoriesList = [];
         foreach ($categories as $category) { 
-            array_push( $categoriesList,CatalogList::fromModel($category));
+            array_push($categoriesList, CatalogList::fromModel($category));
         }
+
         if (Auth::check()) {
             $userId = Auth::user()->id;
 
@@ -46,13 +47,18 @@ class DishController extends Controller
                 $lastOrder = null;
             }
         }
-        return view('catalog', compact('categoriesList', 'lastOrder'));
+
+        // Убираем запрос с использованием is_popular и заменяем его на другой запрос
+        // Пример: вы можете просто получить все блюда
+        $dishes = Dish::all(); // Получаем все блюда, или примените другой фильтр, если нужно
+
+        return view('catalog', compact('categoriesList', 'lastOrder', 'dishes'));
     }
+
 
     
     public function store(Request $request)
     {
-       
         $request->validate([
             'name' => 'required|string|max:255',
             'image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
@@ -60,8 +66,6 @@ class DishController extends Controller
             'category_id' => 'required'
         ]);
         
-     
-
         $imagePath = null;
         if ($request->hasFile('image_path')) {
             $image = $request->file('image_path');
@@ -80,7 +84,7 @@ class DishController extends Controller
 
         $dish->ingredients()->attach($ingredients);
 
-        return redirect()->route('dashboard')->with('success', 'Dish created successfully.');
+        return redirect()->route('Manager_Menu')->with('success', 'Dish created successfully.');
     }
 
     /**
@@ -126,7 +130,7 @@ class DishController extends Controller
 
         $dish->ingredients()->sync($ingredients);
 
-        return redirect()->route('dashboard')->with('success', 'Dish updated successfully.');
+        return redirect()->route('Manager_Menu')->with('success', 'Dish updated successfully.');
     }
 
     /**
@@ -144,7 +148,7 @@ class DishController extends Controller
 
         $dish->delete();
 
-        return redirect()->route('dashboard')->with('success', 'Блюдо удалено успешно.');
+        return redirect()->route('Manager_Menu')->with('success', 'Блюдо удалено успешно.');
     }
 
 }

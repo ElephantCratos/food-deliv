@@ -1,3 +1,179 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+/* Стили для scroll-margin-top */
+.scroll-mt-24 {
+    scroll-margin-top: 6rem; /* Это значение зависит от высоты вашего фиксированного меню */
+}
+
+/* Общие стили */
+body {
+    background-color: #f9fafb;
+    color: #333;
+    font-family: 'Helvetica', sans-serif;
+}
+
+header {
+    background-color: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px 0;
+}
+
+a {
+    color: #333;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #007bff;
+    transition: color 0.3s;
+}
+
+/* Стиль футера */
+footer {
+    background-color: #ffffff;
+    padding: 40px 0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    color: #666;
+    text-align: center;
+    font-size: 14px;
+    position: relative;
+}
+
+footer p {
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+}
+
+footer a {
+    color: #007bff;
+    font-weight: 600;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+footer a:hover {
+    color: #0056b3;
+    transform: scale(1.05);
+}
+
+.footer-effect {
+    opacity: 0;
+    animation: fadeIn 1.5s forwards;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Эффект мутного стекла */
+.bg-blur {
+    background-color: rgba(255, 255, 255, 0.7); /* Белый фон с прозрачностью */
+    backdrop-filter: blur(10px); /* Размытие фона */
+}
+
+/* Кнопки с пастельными оттенками */
+.btn-light {
+    background-color: #fc6A03; /* Светло-оранжевый (пастельный) */
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-light:hover {
+    background-color: #ffdb85; /* Более тёмный оранжевый */
+    transform: scale(1.05); /* Немного увеличиваем кнопку при наведении */
+}
+
+.btn-light:active {
+    background-color: #e8b85f; /* Ещё более тёмный оттенок */
+}
+
+/* Кнопки категорий */
+.btn-category {
+    background-color: #ffdb85; /* Светло-оранжевый (пастельный) */
+    color: white;
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.btn-category:hover {
+    background-color: #114; /* Более тёмный оранжевый */
+    color: white;
+}
+
+/* Стили для карточек с блюдами */
+.card {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px); /* Немного поднимаем карточку при наведении */
+}
+/* Кнопки в карточках */
+.card button {
+    padding: 0.5rem 1rem; /* Уменьшаем отступы на кнопке */
+    font-size: 0.875rem; /* Меньший шрифт */
+    line-height: 1.25rem; /* Улучшаем вертикальное выравнивание */
+}
+
+/* Корректируем стили карточек */
+.card {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    height: 100%; /* Делаем карточку адаптивной по высоте */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card .btn-light {
+    width: 100%; /* Делаем кнопку на всю ширину */
+    text-align: center;
+}
+
+/* Уменьшаем размер и отступы для изображений */
+.card img {
+    object-fit: cover;
+    width: 100%;
+    height: 180px; /* Уменьшаем высоту изображений */
+    border-radius: 8px;
+}
+
+/* Сделаем отступы внутри карточек меньше */
+.card .flex {
+    margin-bottom: 0.5rem;
+}
