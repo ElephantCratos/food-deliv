@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Order;
+use App\ReadModel\CatalogList;
 use Illuminate\Http\Request;
 use App\Models\Dish;
 use App\Models\Ingredient;
@@ -27,8 +29,12 @@ class DishController extends Controller
     public function showCatalog()
     {
         $lastOrder = null;
-        $Dish = Dish::orderBy('name')->get();
+        $categories = Category::orderBy('id')->get();
 
+        $categoriesList = [];
+        foreach ($categories as $category) { 
+            array_push( $categoriesList,CatalogList::fromModel($category));
+        }
         if (Auth::check()) {
             $userId = Auth::user()->id;
 
@@ -40,7 +46,7 @@ class DishController extends Controller
                 $lastOrder = null;
             }
         }
-        return view('catalog', compact('Dish', 'lastOrder'));
+        return view('catalog', compact('categoriesList', 'lastOrder'));
     }
 
     

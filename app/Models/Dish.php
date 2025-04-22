@@ -28,4 +28,7 @@ class Dish extends Model
         return $this->belongsToMany(Ingredient::class, 'dish_and_ingredients', 'dish_id', 'ingredients_id');
     }
 
+    public function category() { 
+        return $this->belongsTo(Category::class);
+    }
 }
