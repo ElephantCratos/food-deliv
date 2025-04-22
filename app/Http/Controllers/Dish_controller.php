@@ -40,6 +40,7 @@ class Dish_controller extends Controller
                 $lastOrder = null;
             }
         }
+      
         return view('catalog', compact('Dish', 'lastOrder'));
     }
 

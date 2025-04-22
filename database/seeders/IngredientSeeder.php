@@ -40,6 +40,7 @@ class IngredientSeeder extends Seeder
             'id' => '1',
             'name' =>'Pizza Margaritta',
             'image_path' => 'images/1695870651_gas-kvas-com-p-kartinki-pitstsa-1.jpg',
+            'category_id' => rand(1,3),
             'price' => '200',
         ]);
 
@@ -57,6 +58,7 @@ class IngredientSeeder extends Seeder
             'id' => '2',
             'name' =>'Pizza Pepperoni',
             'image_path' => 'images/1703351039_mykaleidoscope-ru-p-zelenaya-pitstsa-krasivo-62.jpg',
+            'category_id' => rand(1,3),
             'price' => '250',
         ]);
 
