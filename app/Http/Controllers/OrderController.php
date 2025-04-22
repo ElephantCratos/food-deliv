@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\Status;
 use Illuminate\Contracts\Support\ValidatedData;
 use Illuminate\Support\Facades\Auth;
+use App\Services\PromocodeService;
 
 
 class OrderController extends Controller
@@ -46,31 +47,49 @@ class OrderController extends Controller
      * Show the form for creating a new resource.
      */
 
-    public function showCart()
+     public function showCart(PromocodeService $promocodeService)
     {
         $userId = Auth::user()->id;
-
 
         $lastOrder = Order::where('customer_id', $userId)
             ->orderBy('created_at', 'desc')
             ->first();
+            
         if ($lastOrder != null && $lastOrder->status_id != null) {
             $lastOrder = null;
         }
 
         $positions = $lastOrder ? $lastOrder->positions : null;
+        
+        // Обработка промокода
+        $promocode = null;
+        $discountAmount = 0;
+        $totalWithDiscount = $lastOrder ? $lastOrder->price : 0;
+        
+        if (session('promocode')) {
+            $promocode = $promocodeService->validate(session('promocode'));
+            if ($promocode && $lastOrder) {
+                $totalWithDiscount = $promocodeService->apply($promocode, $lastOrder->price);
+                $discountAmount = $lastOrder->price - $totalWithDiscount;
+            }
+        }
 
-        return view('cart', compact('positions', 'lastOrder'));
+        return view('cart', compact(
+            'positions',
+            'lastOrder',
+            'promocode',
+            'discountAmount',
+            'totalWithDiscount'
+        ));
     }
+ 
 
-    public function sendOrder(Request $request)
+    public function sendOrder(Request $request, PromocodeService $promocodeService)
     {
-
         $validatedData = $request->validate([
             'adress' => 'required|string|max:255',
             'comment' => 'nullable|string|max:255',
             'time' => '|date_format:H:i|',
-
         ]);
 
         $userId = Auth::user()->id;
@@ -80,23 +99,62 @@ class OrderController extends Controller
             ->first();
 
         if ((int)$lastOrder->price == 0) {
-
             return redirect()->route('Cart');
         }
 
+        // Применение промокода
+        if (session('promocode')) {
+            $promocode = $promocodeService->validate(session('promocode'));
+            
+            if ($promocode) {
+                $newTotal = $promocodeService->apply($promocode, $lastOrder->price);
+                $discountAmount = $lastOrder->price - $newTotal;
+                
+                // Обновляем заказ
+                $lastOrder->price = $newTotal;
+                $lastOrder->discount = $discountAmount;
+                $lastOrder->promocode_id = $promocode->id;
+                
+                // Увеличиваем счетчик использований
+                $promocodeService->incrementUsage($promocode);
+            }
+            
+            // Очищаем промокод из сессии
+            session()->forget('promocode');
+        }
+
+        // Обновление данных заказа
         $lastOrder->status_id = 1;
         $lastOrder->address = $validatedData['adress'];
         $lastOrder->comment = $validatedData['comment'];
-
-        if ($request->input('fast_value') == "0") {
-            $lastOrder->expected_at = $validatedData['time'];
-        } else {
-            $lastOrder->expected_at = null;
-        }
+        $lastOrder->expected_at = $request->input('fast_value') == "0" 
+            ? $validatedData['time'] 
+            : null;
 
         $lastOrder->save();
 
         return redirect()->route('Cart')->with('status', 'Заказ успешно оформлен');
+    }
+
+    public function applyPromocode(Request $request, PromocodeService $promocodeService)
+    {
+        $request->validate(['promocode' => 'required|string']);
+        
+        $promocode = $promocodeService->validate($request->promocode);
+        
+        if (!$promocode) {
+            return back()->with('error', 'Промокод недействителен или истек');
+        }
+        
+        session(['promocode' => $promocode->code]);
+        
+        return back()->with('success', 'Промокод успешно применен!');
+    }
+
+    public function removePromocode()
+    {
+        session()->forget('promocode');
+        return back()->with('status', 'Промокод удален');
     }
 
     function showOwnOrders()
@@ -157,4 +215,5 @@ class OrderController extends Controller
 
         return redirect()->back()->with('error', 'Order not found.');
     }
+
 }

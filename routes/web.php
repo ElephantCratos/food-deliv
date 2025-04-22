@@ -9,6 +9,7 @@ use App\Http\Controllers\DishController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\IngridientController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PromocodeController;
 
 
 Route::get('/', function () {
@@ -30,6 +31,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/order_position/delete/{id}',[OrderPositionController::class, 'destroy']) ->name('delete-order-position');
     Route::post('/add_to_cart', [OrderPositionController::class, 'store']) -> name('add_to_cart');
     Route::get('/Cart', [OrderController::class,'showCart'])->name('Cart');
+    Route::post('/cart/apply-promocode', [OrderController::class, 'applyPromocode'])
+    ->name('cart.apply-promocode');
+    Route::post('/cart/remove-promocode', [OrderController::class, 'removePromocode'])
+    ->name('cart.remove-promocode');
     Route::post('send_cart', [OrderController::class, 'sendOrder'])->name('send_order');
 
     Route::middleware(['can:access to kitchen panel'])->group(function () {
@@ -91,6 +96,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::delete('/dish/delete/{id}', [DishController::class, 'delete'])->name('dish.delete');
         Route::delete('/ingredient/delete/{id}', [IngridientController::class, 'delete'])->name('Ingridient.delete');
+
+        Route::resource('promocodes', App\Http\Controllers\PromocodeController::class)
+        ->names('admin.promocodes');
 
     });
 });

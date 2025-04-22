@@ -31,4 +31,8 @@ class Order extends Model
         return $this->belongsTo(Status::class);
     }
 
+    public function promocode()
+    {
+        return $this->belongsTo(Promocode::class);
+    }
 }
