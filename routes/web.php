@@ -54,8 +54,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::middleware(['can:access to chat'])->group(function() {
         Route::get('/users', [ChatController::class, 'showUsers'])->name('Users_list');
-        Route::get('/chat/{userId}', [ChatController::class, 'showChat'])->name('showChat');
-        Route::post('/chat/{userId}', [ChatController::class, 'sendMessage']);
+        Route::get('/chat/user/{user}', [ChatController::class, 'openChat'])->name('chats.open');
+        Route::get('/chat/{chat}', [ChatController::class, 'showChat']) ->name('chats.show');
+        Route::post('/chat/{chat}', [ChatController::class, 'sendMessage'])->name('chats.send');
     });
 
     Route::middleware(['can:access to manager panel'])->group(function () {

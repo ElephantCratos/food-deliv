@@ -16,6 +16,18 @@
                 <input type="text" id="foodPrice" name="price" value="" class="px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:border-blue-300" required>
             </div>
             <div class="mb-4">
+                <label for="category" class="block text-gray-700 text-sm font-bold mb-2">
+                    Выберите категорию:
+                </label>
+                <select id="category" name="category_id" class="block w-full p-2 border border-gray-300 rounded">
+                    <option value="">-- Выберите категорию --</option>
+                    @foreach ($categories as $category)
+                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            
+            <div class="mb-4">
                 <label for="toppings" class="block text-gray-700 text-sm font-bold mb-2">Choose Toppings:</label>
                 <div id="toppings" class="text-gray-700">
                     @foreach ($ingredient as $Ingredient)
