@@ -9,12 +9,12 @@ use App\Models\Ingredient;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 
-class Dish_controller extends Controller
+class DishController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-   public function index()
+   public function showDishToManager()
     {
         $Dish = Dish::OrderBy('name')
             ->get();
@@ -24,7 +24,7 @@ class Dish_controller extends Controller
        ]));
     }
 
-    public function index1()
+    public function showCatalog()
     {
         $lastOrder = null;
         $Dish = Dish::orderBy('name')->get();
