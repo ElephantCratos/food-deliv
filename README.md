@@ -1,3 +1,4 @@
+
 # Команда проекта
 * Петрушов Александр 1121б
 * Малых Кирилл 1121б
@@ -51,6 +52,11 @@ PHP 8.2 REQUIRED
 
 Теперь проект должен работать.
 
+*
+
+## *СПЕЦИАЛЬНО ДЛЯ АРТУРА НЕ ВСЕ ОТСЮДА НАДО ЗАПУСКАТЬ В ДОКЕРЕ*
+
+*
 **Must Have Commands to start**
 
     git clone https://github.com/ElephantCratos/food-deliv.git
@@ -64,8 +70,8 @@ PHP 8.2 REQUIRED
      php artisan config:clear
      php artisan cache:clear
      php artisan route:clear
-     npm i
-     npm run dev
+     npm i - не ДОКЕР
+     npm run dev - не ДОКЕР
      php artisan migrate:fresh -seed
 
     
