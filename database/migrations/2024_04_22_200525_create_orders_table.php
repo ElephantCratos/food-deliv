@@ -22,7 +22,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('image_path');
-
+            $table->unsignedBigInteger('category_id');
             $table->foreignId('extra_ingredients_id')->references('id')->on('ingredients')->nullable();
             $table->decimal('price', 10, 2);
             $table->timestamps();
@@ -32,7 +32,7 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('dish_id')->references('id')->on('dish');
-
+            
             $table->decimal('price', 10, 2);
             $table->integer('quantity');
             $table->timestamps();
