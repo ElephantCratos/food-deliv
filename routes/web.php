@@ -100,6 +100,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('promocodes', App\Http\Controllers\PromocodeController::class)
         ->names('admin.promocodes');
 
+        Route::get('/Manager_Promocodes', [PromocodeController::class, 'showPromocodesToManager'])->name('Manager_Promocodes');
+
+        // Форма добавления промокода
+        Route::get('/Add_Promocode', [PromocodeController::class, 'showRedactorPromocodes'])->name('Add_Promocode');
+
+        // Сохранение нового промокода
+        Route::post('/promocode', [PromocodeController::class, 'store'])->name('promocode.store');
+
+        // Форма редактирования
+        Route::get('/promocode/{id}/edit', [PromocodeController::class, 'edit'])->name('promocode.edit');
+
+        // Обновление промокода
+        Route::put('/promocode/{id}', [PromocodeController::class, 'update'])->name('promocode.update');
+
+        // Удаление промокода
+        Route::delete('/promocode/delete/{id}', [PromocodeController::class, 'delete'])->name('promocode.delete');
     });
 });
 
