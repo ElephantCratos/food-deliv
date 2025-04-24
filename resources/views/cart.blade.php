@@ -19,11 +19,45 @@
 <div class="container mx-auto mt-10 mb-10">
     <h1 class="text-2xl font-bold mb-4">Корзина</h1>
 
+    <!-- Блок промокода -->
+    <div class="bg-white shadow rounded-lg p-4 mb-6">
+        @if($promocode)
+        <div class="flex justify-between items-center bg-green-50 p-3 rounded-md mb-3">
+            <div>
+                <span class="font-medium">Промокод:</span> 
+                <span class="text-green-600">{{ $promocode->code }}</span>
+                <span class="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded">
+                    {{ $promocode->type === 'percent' ? $promocode->discount.'%' : $promocode->discount.'₽' }}
+                </span>
+                <span class="ml-2 text-green-600">Скидка: {{ $discountAmount }}₽</span>
+            </div>
+            <form action="{{ route('cart.remove-promocode') }}" method="POST">
+                @csrf
+                <button type="submit" class="text-red-500 hover:text-red-700 text-sm font-medium">
+                    Удалить
+                </button>
+            </form>
+        </div>
+        @else
+        <form action="{{ route('cart.apply-promocode') }}" method="POST" class="flex">
+            @csrf
+            <input type="text" name="promocode" 
+                   class="flex-grow px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-yellow-500" 
+                   placeholder="Введите промокод" required>
+            <button type="submit" 
+                    class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-r-md">
+                Применить
+            </button>
+        </form>
+        @endif
+    </div>
+
     <div class="flex flex-col">
         <div class="-my-2 overflow-x-auto">
             <div class="py-2 align-middle inline-block min-w-full">
                 <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
                     <table class="min-w-full divide-y divide-gray-200">
+                        <!-- ... существующая таблица с товарами ... -->
                         <thead class="bg-gray-50">
                             <tr>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -44,26 +78,23 @@
                         <tbody>
                             @if($positions != null)
                             @forelse ($positions as $position)
-
                             <tr class="bg-white">
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
                                         <div class="ml-4">
                                             <div class="text-sm font-medium text-gray-900">
-
                                                 {{$position->dish->name}}
                                             </div>
                                         </div>
                                     </div>
                                 </td>
-
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm text-gray-900"></div>
                                     {{$position->quantity}}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm text-gray-900"></div>
-                                    {{$position->price * $position->quantity}}
+                                    {{$position->price * $position->quantity}}₽
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm text-gray-900"></div>
@@ -71,41 +102,41 @@
                                     <p>{{ $ingredient->name }}</p>
                                     @endforeach
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900"></div>
-                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <form action="{{route('delete-order-position',$position -> id)}}" method="post">
+                                    <form action="{{route('delete-order-position',$position->id)}}" method="post">
                                         @csrf
                                         @method('DELETE')
                                         <button class="text-white bg-red-500 hover:bg-red-700 font-bold py-2 px-3 rounded" type="submit">Удалить</button>
                                     </form>
-
                                 </td>
                             </tr>
                             @empty
-                            <p>Ваша корзина пуста</p>
+                            <tr>
+                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                                    Ваша корзина пуста
+                                </td>
+                            </tr>
                             @endforelse
-
                             @else
-                            <p>Ваша корзина пуста</p>
-
+                            <tr>
+                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                                    Ваша корзина пуста
+                                </td>
+                            </tr>
                             @endif
                         </tbody>
                     </table>
-
                 </div>
             </div>
         </div>
 
         <div class="mt-4 flex justify-center">
-
             <form action="{{route('send_order')}}" method="POST">
                 @csrf
                 <table>
                     <tr>
-                        <td><label for="adress">Адресс</label></td>
-                        <td><input type="text" name="adress"></input></td>
+                        <td><label for="adress">Адрес</label></td>
+                        <td><input type="text" name="adress" class="border rounded px-2 py-1"></td>
                     </tr>
                     <tr>
                         <td><label for="fast">Как можно скорее</label></td>
@@ -116,24 +147,33 @@
                     </tr>
                     <tr>
                         <td><label for="time">Время доставки</label></td>
-                        <td><input type="time" name="time" value="{{ now()->addHour()->format('H:i') }}" min="{{ now()->addHour()->format('H:i') }}"></input></td>
+                        <td><input type="time" name="time" value="{{ now()->addHour()->format('H:i') }}" min="{{ now()->addHour()->format('H:i') }}" class="border rounded px-2 py-1"></td>
                     </tr>
                     <tr>
                         <td><label for="comment">Комментарии к заказу</label></td>
-                        <td><textarea name="comment"></textarea></td>
+                        <td><textarea name="comment" class="border rounded px-2 py-1"></textarea></td>
                     </tr>
                     <tr>
-                        <td>
-                            <button class="pointer-events-none bg-yellow-500 text-white font-bold py-4 px-4 w-full rounded">
-                                @if($lastOrder!=null)
-                                Итого: {{$lastOrder->price}}
-                                @else
-                                Итого: 0
-                                @endif
-                            </button>
+                        <td colspan="2" class="pt-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-medium">Сумма заказа:</span>
+                                <span>{{ $lastOrder ? $lastOrder->price + $discountAmount : 0 }}₽</span>
+                            </div>
+                            @if($promocode)
+                            <div class="flex justify-between items-center mb-2 text-green-600">
+                                <span class="font-medium">Скидка:</span>
+                                <span>-{{ $discountAmount }}₽</span>
+                            </div>
+                            @endif
+                            <div class="flex justify-between items-center font-bold text-lg border-t pt-2">
+                                <span>Итого к оплате:</span>
+                                <span>{{ $lastOrder ? $totalWithDiscount : 0 }}₽</span>
+                            </div>
                         </td>
-                        <td>
-                            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-4 px-4 w-full rounded" type="submit">
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="pt-4">
+                            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-6 w-full rounded" type="submit">
                                 Оформить заказ
                             </button>
                         </td>
@@ -147,15 +187,14 @@
     const checkbox = document.getElementById('fast');
     const hiddenInput = document.getElementById('fast_value');
 
-
     hiddenInput.value = checkbox.checked ? '1' : '0';
-
 
     checkbox.addEventListener('change', function() {
         hiddenInput.value = this.checked ? '1' : '0';
     });
 </script>
 @endsection
+
 @section('footer')
 2024 Food Delivery Catalog. All rights reserved.
 @endsection
