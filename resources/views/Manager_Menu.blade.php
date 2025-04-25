@@ -7,7 +7,7 @@
                         <th class="border-2 border-slate-300 p-5 text-white text-center">Id</th>
                         <th class="border-2 border-slate-300 p-5 text-white text-center">Название блюда</th>
                         <th class="border-2 border-slate-300 p-5 text-white text-center">Изображение</th>
-                        <th class="border-2 border-slate-300 p-5 text-white text-center">Топинги</th>
+                        <th class="border-2 border-slate-300 p-5 text-white text-center">Категория</th>
                         <th class="border-2 border-slate-300 p-5 text-white text-center">Цена</th>
                         <th class="border-2 border-slate-300 p-5 text-white text-center">Изменение</th>
                     </tr>
@@ -17,13 +17,7 @@
                             <td class="border-2 border-slate-300 p-5 text-white text-center">{{ $dish->id }}</td>
                             <td class="border-2 border-slate-300 p-5 text-white text-center">{{ $dish->name }}</td>
                             <td class="border-2 border-slate-300 p-5 text-white text-center">{{ $dish->image_path }}</td>
-                            <td class="border-2 border-slate-300 p-5 text-white text-center"> @if ($dish->ingredients->isNotEmpty())
-                                    @foreach ($dish->ingredients as $ingredient)
-                                        {{ $ingredient->name }}@if (!$loop->last), @endif
-                                    @endforeach
-                                @else
-                                    <em>No ingredients found</em>
-                                @endif</td>
+                            <td class="border-2 border-slate-300 p-5 text-white text-center">{{$dish->category->name}}</td>
                             <td class="border-2 border-slate-300 p-5 text-white text-center">{{ $dish->price }}</td>
                             <td class="border-2 border-slate-300 p-5 text-white text-center">
                                 <form method="get" action="{{ route('dish.edit', $dish->id) }}">

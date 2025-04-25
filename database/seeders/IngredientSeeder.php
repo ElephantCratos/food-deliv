@@ -4,9 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Ingredient;
 use App\Models\Dish;
-use App\Models\DishAndIngredient;
 
 class IngredientSeeder extends Seeder
 {
@@ -15,27 +13,6 @@ class IngredientSeeder extends Seeder
      */
     public function run(): void
     {
-        $pepperoni = Ingredient::create([
-            'id' => '1',
-            'name' => 'Pepperoni',
-            'description' => 'zxc',
-            'price' => '10',
-        ]);
-
-        $tomato = Ingredient::create([
-            'id' => '2',
-            'name' => 'Tomato',
-            'description' => 'zxc',
-            'price' => '10',
-        ]);
-
-        $cheese = Ingredient::create([
-            'id' => '3',
-            'name' => 'Cheese',
-            'description' => 'zxc',
-            'price' => '10',
-        ]);
-
         $dish = Dish::create([
             'id' => '1',
             'name' =>'Pizza Margaritta',
@@ -44,37 +21,12 @@ class IngredientSeeder extends Seeder
             'category_id' => rand(1,3),
         ]);
 
-        $dishAndIngredient = DishAndIngredient::create([
-            'dish_id' => $dish->id,
-            'ingredients_id' => $tomato->id,
-        ]);
-
-        $dishAndIngredient = DishAndIngredient::create([
-            'dish_id' => $dish->id,
-            'ingredients_id' => $cheese->id,
-        ]);
-
         $dish = Dish::create([
             'id' => '2',
             'name' =>'Pizza Pepperoni',
             'image_path' => 'images/1703351039_mykaleidoscope-ru-p-zelenaya-pitstsa-krasivo-62.jpg',
             'price' => '250',
             'category_id' => rand(1,3),
-        ]);
-
-        $dishAndIngredient = DishAndIngredient::create([
-            'dish_id' => $dish->id,
-            'ingredients_id' => $tomato->id,
-        ]);
-
-        $dishAndIngredient = DishAndIngredient::create([
-            'dish_id' => $dish->id,
-            'ingredients_id' => $cheese->id,
-        ]);
-
-        $dishAndIngredient = DishAndIngredient::create([
-            'dish_id' => $dish->id,
-            'ingredients_id' => $pepperoni->id,
         ]);
     }
 }

@@ -74,14 +74,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/orders/{id}/accept', [OrderController::class, 'acceptOrder'])->name('orders.accept');
         Route::post('/orders/{id}/decline', [OrderController::class, 'declineOrder'])->name('orders.decline');
 
-        Route::get('/Manager_Ingredients', [IngridientController::class, 'showIngredientsToManager'])->name('Manager_Ingredients');
-
         Route::post('/dish', [DishController::class, 'store'])->name('dish.store');
-
-
-        Route::post('/ingredient', [ingridientController::class, 'store'])->name('ingredient.store');
-
-        Route::get('/Add_ingredient', [ingridientController::class, 'showRedactorIngridients'])->name('Add_ingredient');
 
         Route::get('/Manager_Menu',[DishController::class, 'showDishToManager'])->name('Manager_Menu');
 
@@ -95,7 +88,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/ingredient/{id}', [IngridientController::class, 'update'])->name('ingredient.update');
 
         Route::delete('/dish/delete/{id}', [DishController::class, 'delete'])->name('dish.delete');
-        Route::delete('/ingredient/delete/{id}', [IngridientController::class, 'delete'])->name('Ingridient.delete');
 
         Route::resource('promocodes', App\Http\Controllers\PromocodeController::class)
         ->names('admin.promocodes');

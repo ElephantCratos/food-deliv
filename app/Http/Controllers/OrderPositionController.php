@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Ingredient;
 use App\Models\Dish;
 use App\Models\OrderPosition;
 use App\Models\Order;
@@ -28,26 +27,6 @@ class OrderPositionController extends Controller
             'price' => $dish->price,
             'quantity' => $request->quantity,
         ]);
-
-        $selectedIngredients = $request->all();
-
-        $ingredientIds = [];
-
-        foreach ($selectedIngredients as $key => $value) {
-            if (str_starts_with($key, 'topping')) {
-                $ingredientIds[] = $value;
-            }
-        }
-
-
-        $ingredients = Ingredient::whereIn('id', $ingredientIds)->get();
-
-
-
-
-
-        $OrderPosition->ingredients()->attach($ingredients);
-
 
         $userId = Auth::id();
 
@@ -117,13 +96,7 @@ class OrderPositionController extends Controller
         $lastOrder->price -= (float)$dish->price * (float)$orderPosition->quantity;
         $lastOrder->save();
 
-
-        $orderPosition->ingredients()->detach();
-
         $orderPosition->delete();
-
-
-
 
         return redirect()->route('Cart')->with('success', 'Блюдо убрано из заказа');
 

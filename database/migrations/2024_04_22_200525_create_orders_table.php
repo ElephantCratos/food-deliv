@@ -10,20 +10,11 @@ return new class extends Migration
      * Run the migrations.*/
     public function up(): void
     {
-        Schema::create('ingredients', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('description');
-            $table->decimal('price', 10, 2);
-            $table->timestamps();
-        });
-
         Schema::create('dish', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('image_path');
             $table->unsignedBigInteger('category_id');
-            $table->foreignId('extra_ingredients_id')->references('id')->on('ingredients')->nullable();
             $table->decimal('price', 10, 2);
             $table->timestamps();
         });
@@ -59,11 +50,6 @@ return new class extends Migration
             $table->string('comment')->nullable();
             $table->time('expected_at')->nullable();
             $table->timestamps();
-        });
-
-        Schema::table('dish', function (Blueprint $table) {
-            $table->dropForeign(['extra_ingredients_id']);
-            $table->dropColumn('extra_ingredients_id');
         });
     }
 
