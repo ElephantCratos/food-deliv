@@ -4,15 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
-use App\Models\Ingredient;
 
 
-class IngridientController extends Controller
+class CategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function showIngridientsToCustomer()
+    public function showCategoriesToCustomer()
     {
         $categories = Category::OrderBy('name')
             ->get();

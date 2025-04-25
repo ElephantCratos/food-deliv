@@ -7,7 +7,7 @@ use App\Http\Controllers\CourierController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DishController;
 use App\Http\Controllers\ChatController;
-use App\Http\Controllers\IngridientController;
+use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PromocodeController;
 
@@ -78,14 +78,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('/Manager_Menu',[DishController::class, 'showDishToManager'])->name('Manager_Menu');
 
-        Route::get('/Edit_menu',[IngridientController::class, 'showIngridientsToCustomer'])->name('Edit_menu');
+        Route::get('/Edit_menu',[CategoryController::class, 'showCategoriesToCustomer'])->name('Edit_menu');
 
         Route::get('/dish/{id}/edit', [DishController::class, 'edit'])->name('dish.edit');
 
         Route::put('/dish/{id}', [DishController::class, 'update'])->name('dish.update');
-
-        Route::get('/ingredient/{id}/edit', [IngridientController::class, 'edit'])->name('ingredient.edit');
-        Route::put('/ingredient/{id}', [IngridientController::class, 'update'])->name('ingredient.update');
 
         Route::delete('/dish/delete/{id}', [DishController::class, 'delete'])->name('dish.delete');
 
