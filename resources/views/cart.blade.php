@@ -7,192 +7,158 @@
 @section('title')
 {{ config('app.name', 'Laravel') }}
 @endsection
-<!-- Fonts -->
 <link rel="preconnect" href="https://fonts.bunny.net">
 <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+<style>
+    .toggle {
+        position: relative;
+        width: 60px;
+        height: 30px;
+        background: #e2e8f0;
+        border-radius: 9999px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+    .toggle::before {
+        content: '';
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        top: 3px;
+        left: 3px;
+        background: white;
+        border-radius: 50%;
+        transition: left 0.3s ease;
+    }
+    .toggle.active {
+        background: #48bb78;
+    }
+    .toggle.active::before {
+        left: 33px;
+    }
+</style>
 @endsection
 
-@section('nav')
-@parent
-@endsection
 @section('content')
-<div class="container mx-auto mt-10 mb-10">
-    <h1 class="text-2xl font-bold mb-4">Корзина</h1>
+<div class="container mx-auto mt-10 mb-20 px-4">
+    <h1 class="text-3xl font-bold mb-6">Оформление заказа</h1>
 
-    <!-- Блок промокода -->
-    <div class="bg-white shadow rounded-lg p-4 mb-6">
-        @if($promocode)
-        <div class="flex justify-between items-center bg-green-50 p-3 rounded-md mb-3">
-            <div>
-                <span class="font-medium">Промокод:</span> 
-                <span class="text-green-600">{{ $promocode->code }}</span>
-                <span class="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded">
-                    {{ $promocode->type === 'percent' ? $promocode->discount.'%' : $promocode->discount.'₽' }}
-                </span>
-                <span class="ml-2 text-green-600">Скидка: {{ $discountAmount }}₽</span>
-            </div>
-            <form action="{{ route('cart.remove-promocode') }}" method="POST">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Левая часть: форма доставки -->
+        <div class="md:col-span-2 space-y-6">
+            <form action="{{route('send_order')}}" method="POST" class="space-y-4">
                 @csrf
-                <button type="submit" class="text-red-500 hover:text-red-700 text-sm font-medium">
-                    Удалить
-                </button>
-            </form>
-        </div>
-        @else
-        <form action="{{ route('cart.apply-promocode') }}" method="POST" class="flex">
-            @csrf
-            <input type="text" name="promocode" 
-                   class="flex-grow px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-yellow-500" 
-                   placeholder="Введите промокод" required>
-            <button type="submit" 
-                    class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-r-md">
-                Применить
-            </button>
-        </form>
-        @endif
-    </div>
 
-    <div class="flex flex-col">
-        <div class="-my-2 overflow-x-auto">
-            <div class="py-2 align-middle inline-block min-w-full">
-                <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <!-- ... существующая таблица с товарами ... -->
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Название
-                                </th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Количество
-                                </th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Цена
-                                </th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Топинги
-                                </th>
-                                <th scope="col" class="relative px-6 py-3 "></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if($positions != null)
-                            @forelse ($positions as $position)
-                            <tr class="bg-white">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div class="ml-4">
-                                            <div class="text-sm font-medium text-gray-900">
-                                                {{$position->dish->name}}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900"></div>
-                                    {{$position->quantity}}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900"></div>
-                                    {{$position->price * $position->quantity}}₽
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900"></div>
-                                    @foreach ($position->ingredients as $ingredient)
-                                    <p>{{ $ingredient->name }}</p>
-                                    @endforeach
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <form action="{{route('delete-order-position',$position->id)}}" method="post">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="text-white bg-red-500 hover:bg-red-700 font-bold py-2 px-3 rounded" type="submit">Удалить</button>
-                                    </form>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">
-                                    Ваша корзина пуста
-                                </td>
-                            </tr>
-                            @endforelse
-                            @else
-                            <tr>
-                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">
-                                    Ваша корзина пуста
-                                </td>
-                            </tr>
-                            @endif
-                        </tbody>
-                    </table>
+                <div class="flex items-center space-x-4">
+                    <span class="font-medium">Самовывоз</span>
+                    <div id="pickupToggle" class="toggle"></div>
+                    <span class="font-medium">Доставка</span>
                 </div>
-            </div>
+
+                <div id="adressField">
+                    <label class="block font-medium mb-1" for="adress">Адрес доставки</label>
+                    <input type="text" name="adress" id="adressInput" class="w-full p-2 border border-gray-300 rounded-lg" required>
+                </div>
+
+                <div id="pickupInfo" class="hidden p-4 bg-gray-100 rounded-lg">
+                    <p class="text-sm text-gray-700">Забирайте свой сочный шашлычок здесь, ЙОУ:</p>
+                    <p class="font-bold mt-1">ул. Пушкина, д. Колотушкина</p>
+                </div>
+
+                <div>
+                    <label class="block font-medium mb-1">Время доставки</label>
+                    <div class="flex flex-wrap gap-2">
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="time" value="09:00 - 09:30" class="form-radio" checked>
+                            <span>09:00 - 09:30</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="time" value="09:30 - 10:00" class="form-radio">
+                            <span>09:30 - 10:00</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="time" value="other" class="form-radio">
+                            <span>Другое время</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-medium mb-1" for="comment">Комментарий к заказу</label>
+                    <textarea name="comment" class="w-full p-2 border border-gray-300 rounded-lg"></textarea>
+                </div>
+
+                <div>
+                    <label class="block font-medium mb-1">Промокод</label>
+                    <div class="flex space-x-2">
+                        <input type="text" name="promo" class="flex-1 p-2 border border-gray-300 rounded-lg">
+                        <button type="button" class="bg-orange-500 text-white px-4 py-2 rounded-lg">Применить</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-medium mb-1">Способ оплаты</label>
+                    <select name="payment" class="w-full p-2 border border-gray-300 rounded-lg">
+                        <option value="card_online">Картой на сайте</option>
+                        <option value="card_courier">Картой курьеру</option>
+                        <option value="cash">Наличными</option>
+                    </select>
+                </div>
+
+                <div class="mt-6 flex justify-between">
+                    <button class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg" type="submit">Оформить заказ</button>
+                </div>
+            </form>
         </div>
 
-        <div class="mt-4 flex justify-center">
-            <form action="{{route('send_order')}}" method="POST">
-                @csrf
-                <table>
-                    <tr>
-                        <td><label for="adress">Адрес</label></td>
-                        <td><input type="text" name="adress" class="border rounded px-2 py-1"></td>
-                    </tr>
-                    <tr>
-                        <td><label for="fast">Как можно скорее</label></td>
-                        <td>
-                            <input type="checkbox" name="fast" id="fast">
-                            <input type="hidden" name="fast_value" id="fast_value" value="0">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for="time">Время доставки</label></td>
-                        <td><input type="time" name="time" value="{{ now()->addHour()->format('H:i') }}" min="{{ now()->addHour()->format('H:i') }}" class="border rounded px-2 py-1"></td>
-                    </tr>
-                    <tr>
-                        <td><label for="comment">Комментарии к заказу</label></td>
-                        <td><textarea name="comment" class="border rounded px-2 py-1"></textarea></td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" class="pt-4">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="font-medium">Сумма заказа:</span>
-                                <span>{{ $lastOrder ? $lastOrder->price + $discountAmount : 0 }}₽</span>
-                            </div>
-                            @if($promocode)
-                            <div class="flex justify-between items-center mb-2 text-green-600">
-                                <span class="font-medium">Скидка:</span>
-                                <span>-{{ $discountAmount }}₽</span>
-                            </div>
-                            @endif
-                            <div class="flex justify-between items-center font-bold text-lg border-t pt-2">
-                                <span>Итого к оплате:</span>
-                                <span>{{ $lastOrder ? $totalWithDiscount : 0 }}₽</span>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" class="pt-4">
-                            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-6 w-full rounded" type="submit">
-                                Оформить заказ
-                            </button>
-                        </td>
-                    </tr>
-                </table>
-            </form>
+        <!-- Правая часть: состав заказа -->
+        <div class="bg-white p-6 rounded-lg shadow-md space-y-4">
+            <h2 class="text-xl font-bold">Состав заказа</h2>
+            @foreach ($positions as $position)
+                <div class="flex justify-between">
+                    <span>{{ $position->dish->name }} x{{ $position->quantity }}</span>
+                    <span>{{ $position->price * $position->quantity }} ₽</span>
+                </div>
+            @endforeach
+
+            <hr class="my-4">
+
+            <div class="flex justify-between font-bold text-lg">
+                <span>Итого:</span>
+                <span>
+                    @if($lastOrder!=null)
+                        {{ $lastOrder->price }} ₽
+                    @else
+                        0 ₽
+                    @endif
+                </span>
+            </div>
         </div>
     </div>
 </div>
+
 <script>
-    const checkbox = document.getElementById('fast');
-    const hiddenInput = document.getElementById('fast_value');
+    const toggle = document.getElementById('pickupToggle');
+    const addressField = document.getElementById('adressField');
+    const pickupInfo = document.getElementById('pickupInfo');
+    const adressInput = document.getElementById('adressInput');
 
-    hiddenInput.value = checkbox.checked ? '1' : '0';
+    toggle.addEventListener('click', () => {
+        toggle.classList.toggle('active');
+        const isPickup = toggle.classList.contains('active');
 
-    checkbox.addEventListener('change', function() {
-        hiddenInput.value = this.checked ? '1' : '0';
+        if (isPickup) {
+            addressField.classList.add('hidden');
+            pickupInfo.classList.remove('hidden');
+            adressInput.value = 'ул. Пушкина, д. Колотушкина';
+        } else {
+            addressField.classList.remove('hidden');
+            pickupInfo.classList.add('hidden');
+            adressInput.value = '';
+        }
     });
 </script>
+
 @endsection
 
 @section('footer')
