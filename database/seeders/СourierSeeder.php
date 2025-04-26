@@ -9,7 +9,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 
-class CourierSeeder extends Seeder
+class СourierSeeder extends Seeder
 {
     /**
      * Run the database seeds.

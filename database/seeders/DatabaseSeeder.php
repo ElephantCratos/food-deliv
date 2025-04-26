@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
             CourierSeeder::class,
             UserSeeder::class,
             StatusSeeder::class,
-            IngredientSeeder::class,
+            DishSeeder::class,
             PromocodeSeeder::class
         ]);
     }

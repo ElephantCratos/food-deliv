@@ -25,11 +25,6 @@ class Dish extends Model
         return $this->belongsToMany(OrderPosition::class);
     }
 
-    public function ingredients()
-    {
-        return $this->belongsToMany(Ingredient::class, 'dish_and_ingredients', 'dish_id', 'ingredients_id');
-    }
-
     public function category() { 
         return $this->belongsTo(Category::class);
     }

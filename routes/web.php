@@ -7,7 +7,7 @@ use App\Http\Controllers\CourierController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DishController;
 use App\Http\Controllers\ChatController;
-use App\Http\Controllers\IngridientController;
+use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PromocodeController;
 
@@ -74,28 +74,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/orders/{id}/accept', [OrderController::class, 'acceptOrder'])->name('orders.accept');
         Route::post('/orders/{id}/decline', [OrderController::class, 'declineOrder'])->name('orders.decline');
 
-        Route::get('/Manager_Ingredients', [IngridientController::class, 'showIngredientsToManager'])->name('Manager_Ingredients');
-
         Route::post('/dish', [DishController::class, 'store'])->name('dish.store');
-
-
-        Route::post('/ingredient', [ingridientController::class, 'store'])->name('ingredient.store');
-
-        Route::get('/Add_ingredient', [ingridientController::class, 'showRedactorIngridients'])->name('Add_ingredient');
 
         Route::get('/Manager_Menu',[DishController::class, 'showDishToManager'])->name('Manager_Menu');
 
-        Route::get('/Edit_menu',[IngridientController::class, 'showIngridientsToCustomer'])->name('Edit_menu');
+        Route::get('/Edit_menu',[CategoryController::class, 'showCategoriesToCustomer'])->name('Edit_menu');
 
         Route::get('/dish/{id}/edit', [DishController::class, 'edit'])->name('dish.edit');
 
         Route::put('/dish/{id}', [DishController::class, 'update'])->name('dish.update');
 
-        Route::get('/ingredient/{id}/edit', [IngridientController::class, 'edit'])->name('ingredient.edit');
-        Route::put('/ingredient/{id}', [IngridientController::class, 'update'])->name('ingredient.update');
-
         Route::delete('/dish/delete/{id}', [DishController::class, 'delete'])->name('dish.delete');
-        Route::delete('/ingredient/delete/{id}', [IngridientController::class, 'delete'])->name('Ingridient.delete');
 
         Route::resource('promocodes', App\Http\Controllers\PromocodeController::class)
         ->names('admin.promocodes');
