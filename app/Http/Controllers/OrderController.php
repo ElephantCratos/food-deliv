@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Models\Dish;
 use App\Models\Status;
 use Illuminate\Contracts\Support\ValidatedData;
 use Illuminate\Support\Facades\Auth;
@@ -48,40 +49,41 @@ class OrderController extends Controller
      */
 
      public function showCart(PromocodeService $promocodeService)
-    {
-        $userId = Auth::user()->id;
+{
+    $cart = session('cart', []);
 
-        $lastOrder = Order::where('customer_id', $userId)
-            ->orderBy('created_at', 'desc')
-            ->first();
-            
-        if ($lastOrder != null && $lastOrder->status_id != null) {
-            $lastOrder = null;
+    $positions = collect($cart)->map(function ($item) {
+        $dish = Dish::find($item['dish_id']);
+        return (object) [
+            'dish' => $dish,
+            'quantity' => $item['quantity'],
+            'price' => $item['price'],
+        ];
+    });
+
+    $total = $positions->sum(fn($item) => $item->price * $item->quantity);
+
+    // Промокод
+    $promocode = null;
+    $discountAmount = 0;
+    $totalWithDiscount = $total;
+
+    if (session('promocode')) {
+        $promocode = $promocodeService->validate(session('promocode'));
+        if ($promocode) {
+            $totalWithDiscount = $promocodeService->apply($promocode, $total);
+            $discountAmount = $total - $totalWithDiscount;
         }
-
-        $positions = $lastOrder ? $lastOrder->positions : null;
-        
-        // Обработка промокода
-        $promocode = null;
-        $discountAmount = 0;
-        $totalWithDiscount = $lastOrder ? $lastOrder->price : 0;
-        
-        if (session('promocode')) {
-            $promocode = $promocodeService->validate(session('promocode'));
-            if ($promocode && $lastOrder) {
-                $totalWithDiscount = $promocodeService->apply($promocode, $lastOrder->price);
-                $discountAmount = $lastOrder->price - $totalWithDiscount;
-            }
-        }
-
-        return view('cart', compact(
-            'positions',
-            'lastOrder',
-            'promocode',
-            'discountAmount',
-            'totalWithDiscount'
-        ));
     }
+
+    return view('cart', compact(
+        'positions',
+        'promocode',
+        'discountAmount',
+        'totalWithDiscount'
+    ));
+}
+
  
 
     public function sendOrder(Request $request, PromocodeService $promocodeService)

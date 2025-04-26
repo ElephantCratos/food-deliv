@@ -4,60 +4,88 @@
 <head>
     <meta charset="UTF-8">
     <title>@yield('title', 'Food Delivery')</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="{{ asset('css/styles.css') }}" rel="stylesheet">
     @yield('head')
-
 </head>
 
-<body class="flex flex-col min-h-screen bg-gray-50 text-gray-900">
+<body class="bg-[#f9f9f9] text-gray-900 font-sans flex flex-col min-h-screen">
 
-    {{-- Header --}}
-    <header class="py-4">
-        <div class="container mx-auto px-4 flex justify-between items-center">
-            <a href="{{ route('catalog') }}" class="text-gray-900 text-2xl font-bold hover:text-blue-600 transition">
-                🍔 FoodieDelivery
+    <header class="bg-white shadow-sm border-b">
+        {{-- Верхняя навигация --}}
+        <div class="container mx-auto px-4 lg:px-8 py-2 flex flex-wrap justify-between items-center text-sm text-gray-800">
+            <div class="flex items-center gap-4 flex-wrap">
+                <span class="text-red-600 font-semibold">🔴 Кухня LIVE</span>
+                <a href="#" class="hover:underline">О нас</a>
+                <a href="#" class="hover:underline">Контакты</a>
+                <a href="#" class="hover:underline">Корпоративные заказы</a>
+            </div>
+        </div>
+    
+        {{-- Основной блок шапки --}}
+        <div class="container mx-auto px-4 lg:px-8 py-4 flex flex-col lg:flex-row justify-between items-center gap-4 lg:gap-12">
+            {{-- Логотип и описание --}}
+            <div class="flex items-center gap-4 min-w-0">
+                <div class="text-5xl lg:text-6xl">🔥</div>
+                <div class="min-w-0">
+                    <h1 class="text-xl lg:text-2xl font-extrabold uppercase leading-5 tracking-wide whitespace-nowrap">ШАШЛЫЧНЫЙ ДВОР</h1>
+                    <p class="text-sm lg:text-base text-red-500 font-medium">Лучшее мясо в г. Нягань</p>
+                </div>
+            </div>
+    
+            {{-- Инфо о доставке --}}
+            <div class="text-center lg:text-left text-sm lg:text-base">
+                <p class="font-semibold text-gray-700 uppercase">Доставка по городу</p>
+                <p class="text-gray-700">30 мин · <span class="text-yellow-500 font-bold">★ 4.6</span></p>
+            </div>
+    
+            {{-- Иконки профиля --}}
+            <div class="flex items-center gap-6 text-sm text-gray-800 text-center">
+                <div class="flex flex-col items-center">
+                    <div class="text-2xl lg:text-3xl">🎧</div>
+                    <span class="mt-1">Поддержка</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="text-2xl lg:text-3xl">🎟️</div>
+                    <span class="mt-1">Мои акции</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="text-2xl lg:text-3xl">👤</div>
+                    <span class="mt-1">Профиль</span>
+                </div>
+            </div>
+        </div>
+    
+        {{-- Категории и корзина --}}
+        <div class="container mx-auto px-4 lg:px-8 pt-3 pb-4 border-t flex flex-wrap items-center gap-4 lg:gap-6">
+            @isset($categoriesList)
+            <x-categories :categoriesList="$categoriesList" />
+            @endisset
+
+    
+            {{-- Кнопка корзины --}}
+            <a href="{{ route('Cart') }}"
+               class="ml-auto bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-5 py-2 rounded-full transition whitespace-nowrap">
+                Корзина
             </a>
-
-            <nav>
-                <ul class="flex items-center space-x-6">
-                    @section('nav')
-                        <li><a href="{{ route('profile.edit') }}" class="hover:underline text-gray-900">Профиль</a></li>
-                        <li><a href="{{ route('catalog') }}" class="hover:underline text-gray-900">Меню</a></li>
-
-                        {{-- Cart button --}}
-                        <li>
-                            <a href="{{ route('Cart') }}" class="relative hover:underline text-gray-900">
-                                🛒 Корзина
-                                @if(session()->has('cart') && count(session('cart')) > 0)
-                                    <span class="absolute -top-2 -right-3 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full animate-pulse">
-                                        {{ count(session('cart')) }}
-                                    </span>
-                                @endif
-                            </a>
-                        </li>
-                    @show
-                </ul>
-            </nav>
         </div>
     </header>
 
-    {{-- Main content --}}
-    <main class="flex-grow">
+     {{-- Контент страницы --}}
+     <main class="flex-grow">
         @yield('content')
     </main>
 
-    {{-- Footer --}}
-    <footer class="footer-effect">
-        <div class="container mx-auto px-4">
-            <p>@yield('footer', '© ' . date('Y') . ' FoodieDelivery. Все права защищены.')</p>
-            <p class="mt-2">
-                <a href="#" class="hover:underline">Политика конфиденциальности</a> |
-                <a href="#" class="hover:underline">Условия использования</a>
-            </p>
-        </div>
+    {{-- Футер --}}
+    <footer class="bg-gray-100 text-center py-4">
+        @yield('footer')
     </footer>
 
+    {{-- Скрипты --}}
+    @yield('scripts')
 </body>
+    
 
+    
 </html>
