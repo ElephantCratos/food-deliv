@@ -7,7 +7,6 @@ use App\Models\Order;
 use App\ReadModel\CatalogList;
 use Illuminate\Http\Request;
 use App\Models\Dish;
-use App\Models\Ingredient;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 
@@ -80,10 +79,6 @@ class DishController extends Controller
             'category_id' => (int)$request->category_id,
         ]);
 
-        $ingredients = Ingredient::whereIn('id', $request->input('ingredients', []))->get();
-
-        $dish->ingredients()->attach($ingredients);
-
         return redirect()->route('Manager_Menu')->with('success', 'Dish created successfully.');
     }
 
@@ -126,10 +121,6 @@ class DishController extends Controller
 
         $dish->update($validatedData);
 
-        $ingredients = Ingredient::whereIn('id', $request->input('ingredients', []))->get();
-
-        $dish->ingredients()->sync($ingredients);
-
         return redirect()->route('Manager_Menu')->with('success', 'Dish updated successfully.');
     }
 
@@ -143,8 +134,6 @@ class DishController extends Controller
         if ($dish->image_path) {
             Storage::delete($dish->image_path);
         }
-
-        $dish->ingredients()->detach();
 
         $dish->delete();
 

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Ingredient;
 use App\Models\Dish;
 use App\Models\OrderPosition;
 use App\Models\Order;
@@ -70,13 +69,7 @@ class OrderPositionController extends Controller
         $lastOrder->price -= (float)$dish->price * (float)$orderPosition->quantity;
         $lastOrder->save();
 
-
-        $orderPosition->ingredients()->detach();
-
         $orderPosition->delete();
-
-
-
 
         return redirect()->route('Cart')->with('success', 'Блюдо убрано из заказа');
 

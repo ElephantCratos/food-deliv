@@ -15,7 +15,7 @@
                     <th class="p-3 border-b font-medium text-gray-700">ID</th>
                     <th class="p-3 border-b font-medium text-gray-700">Название блюда</th>
                     <th class="p-3 border-b font-medium text-gray-700">Изображение</th>
-                    <th class="p-3 border-b font-medium text-gray-700">Топпинги</th>
+                    <th class="p-3 border-b font-medium text-gray-700">Категория</th>
                     <th class="p-3 border-b font-medium text-gray-700">Цена</th>
                     <th class="p-3 border-b font-medium text-gray-700">Действия</th>
                 </tr>
@@ -29,13 +29,7 @@
                             <img src="{{ asset($dish->image_path) }}" alt="Фото блюда" class="w-16 h-16 object-cover rounded">
                         </td>
                         <td class="p-3 border-b">
-                            @if ($dish->ingredients->isNotEmpty())
-                                @foreach ($dish->ingredients as $ingredient)
-                                    {{ $ingredient->name }}@if (!$loop->last), @endif
-                                @endforeach
-                            @else
-                                <em class="text-gray-400">Нет топпингов</em>
-                            @endif
+                         <td class="p-3 border-b">{{$dish->category->name}}</td>
                         </td>
                         <td class="p-3 border-b">{{ $dish->price }} ₽</td>
                         <td class="p-3 border-b space-y-1">
