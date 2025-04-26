@@ -88,12 +88,41 @@
                     <textarea name="comment" class="w-full p-2 border border-gray-300 rounded-lg"></textarea>
                 </div>
 
-                <div>
-                    <label class="block font-medium mb-1">Промокод</label>
-                    <div class="flex space-x-2">
-                        <input type="text" name="promo" class="flex-1 p-2 border border-gray-300 rounded-lg">
-                        <button type="button" class="bg-orange-500 text-white px-4 py-2 rounded-lg">Применить</button>
-                    </div>
+                <div class="">
+                    @if($promocode)
+                        <div class="flex justify-between items-center p-3 rounded-lg mb-3 bg-gray-50">
+                            <div class="flex items-center space-x-3">
+                                <span class="font-medium">Промокод:</span>
+                                <span class="text-green-600">{{ $promocode->code }}</span>
+                                <span class="px-2 py-1 bg-green-100 text-green-800 text-sm rounded-lg">
+                                    {{ $promocode->type === 'percent' ? $promocode->discount.'%' : $promocode->discount.'₽' }}
+                                </span>
+                                <span class="text-green-600">Скидка: {{ $discountAmount }}₽</span>
+                            </div>
+                            <form action="{{ route('cart.remove-promocode') }}" method="POST">
+                                @csrf
+                                <button type="submit" class="text-red-500 hover:text-red-700 font-medium text-sm">
+                                    Удалить
+                                </button>
+                            </form>
+                        </div>
+                    @else
+                        <div>
+                            <label class="block font-medium mb-1">Промокод</label>
+                            <form action="{{ route('cart.apply-promocode') }}" method="POST" class="flex space-x-2">
+                                @csrf
+                                <input type="text" 
+                                       name="promocode" 
+                                       class="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                       placeholder="Введите промокод" 
+                                       required>
+                                <button type="submit" 
+                                        class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg">
+                                    Применить
+                                </button>
+                            </form>
+                        </div>
+                    @endif
                 </div>
 
                 <div>
@@ -112,27 +141,31 @@
         </div>
 
         <!-- Правая часть: состав заказа -->
-        <div class="bg-white p-6 rounded-lg shadow-md space-y-4">
-            <h2 class="text-xl font-bold">Состав заказа</h2>
-            @foreach ($positions as $position)
-                <div class="flex justify-between">
-                    <span>{{ $position->dish->name }} x{{ $position->quantity }}</span>
-                    <span>{{ $position->price * $position->quantity }} ₽</span>
-                </div>
-            @endforeach
+        <!-- Правая часть: состав заказа -->
+<div class="bg-white p-6 rounded-lg shadow-md space-y-4">
+    <h2 class="text-xl font-bold">Состав заказа</h2>
+    @forelse ($positions as $position)
+        <div class="flex justify-between">
+            <span>{{ $position->dish->name }} x{{ $position->quantity }}</span>
+            <span>{{ $position->price * $position->quantity }} ₽</span>
+        </div>
+    @empty
+        <p class="text-gray-500">Ваша корзина пуста.</p>
+    @endforelse
 
-            <hr class="my-4">
+    <hr class="my-4">
 
-            <div class="flex justify-between font-bold text-lg">
-                <span>Итого:</span>
-                <span>
-                    @if($lastOrder!=null)
-                        {{ $lastOrder->price }} ₽
-                    @else
-                        0 ₽
-                    @endif
-                </span>
-            </div>
+    <div class="flex justify-between font-bold text-lg">
+        <span>Итого:</span>
+        <span>{{ $totalWithDiscount }} ₽</span>
+    </div>
+    @if($discountAmount > 0)
+        <div class="text-sm text-green-600">
+            Скидка по промокоду: −{{ $discountAmount }} ₽
+        </div>
+    @endif
+</div>
+
         </div>
     </div>
 </div>

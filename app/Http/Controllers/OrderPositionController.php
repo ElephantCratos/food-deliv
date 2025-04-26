@@ -16,87 +16,40 @@ class OrderPositionController extends Controller
      */
     public function store(Request $request)
     {
-
-        $id = $request->input('dish_id');
-        $dish = Dish::findOrFail($id);
         $request->validate([
-            'quantity'=>'required|numeric|min:1',
+            'dish_id' => 'required|integer',
+            'quantity' => 'required|integer|min:1',
         ]);
-
-        $OrderPosition = OrderPosition::create([
-            'dish_id' => $id,
-            'price' => $dish->price,
-            'quantity' => $request->quantity,
-        ]);
-
-        $selectedIngredients = $request->all();
-
-        $ingredientIds = [];
-
-        foreach ($selectedIngredients as $key => $value) {
-            if (str_starts_with($key, 'topping')) {
-                $ingredientIds[] = $value;
+    
+        $dish = Dish::find($request->dish_id);
+        if (!$dish) {
+            return redirect()->back()->with('error', 'Блюдо не найдено.');
+        }
+    
+        $cart = session()->get('cart', []);
+    
+        // Если такое блюдо уже есть — увеличиваем количество
+        $found = false;
+        foreach ($cart as &$item) {
+            if ($item['dish_id'] == $dish->id) {
+                $item['quantity'] += $request->quantity;
+                $found = true;
+                break;
             }
         }
-
-
-        $ingredients = Ingredient::whereIn('id', $ingredientIds)->get();
-
-
-
-
-
-        $OrderPosition->ingredients()->attach($ingredients);
-
-
-        $userId = Auth::id();
-
-        $lastOrder = Order::where('customer_id', $userId)
-            ->orderBy('created_at', 'desc')
-            ->first();
-
-
-        if (empty($lastOrder) || $lastOrder->status_id != null) {
-
-            $newOrder = new Order();
-            $newOrder->customer_id = $userId;
-            $newOrder->status_id = null;
-            $newOrder->courier_id = null;
-
-            $dishPrice = (float) $dish->price;
-            $dishQuantity = $OrderPosition->quantity;
-
-            $priceIncrease = $dishPrice * $dishQuantity;
-
-
-            $newOrder->price = $newOrder->price + $priceIncrease;
-
-            $newOrder->save();
-
-            $newOrder->positions()->attach($OrderPosition);
-
+        if (!$found) {
+            $cart[] = [
+                'dish_id' => $dish->id,
+                'price' => $dish->price,
+                'quantity' => $request->quantity,
+            ];
         }
-        else
-        {
-            $dishPrice = (float) $dish->price;
-            $dishQuantity = $OrderPosition->quantity;
-
-            $priceIncrease = $dishPrice * $dishQuantity;
-
-
-            $lastOrder->price = $lastOrder->price + $priceIncrease;
-
-
-            $lastOrder->positions()->attach($OrderPosition);
-            $lastOrder->save();
-
-
-        }
-
-
-
-        return redirect()->route('catalog')->with('success', 'OrderPosition created successfully.');
+    
+        session()->put('cart', $cart);
+    
+        return redirect()->route('catalog')->with('success', 'Блюдо добавлено в корзину.');
     }
+    
 
     /**
      * Remove the specified resource from storage.

@@ -61,7 +61,7 @@ class DishController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
             'price' => 'required|numeric|min:0',
             'category_id' => 'required'
         ]);
