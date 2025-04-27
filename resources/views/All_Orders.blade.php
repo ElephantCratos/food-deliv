@@ -52,8 +52,11 @@
                 <p class="text-gray-600">Status: {{$order->status->name}}</p>
 
                 <ul class="list-disc list-inside text-gray-600">
+                    
+                 
                     @foreach($order->positions as $position)
-                    <li>{{$position->dish->name}} - ${{$position->price}} - @foreach ($position->ingredients as $pos) {{$pos->name}} @endforeach</li>
+                  
+                    <li>{{$position->dish->name}} - ${{$position->price}}</li>
                     <li>Количество: {{ $position->quantity }}</li>
 
                     @endforeach

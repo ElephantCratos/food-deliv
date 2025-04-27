@@ -2,72 +2,58 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Order;
-use App\Models\Status;
+use Illuminate\Http\RedirectResponse;
 
+// ОТРЕФАКТОРЕН, НО НАДО ПРОСМОТРЕТЬ ПО УТАТУСАМ. ЕСЛИ ОТКАЗЫВАЕМСЯ - ПЕРЕДЕЛКА.
 class KitchenController extends Controller
 {
     public function showOrdersToKitchen()
     {
-
-        $orders = Order::whereIn('status_id', [2, 3, 4])
+        $orders = Order::whereIn('status_id', [
+                Order::STATUS_AWAITING_ACCEPTANCE,
+                Order::STATUS_IN_KITCHEN,
+                Order::STATUS_WAITING_FOR_COURIER
+            ])
+            ->with('status')
             ->orderBy('id')
             ->get();
-        foreach ($orders as $order) {
-            if ($order->expected_at === null) {
-                $order->expected_at = 'As soon as possible';
-            }
-        }
 
-        return view('Kitchen_Orders', compact('orders'));
+        return view('Kitchen_Orders', [
+            'orders' => $orders->map(function ($order) {
+                $order->expected_at_formatted = $order->expected_at ?? 'As soon as possible';
+                return $order;
+            })
+        ]);
     }
 
-    public function confirmPreparation($id)
+    public function confirmPreparation(Order $order): RedirectResponse
     {
-        $order = Order::find($id);
-
-        if ($order) {
-            // "Ожидает курьера"
-            $order->status_id = 3;
-            $order->save();
-
-            return redirect()->back()->with('success', 'Order preparation confirmed successfully.');
-        }
-
-        return redirect()->back()->with('error', 'Order not found.');
+        $order->update([
+            'status_id' => Order::STATUS_IN_KITCHEN,
+        ]);
+        $order->save;
+        dd($order->status_id, Order::STATUS_IN_KITCHEN);
+        return back()->with('success', 'Подтверждено начало приготовления заказа');
     }
 
-
-    public function transferToCourier($id)
+    public function transferToCourier(Order $order): RedirectResponse
     {
-        $order = Order::find($id);
+        $order->update([
+            'status_id' => Order::STATUS_WAITING_FOR_COURIER,
+           
+        ]);
 
-        if ($order) {
-            // "В пути"
-            $order->status_id = 4;
-            $order->save();
-
-            return redirect()->back()->with('success', 'Order transferred to courier successfully.');
-        }
-
-        return redirect()->back()->with('error', 'Order not found.');
+        return back()->with('success', 'Заказ передан курьеру');
     }
 
-
-    public function courierArrived($id)
+    public function courierArrived(Order $order): RedirectResponse
     {
+        $order->update([
+            'status_id' => Order::STATUS_GIVEN_TO_COURIER,
+            
+        ]);
 
-        $order = Order::find($id);
-
-        if ($order) {
-            // "В пути"
-            $order->status_id = 5;
-            $order->save();
-
-            return redirect()->back()->with('success', 'Order transferred to courier successfully.');
-        }
-
-        return redirect()->back()->with('error', 'Order not found.');
+        return back()->with('success', 'Курьер принял заказ');
     }
 }

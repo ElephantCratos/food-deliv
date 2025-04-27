@@ -15,7 +15,7 @@
                     <p>Status: {{ $order->status->name }}</p>
                     <!-- Add more details as needed -->
                     @foreach($order->positions as $position)
-                <li>{{$position->dish->name}} - ${{$position->price}} - @foreach ($position->ingredients as $pos) {{$pos->name}} @endforeach </li>
+                <li>{{$position->dish->name}} - ${{$position->price}}</li>
                 <li>Количество: {{ $position->quantity }}</li>
                 @endforeach
                 <p class="text-gray-800 font-semibold">Address: {{ $order->address }}</p>

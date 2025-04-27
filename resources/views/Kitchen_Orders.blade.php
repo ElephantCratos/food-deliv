@@ -26,7 +26,7 @@
                             <!-- Add more details as needed -->
                             @if($order->status_id == 2 )
                             @foreach($order->positions as $position)
-                        <li>{{$position->dish->name}} - ${{$position->price}} - @foreach ($position->ingredients as $pos) {{$pos->name}} @endforeach</li>
+                        <li>{{$position->dish->name}} - ${{$position->price}}</li>
                         <li>Количество: {{ $position->quantity }}</li>
                         @endforeach
                                 <p class="text-gray-800 font-semibold">Address: {{ $order->address }}</p>
