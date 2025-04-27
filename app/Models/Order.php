@@ -11,14 +11,11 @@ class Order extends Model
 
     // Константы статусов (соответствуют StatusSeeder)
     const STATUS_IN_PROGRESS = 1;
-    const STATUS_AWAITING_ACCEPTANCE = 2;
-    const STATUS_IN_KITCHEN = 3;
-    const STATUS_WAITING_FOR_COURIER = 4;
-    const STATUS_GIVEN_TO_COURIER = 5;
-    const STATUS_COURIER_ON_THE_WAY = 6;
-    const STATUS_COMPLETED = 7;
-    const STATUS_DECLINED = 8;
-    const STATUS_DECLINED_BY_CUSTOMER = 9;
+    const STATUS_IN_KITCHEN = 2;
+    const STATUS_WAITING_FOR_COURIER = 3;
+    const STATUS_COURIER_ON_THE_WAY = 4;
+    const STATUS_COMPLETED = 5;
+    const STATUS_DECLINED = 6;
 
     protected $fillable = [
         'id',
@@ -38,10 +35,7 @@ class Order extends Model
         return $this->belongsToMany(OrderPosition::class);
     }
 
-    public function status()
-    {
-        return $this->belongsTo(Status::class);
-    }
+  
 
     public function promocode()
     {
@@ -52,9 +46,8 @@ class Order extends Model
     public function scopeAvailableForCourier($query, int $userId)
     {
         return $query
-            ->whereIn('status_id', [
+            ->whereIn('status', [
                 self::STATUS_WAITING_FOR_COURIER,
-                self::STATUS_GIVEN_TO_COURIER,
                 self::STATUS_COURIER_ON_THE_WAY
             ])
             ->where(function ($query) use ($userId) {

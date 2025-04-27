@@ -11,7 +11,6 @@ class KitchenController extends Controller
     public function showOrdersToKitchen()
     {
         $orders = Order::whereIn('status_id', [
-                Order::STATUS_AWAITING_ACCEPTANCE,
                 Order::STATUS_IN_KITCHEN,
                 Order::STATUS_WAITING_FOR_COURIER
             ])
@@ -33,7 +32,7 @@ class KitchenController extends Controller
             'status_id' => Order::STATUS_IN_KITCHEN,
         ]);
         $order->save;
-        dd($order->status_id, Order::STATUS_IN_KITCHEN);
+       
         return back()->with('success', 'Подтверждено начало приготовления заказа');
     }
 
@@ -47,13 +46,5 @@ class KitchenController extends Controller
         return back()->with('success', 'Заказ передан курьеру');
     }
 
-    public function courierArrived(Order $order): RedirectResponse
-    {
-        $order->update([
-            'status_id' => Order::STATUS_GIVEN_TO_COURIER,
-            
-        ]);
-
-        return back()->with('success', 'Курьер принял заказ');
-    }
+   
 }

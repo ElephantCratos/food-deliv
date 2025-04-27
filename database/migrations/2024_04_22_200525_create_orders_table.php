@@ -32,11 +32,7 @@ return new class extends Migration
 
 
 
-        Schema::create('status', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->timestamps();
-        });
+      
 
 
 
@@ -44,7 +40,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('customer_id')->nullable()->references('id')->on('users');
             $table->foreignId('courier_id')->nullable()->references('id')->on('users');
-            $table->foreignId('status_id')->nullable()->references('id')->on('status');
+            $table->foreignId('status');
             $table->decimal('price', 10, 2);
             $table->string('address')->nullable();
             $table->string('comment')->nullable();
