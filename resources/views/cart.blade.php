@@ -7,6 +7,7 @@
 @section('title')
 {{ config('app.name', 'Laravel') }}
 @endsection
+
 <link rel="preconnect" href="https://fonts.bunny.net">
 <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 <style>
@@ -46,7 +47,7 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Левая часть: форма доставки -->
         <div class="md:col-span-2 space-y-6">
-            <form action="{{route('send_order')}}" method="POST" class="space-y-4">
+            <form action="{{ route('send_order') }}" method="POST" class="space-y-4">
                 @csrf
 
                 <div class="flex items-center space-x-4">
@@ -62,7 +63,7 @@
 
                 <div id="pickupInfo" class="hidden p-4 bg-gray-100 rounded-lg">
                     <p class="text-sm text-gray-700">Забирайте свой сочный шашлычок здесь, ЙОУ:</p>
-                    <p class="font-bold mt-1">ул. Пушкина, д. Колотушкина</p>
+                    <p class="font-bold mt-1">Ул. Ленина д.3, 0 этаж</p>
                 </div>
 
                 <div>
@@ -88,7 +89,7 @@
                     <textarea name="comment" class="w-full p-2 border border-gray-300 rounded-lg"></textarea>
                 </div>
 
-                <div class="">
+                <div id="promoSection">
                     @if($promocode)
                         <div class="flex justify-between items-center p-3 rounded-lg mb-3 bg-gray-50">
                             <div class="flex items-center space-x-3">
@@ -99,28 +100,24 @@
                                 </span>
                                 <span class="text-green-600">Скидка: {{ $discountAmount }}₽</span>
                             </div>
-                            <form action="{{ route('cart.remove-promocode') }}" method="POST">
-                                @csrf
-                                <button type="submit" class="text-red-500 hover:text-red-700 font-medium text-sm">
-                                    Удалить
-                                </button>
-                            </form>
+                            <button type="button" id="removePromocode" class="text-red-500 hover:text-red-700 font-medium text-sm">
+                                Удалить
+                            </button>
                         </div>
                     @else
                         <div>
                             <label class="block font-medium mb-1">Промокод</label>
-                            <form action="{{ route('cart.apply-promocode') }}" method="POST" class="flex space-x-2">
-                                @csrf
+                            <div class="flex space-x-2">
                                 <input type="text" 
-                                       name="promocode" 
+                                       id="promocodeInput" 
                                        class="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                       placeholder="Введите промокод" 
-                                       required>
-                                <button type="submit" 
+                                       placeholder="Введите промокод">
+                                <button type="button" 
+                                        onclick="applyPromocode()" 
                                         class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg">
                                     Применить
                                 </button>
-                            </form>
+                            </div>
                         </div>
                     @endif
                 </div>
@@ -141,31 +138,40 @@
         </div>
 
         <!-- Правая часть: состав заказа -->
-        <!-- Правая часть: состав заказа -->
-<div class="bg-white p-6 rounded-lg shadow-md space-y-4">
-    <h2 class="text-xl font-bold">Состав заказа</h2>
-    @forelse ($positions as $position)
-        <div class="flex justify-between">
-            <span>{{ $position->dish->name }} x{{ $position->quantity }}</span>
-            <span>{{ $position->price * $position->quantity }} ₽</span>
-        </div>
-    @empty
-        <p class="text-gray-500">Ваша корзина пуста.</p>
-    @endforelse
+        <div class="bg-white p-6 rounded-lg shadow-md space-y-4">
+            <h2 class="text-xl font-bold">Состав заказа</h2>
+            <div id="cartItems">
+                @forelse ($positions as $position)
+                    <div class="flex justify-between items-center cart-item" data-id="{{ $position->dish->id }}">
+                        <div class="flex items-center space-x-3">
+                            <span>{{ $position->dish->name }} x{{ $position->quantity }}</span>
+                            <button 
+                                class="quantity-btn bg-gray-200 hover:bg-gray-300 px-2 rounded" 
+                                data-id="{{ $position->dish->id }}" 
+                                data-action="increase">+</button>
+                            <button 
+                                class="quantity-btn bg-gray-200 hover:bg-gray-300 px-2 rounded" 
+                                data-id="{{ $position->dish->id }}" 
+                                data-action="decrease">−</button>
+                        </div>
+                        <span class="item-total">{{ $position->price * $position->quantity }} ₽</span>
+                    </div>
+                @empty
+                    <p class="text-gray-500">Ваша корзина пуста.</p>
+                @endforelse
+            </div>
 
-    <hr class="my-4">
+            <hr class="my-4">
 
-    <div class="flex justify-between font-bold text-lg">
-        <span>Итого:</span>
-        <span>{{ $totalWithDiscount }} ₽</span>
-    </div>
-    @if($discountAmount > 0)
-        <div class="text-sm text-green-600">
-            Скидка по промокоду: −{{ $discountAmount }} ₽
-        </div>
-    @endif
-</div>
-
+            <div class="flex justify-between font-bold text-lg">
+                <span>Итого:</span>
+                <span id="cart-total">{{ $totalWithDiscount }} ₽</span>
+            </div>
+            @if($discountAmount > 0)
+                <div class="text-sm text-green-600">
+                    Скидка по промокоду: −{{ $discountAmount }} ₽
+                </div>
+            @endif
         </div>
     </div>
 </div>
@@ -190,8 +196,107 @@
             adressInput.value = '';
         }
     });
-</script>
 
+
+    document.querySelectorAll('.quantity-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const dishId = this.dataset.id;
+            const action = this.dataset.action;
+            const cartItem = this.closest('.cart-item');
+            const quantitySpan = this.parentElement.querySelector('span');
+            let currentQuantity = parseInt(quantitySpan.innerText.split('x')[1]);
+
+            if (action === 'increase') {
+                currentQuantity++;
+            } else if (action === 'decrease') {
+                currentQuantity = Math.max(0, currentQuantity - 1);
+            }
+
+            fetch(`/cart/update/${dishId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ quantity: currentQuantity })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (data.dishRemoved) {
+                      
+                        cartItem.remove();
+
+                        if (document.querySelectorAll('.cart-item').length === 0) {
+                            document.getElementById('cartItems').innerHTML = '<p class="text-gray-500">Ваша корзина пуста.</p>';
+                        }
+                    } else {
+                        quantitySpan.innerText = quantitySpan.innerText.split('x')[0] + 'x' + currentQuantity;
+                        cartItem.querySelector('.item-total').textContent = (data.itemTotal || 0) + ' ₽';
+                    }
+                    
+                  
+                    document.getElementById('cart-total').textContent = data.total + ' ₽';
+                    
+                    
+                    const cartCountEl = document.querySelector('.cart-count');
+                    if (cartCountEl) {
+                        cartCountEl.textContent = data.cartCount || 0;
+                    }
+                }
+            });
+        });
+    });
+
+    function applyPromocode() {
+        const promocode = document.getElementById('promocodeInput').value;
+        if (!promocode) {
+            alert('Введите промокод');
+            return;
+        }
+
+        fetch('{{ route('cart.apply-promocode') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({ promocode })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Ошибка применения промокода');
+            }
+        })
+        .catch(() => {
+            alert('Ошибка соединения с сервером');
+        });
+    }
+
+    document.getElementById('removePromocode')?.addEventListener('click', function () {
+        fetch('{{ route('cart.remove-promocode') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Ошибка при удалении промокода');
+            }
+        })
+        .catch(() => {
+            alert('Ошибка соединения с сервером');
+        });
+    });
+</script>
 @endsection
 
 @section('footer')
