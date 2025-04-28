@@ -2,50 +2,49 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\OrderStatus;
 use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
-
-
-// ОТРЕФАКТОРЕН, НО НАДО ПРОСМОТРЕТЬ ПО СТАТУСАМ И ПРОЧЕЙ ШЕЛУПОНИ
 
 class CourierController extends Controller
 {
     // Список заказов для курьера
     public function showOrdersToCourier()
     {
-        $orders = Order::availableForCourier(Auth::id())->get();
-        return view('Courier_Orders', compact('orders'));
+        $user = auth()->user();
+    
+        $orders = Order::where('courier_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->each(function ($order) {
+                $order->expected_at_formatted = $order->expected_at ?? 'As soon as possible';
+            });
+    
+        return view('Courier_Orders', [
+            'orders' => $orders,
+            'courier' => $user
+        ]);
     }
 
     // Принять заказ
-    public function acceptOrder(Order $order)
+    public function acceptOrder($id)
     {
-        if (!$order->canBeAccepted()) {
-            return back()->with('error', 'Заказ нельзя принять в текущем статусе');
-        }
-
-        if ($order->courier_id && $order->courier_id !== Auth::id()) {
-            return back()->with('error', 'Заказ уже взят другим курьером');
-        }
-
+        $order = Order::findOrFail($id);
+        
         $order->update([
-            'courier_id' => Auth::id(),
-            'status_id' => Order::STATUS_GIVEN_TO_COURIER
+            'status' => OrderStatus::COURIER_ON_THE_WAY->value
         ]);
 
         return back()->with('success', 'Заказ успешно принят');
     }
 
     // Подтвердить доставку
-    public function confirmDelivery(Order $order)
+    public function confirmDelivery($id)
     {
-        if ($order->courier_id !== Auth::id()) {
-            return back()->with('error', 'Это не ваш заказ');
-        }
+        $order = Order::findOrFail($id);
 
         $order->update([
-            'status_id' => Order::STATUS_COMPLETED,
-            'delivered_at' => now()
+            'status' => OrderStatus::COMPLETED->value,
         ]);
 
         return back()->with('success', 'Доставка подтверждена');
@@ -59,7 +58,7 @@ class CourierController extends Controller
         }
 
         $order->update([
-            'status_id' => Order::STATUS_DECLINED,
+            'status' => OrderStatus::DECLINED->value,
             'courier_id' => null
         ]);
 

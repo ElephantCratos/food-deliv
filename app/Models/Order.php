@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\OrderStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -9,24 +10,20 @@ class Order extends Model
 {
     use HasFactory;
 
-    // Константы статусов (соответствуют StatusSeeder)
-    const STATUS_IN_PROGRESS = 1;
-    const STATUS_IN_KITCHEN = 2;
-    const STATUS_WAITING_FOR_COURIER = 3;
-    const STATUS_COURIER_ON_THE_WAY = 4;
-    const STATUS_COMPLETED = 5;
-    const STATUS_DECLINED = 6;
-
     protected $fillable = [
         'id',
         'products_id',
         'customer_id',
         'courier_id',
         'price',
-        'status_id',
+        'status',
         'address',
         'comment',
         'expected_at'
+    ];
+
+    protected $casts = [
+        'status' => OrderStatus::class,
     ];
 
     // Связи
@@ -34,8 +31,6 @@ class Order extends Model
     {
         return $this->belongsToMany(OrderPosition::class);
     }
-
-  
 
     public function promocode()
     {
@@ -47,8 +42,8 @@ class Order extends Model
     {
         return $query
             ->whereIn('status', [
-                self::STATUS_WAITING_FOR_COURIER,
-                self::STATUS_COURIER_ON_THE_WAY
+                OrderStatus::WAITING_FOR_COURIER->value,
+                OrderStatus::COURIER_ON_THE_WAY->value
             ])
             ->where(function ($query) use ($userId) {
                 $query->where('courier_id', $userId)
@@ -67,21 +62,21 @@ class Order extends Model
     // Проверка, можно ли принять заказ
     public function canBeAccepted(): bool
     {
-        return $this->status_id === self::STATUS_WAITING_FOR_COURIER;
+        return $this->status_id === OrderStatus::WAITING_FOR_COURIER;
     }
 
     public function scopePending($query)
     {
-        return $query->where('status_id', self::STATUS_IN_PROGRESS);
+        return $query->where('status', OrderStatus::IN_PROGRESS->value);
     }
 
     // Scope для заказов в работе
     public function scopeInProcess($query)
     {
-        return $query->whereIn('status_id', [
-            self::STATUS_AWAITING_ACCEPTANCE,
-            self::STATUS_IN_KITCHEN,
-            self::STATUS_WAITING_FOR_COURIER
+        return $query->whereIn('status', [
+            OrderStatus::IN_PROGRESS->value,
+            OrderStatus::IN_KITCHEN->value,
+            OrderStatus::WAITING_FOR_COURIER->value
         ]);
     }
 
@@ -89,8 +84,8 @@ class Order extends Model
     public function canBeDeclined(): bool
     {
         return in_array($this->status_id, [
-            self::STATUS_IN_PROGRESS,
-            self::STATUS_AWAITING_ACCEPTANCE
+            OrderStatus::IN_PROGRESS->value,
+            OrderStatus::IN_KITCHEN->value
         ]);
     }
 }

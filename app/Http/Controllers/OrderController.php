@@ -6,51 +6,28 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\Dish;
 use App\Models\OrderPosition;
-use App\Models\Status;
-use Illuminate\Contracts\Support\ValidatedData;
+use App\Enums\OrderStatus;
 use Illuminate\Support\Facades\Auth;
 use App\Services\PromocodeService;
 
-
 class OrderController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function showOrders($Id = null)
-    {
-        if ($Id) {
-            $Order = Order::where('status_id', $Id)->OrderBy('id')->get();
-        } else {
+    public function showOrders($statusId = null)
+{
+    $orders = Order::query()
+        ->when($statusId, fn($query) => $query->where('status', $statusId))
+        ->orderBy('id')
+        ->get();
 
-            $Order = Order::OrderBy('id')
-                ->get();
-        }
-
-        $Status = Status::OrderBy('id')
-            ->get();
-
-        foreach ($Order as $order) {
-            $order->status_name = $Status->where('id', $order->status_id)->first()->name;
-        }
-
-        foreach ($Order as $order) {
-          
-            if ($order->expected_at === null) {
-                $order->expected_at = 'As soon as possible';
-            }
-        }
-        
-        return view('All_Orders', compact([
-            'Order'
-        ]));
+    foreach ($orders as $order) {
+        $order->status_name = $order->status->label();
+        $order->expected_at = $order->expected_at ?? 'As soon as possible';
     }
+    
+    return view('All_Orders', ['Order' => $orders]);
+}
 
-    /**
-     * Show the form for creating a new resource.
-     */
-
-     public function showCart(PromocodeService $promocodeService)
+    public function showCart(PromocodeService $promocodeService)
     {
         $cart = session('cart', []);
 
@@ -86,82 +63,77 @@ class OrderController extends Controller
         ));
     }
 
- 
-
-public function sendOrder(Request $request, PromocodeService $promocodeService)
-{
-    $validatedData = $request->validate([
-        'adress' => 'required|string|max:255',
-        'comment' => 'nullable|string|max:255',
-        'time' => 'nullable|date_format:H:i',
-    ]);
-
-    $cart = session('cart', []);
-
-    if (empty($cart)) {
-        return redirect()->route('Cart')->with('error', 'Корзина пуста');
-    }
-
-    $positions = collect($cart)->map(function ($item) {
-        $dish = Dish::find($item['dish_id']);
-        return (object) [
-            'dish' => $dish,
-            'quantity' => $item['quantity'],
-            'price' => $item['price'],
-        ];
-    });
-
-    $total = $positions->sum(fn($item) => $item->price * $item->quantity);
-
-    if ($total == 0) {
-        return redirect()->route('Cart')->with('error', 'Корзина пуста');
-    }
-
-    // Промокод
-    $promocode = null;
-    $discountAmount = 0;
-    $totalWithDiscount = $total;
-
-    if (session('promocode')) {
-        $promocode = $promocodeService->validate(session('promocode'));
-        if ($promocode) {
-            $totalWithDiscount = $promocodeService->apply($promocode, $total);
-            $discountAmount = $total - $totalWithDiscount;
-        }
-    }
-
-    $order = new Order();
-    $order->customer_id = Auth::id();
-    $order->status_id = 1; // Или другой id, если надо
-    $order->address = $validatedData['adress'];
-    $order->comment = $validatedData['comment'];
-    $order->expected_at = $request->input('fast_value') == "0" 
-        ? $validatedData['time'] 
-        : null;
-    $order->price = $totalWithDiscount;
-    $order->save();
-
-
-    foreach ($positions as $position) {
-        $orderPos = OrderPosition::create([
-            'dish_id' => $position->dish->id,
-            'price' => $position->price,
-            'quantity' => $position->quantity
+    public function sendOrder(Request $request, PromocodeService $promocodeService)
+    {
+        $validatedData = $request->validate([
+            'adress' => 'required|string|max:255',
+            'comment' => 'nullable|string|max:255',
+            'time' => 'nullable|date_format:H:i',
         ]);
-        $order->positions()->attach($orderPos);
+
+        $cart = session('cart', []);
+
+        if (empty($cart)) {
+            return redirect()->route('Cart')->with('error', 'Корзина пуста');
+        }
+
+        $positions = collect($cart)->map(function ($item) {
+            $dish = Dish::find($item['dish_id']);
+            return (object) [
+                'dish' => $dish,
+                'quantity' => $item['quantity'],
+                'price' => $item['price'],
+            ];
+        });
+
+        $total = $positions->sum(fn($item) => $item->price * $item->quantity);
+
+        if ($total == 0) {
+            return redirect()->route('Cart')->with('error', 'Корзина пуста');
+        }
+
+        // Промокод
+        $promocode = null;
+        $discountAmount = 0;
+        $totalWithDiscount = $total;
+
+        if (session('promocode')) {
+            $promocode = $promocodeService->validate(session('promocode'));
+            if ($promocode) {
+                $totalWithDiscount = $promocodeService->apply($promocode, $total);
+                $discountAmount = $total - $totalWithDiscount;
+            }
+        }
+
+        $order = new Order();
+        $order->customer_id = Auth::id();
+        $order->status = OrderStatus::IN_PROGRESS->value;
+        $order->address = $validatedData['adress'];
+        $order->comment = $validatedData['comment'];
+        $order->expected_at = $request->input('fast_value') == "0" 
+            ? $validatedData['time'] 
+            : null;
+        $order->price = $totalWithDiscount;
+        $order->save();
+
+        foreach ($positions as $position) {
+            $orderPos = OrderPosition::create([
+                'dish_id' => $position->dish->id,
+                'price' => $position->price,
+                'quantity' => $position->quantity
+            ]);
+            $order->positions()->attach($orderPos);
+        }
+
+        if ($promocode) {
+            $promocodeService->incrementUsage($promocode);
+        }
+
+        session()->forget('cart');
+        session()->forget('promocode');
+
+        return redirect()->route('Cart')->with('status', 'Заказ успешно оформлен');
     }
-
-    if ($promocode) {
-        $promocodeService->incrementUsage($promocode);
-    }
-
-
-    session()->forget('cart');
-    session()->forget('promocode');
-
-    return redirect()->route('Cart')->with('status', 'Заказ успешно оформлен');
-}
-
 
     public function applyPromocode(Request $request, PromocodeService $promocodeService)
     {
@@ -184,63 +156,39 @@ public function sendOrder(Request $request, PromocodeService $promocodeService)
         return back()->with('status', 'Промокод удален');
     }
 
-    function showOwnOrders()
+    public function showOwnOrders()
     {
-        $userId = Auth::user()->id;
+        $orders = Order::where('customer_id', Auth::id())
+            ->orderByDesc('created_at')
+            ->get()
+            ->each(function ($order) {
+                $order->expected_at = $order->expected_at ?? 'As soon as possible';
+            });
 
-        $Orders = Order::where('customer_id', $userId)
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        foreach ($Orders as $order) {
-        if ($order->expected_at === null) {
-            $order->expected_at = 'As soon as possible';
-        }
-    }
-
-        return view('Customer_Orders', compact( 'Orders'));
+        return view('Customer_Orders', ['Orders' => $orders]);
     }
 
     public function acceptOrder($id)
     {
-        $order = Order::find($id);
+        $order = Order::findOrFail($id);
+        $order->update(['status' => OrderStatus::IN_KITCHEN->value]);
 
-        if ($order) {
-            $order->status_id = 2;
-            $order->save();
-
-            return redirect()->back()->with('success', 'Order status updated successfully.');
-        }
-
-        return redirect()->back()->with('error', 'Order not found.');
+        return back()->with('success', 'Статус заказа успешно обновлен');
     }
 
     public function declineOrder($id)
     {
-        $order = Order::find($id);
+        $order = Order::findOrFail($id);
+        $order->update(['status' => OrderStatus::DECLINED->value]);
 
-        if ($order) {
-            $order->status_id = 8;
-            $order->save();
-
-            return redirect()->back()->with('success', 'Order status updated successfully.');
-        }
-
-        return redirect()->back()->with('error', 'Order not found.');
+        return back()->with('success', 'Статус заказа успешно обновлен');
     }
 
     public function declineByCustomer($id)
     {
-        $order = Order::find($id);
+        $order = Order::findOrFail($id);
+        $order->update(['status' => OrderStatus::DECLINED->value]);
 
-        if ($order) {
-            $order->status_id = 9;
-            $order->save();
-
-            return redirect()->back()->with('success', 'Order status updated successfully.');
-        }
-
-        return redirect()->back()->with('error', 'Order not found.');
+        return back()->with('success', 'Статус заказа успешно обновлен');
     }
-
 }

@@ -34,7 +34,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('customer_id')->nullable()->references('id')->on('users');
             $table->foreignId('courier_id')->nullable()->references('id')->on('users');
-            $table->foreignId('status');
+            $table->unsignedBigInteger('status');
             $table->decimal('price', 10, 2);
             $table->string('address')->nullable();
             $table->string('comment')->nullable();

@@ -2,49 +2,33 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\OrderStatus;
 use App\Models\Order;
 use Illuminate\Http\RedirectResponse;
 
-// ОТРЕФАКТОРЕН, НО НАДО ПРОСМОТРЕТЬ ПО УТАТУСАМ. ЕСЛИ ОТКАЗЫВАЕМСЯ - ПЕРЕДЕЛКА.
 class KitchenController extends Controller
 {
     public function showOrdersToKitchen()
     {
-        $orders = Order::whereIn('status_id', [
-                Order::STATUS_IN_KITCHEN,
-                Order::STATUS_WAITING_FOR_COURIER
+        $orders = Order::whereIn('status', [
+                OrderStatus::IN_KITCHEN->value,
+                OrderStatus::WAITING_FOR_COURIER->value
             ])
-            ->with('status')
             ->orderBy('id')
-            ->get();
-
-        return view('Kitchen_Orders', [
-            'orders' => $orders->map(function ($order) {
+            ->get()
+            ->each(function ($order) {
                 $order->expected_at_formatted = $order->expected_at ?? 'As soon as possible';
-                return $order;
-            })
-        ]);
+            });
+        return view('Kitchen_Orders', ['orders' => $orders]);
     }
 
-    public function confirmPreparation(Order $order): RedirectResponse
+    public function markAsReady($id): RedirectResponse
     {
+        $order = Order::findOrFail($id);
         $order->update([
-            'status_id' => Order::STATUS_IN_KITCHEN,
-        ]);
-        $order->save;
-       
-        return back()->with('success', 'Подтверждено начало приготовления заказа');
-    }
-
-    public function transferToCourier(Order $order): RedirectResponse
-    {
-        $order->update([
-            'status_id' => Order::STATUS_WAITING_FOR_COURIER,
-           
+            'status' => OrderStatus::WAITING_FOR_COURIER->value,
         ]);
 
-        return back()->with('success', 'Заказ передан курьеру');
+        return back()->with('success', 'Заказ готов к передаче курьеру');
     }
-
-   
 }
