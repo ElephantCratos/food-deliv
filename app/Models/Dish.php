@@ -12,20 +12,32 @@ class Dish extends Model
     protected $table = 'dish';
 
     protected $fillable = [
-        'id',
         'name',
         'image_path',
         'price',
         'category_id',
-
     ];
 
-    public function order_position()
+    // Отношения
+    public function orderPositions()
     {
         return $this->belongsToMany(OrderPosition::class);
     }
 
-    public function category() { 
+    public function category()
+    {
         return $this->belongsTo(Category::class);
+    }
+
+    // Scope для популярных блюд (пример)
+    public function scopePopular($query)
+    {
+        return $query->where('is_popular', true);
+    }
+
+    // Аксессор для полного URL изображения
+    public function getImageUrlAttribute()
+    {
+        return $this->image_path ? asset($this->image_path) : null;
     }
 }

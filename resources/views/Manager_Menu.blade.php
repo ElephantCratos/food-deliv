@@ -21,16 +21,14 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($Dish as $dish)
+                @foreach ($dishes as $dish)
                     <tr class="hover:bg-gray-50">
                         <td class="p-3 border-b">{{ $dish->id }}</td>
                         <td class="p-3 border-b">{{ $dish->name }}</td>
                         <td class="p-3 border-b text-center">
                             <img src="{{ asset($dish->image_path) }}" alt="Фото блюда" class="w-16 h-16 object-cover rounded">
                         </td>
-                        <td class="p-3 border-b">
                          <td class="p-3 border-b">{{$dish->category->name}}</td>
-                        </td>
                         <td class="p-3 border-b">{{ $dish->price }} ₽</td>
                         <td class="p-3 border-b space-y-1">
                             <form method="GET" action="{{ route('dish.edit', $dish->id) }}">

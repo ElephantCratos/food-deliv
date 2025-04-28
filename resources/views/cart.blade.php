@@ -46,7 +46,26 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Левая часть: форма доставки -->
         <div class="md:col-span-2 space-y-6">
-            <form action="{{route('send_order')}}" method="POST" class="space-y-4">
+            <!-- Промокод: отдельная форма -->
+            <div class="mt-6 mb-6">
+                <form id="promoForm" action="{{ route('cart.apply-promocode') }}" method="POST" class="flex space-x-2">
+                    @csrf
+                    <input type="text" 
+                           name="promocode" 
+                           id="promocodeInput"
+                           class="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                           placeholder="Введите промокод" 
+                           required>
+                    <button type="submit" 
+                            class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg">
+                        Применить
+                    </button>
+                </form>
+                <div id="promoMessage" class="text-green-600"></div>
+            </div>
+
+            <!-- Форма оформления заказа -->
+            <form action="{{ route('send_order') }}" method="POST" class="space-y-4">
                 @csrf
 
                 <div class="flex items-center space-x-4">
@@ -67,62 +86,14 @@
 
                 <div>
                     <label class="block font-medium mb-1">Время доставки</label>
-                    <div class="flex flex-wrap gap-2">
-                        <label class="flex items-center space-x-2">
-                            <input type="radio" name="time" value="09:00 - 09:30" class="form-radio" checked>
-                            <span>09:00 - 09:30</span>
-                        </label>
-                        <label class="flex items-center space-x-2">
-                            <input type="radio" name="time" value="09:30 - 10:00" class="form-radio">
-                            <span>09:30 - 10:00</span>
-                        </label>
-                        <label class="flex items-center space-x-2">
-                            <input type="radio" name="time" value="other" class="form-radio">
-                            <span>Другое время</span>
-                        </label>
+                    <div class="flex gap-2">
+                        <input type="time" name="time" class="w-full p-2 border border-gray-300 rounded-lg" value="09:00" required>
                     </div>
                 </div>
 
                 <div>
                     <label class="block font-medium mb-1" for="comment">Комментарий к заказу</label>
                     <textarea name="comment" class="w-full p-2 border border-gray-300 rounded-lg"></textarea>
-                </div>
-
-                <div class="">
-                    @if($promocode)
-                        <div class="flex justify-between items-center p-3 rounded-lg mb-3 bg-gray-50">
-                            <div class="flex items-center space-x-3">
-                                <span class="font-medium">Промокод:</span>
-                                <span class="text-green-600">{{ $promocode->code }}</span>
-                                <span class="px-2 py-1 bg-green-100 text-green-800 text-sm rounded-lg">
-                                    {{ $promocode->type === 'percent' ? $promocode->discount.'%' : $promocode->discount.'₽' }}
-                                </span>
-                                <span class="text-green-600">Скидка: {{ $discountAmount }}₽</span>
-                            </div>
-                            <form action="{{ route('cart.remove-promocode') }}" method="POST">
-                                @csrf
-                                <button type="submit" class="text-red-500 hover:text-red-700 font-medium text-sm">
-                                    Удалить
-                                </button>
-                            </form>
-                        </div>
-                    @else
-                        <div>
-                            <label class="block font-medium mb-1">Промокод</label>
-                            <form action="{{ route('cart.apply-promocode') }}" method="POST" class="flex space-x-2">
-                                @csrf
-                                <input type="text" 
-                                       name="promocode" 
-                                       class="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                       placeholder="Введите промокод" 
-                                       required>
-                                <button type="submit" 
-                                        class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg">
-                                    Применить
-                                </button>
-                            </form>
-                        </div>
-                    @endif
                 </div>
 
                 <div>
@@ -135,37 +106,36 @@
                 </div>
 
                 <div class="mt-6 flex justify-between">
-                    <button class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg" type="submit">Оформить заказ</button>
+                    <button class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg" type="submit">
+                        Оформить заказ
+                    </button>
                 </div>
             </form>
         </div>
 
         <!-- Правая часть: состав заказа -->
-        <!-- Правая часть: состав заказа -->
-<div class="bg-white p-6 rounded-lg shadow-md space-y-4">
-    <h2 class="text-xl font-bold">Состав заказа</h2>
-    @forelse ($positions as $position)
-        <div class="flex justify-between">
-            <span>{{ $position->dish->name }} x{{ $position->quantity }}</span>
-            <span>{{ $position->price * $position->quantity }} ₽</span>
-        </div>
-    @empty
-        <p class="text-gray-500">Ваша корзина пуста.</p>
-    @endforelse
+        <div class="bg-white p-6 rounded-lg shadow-md space-y-4">
+            <h2 class="text-xl font-bold">Состав заказа</h2>
+            @forelse ($positions as $position)
+                <div class="flex justify-between">
+                    <span>{{ $position->dish->name }} x{{ $position->quantity }}</span>
+                    <span>{{ $position->price * $position->quantity }} ₽</span>
+                </div>
+            @empty
+                <p class="text-gray-500">Ваша корзина пуста.</p>
+            @endforelse
 
-    <hr class="my-4">
+            <hr class="my-4">
 
-    <div class="flex justify-between font-bold text-lg">
-        <span>Итого:</span>
-        <span>{{ $totalWithDiscount }} ₽</span>
-    </div>
-    @if($discountAmount > 0)
-        <div class="text-sm text-green-600">
-            Скидка по промокоду: −{{ $discountAmount }} ₽
-        </div>
-    @endif
-</div>
-
+            <div class="flex justify-between font-bold text-lg">
+                <span>Итого:</span>
+                <span>{{ $totalWithDiscount }} ₽</span>
+            </div>
+            @if($discountAmount > 0)
+                <div class="text-sm text-green-600">
+                    Скидка по промокоду: −{{ $discountAmount }} ₽
+                </div>
+            @endif
         </div>
     </div>
 </div>
@@ -189,6 +159,34 @@
             pickupInfo.classList.add('hidden');
             adressInput.value = '';
         }
+    });
+
+    // AJAX запрос для отправки промокода
+    const promoForm = document.getElementById('promoForm');
+    promoForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const promocode = document.getElementById('promocodeInput').value;
+        const _token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        fetch("{{ route('cart.apply-promocode') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': _token,
+            },
+            body: JSON.stringify({ promocode })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('promoMessage').textContent = `Промокод применён! Скидка: ${data.discount}₽`;
+                // Обновить стоимость на странице, если нужно
+            } else {
+                document.getElementById('promoMessage').textContent = 'Ошибка применения промокода.';
+            }
+        })
+        .catch(error => console.error('Error:', error));
     });
 </script>
 

@@ -5,135 +5,132 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\Dish;
-use App\Models\Status;
-use Illuminate\Contracts\Support\ValidatedData;
+use App\Models\OrderPosition;
+use App\Enums\OrderStatus;
 use Illuminate\Support\Facades\Auth;
 use App\Services\PromocodeService;
 
-
 class OrderController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function showOrders($Id = null)
+    public function showOrders($statusId = null)
+{
+    $orders = Order::query()
+        ->when($statusId, fn($query) => $query->where('status', $statusId))
+        ->orderBy('id')
+        ->get();
+
+    foreach ($orders as $order) {
+        $order->status_name = $order->status->label();
+        $order->expected_at = $order->expected_at ?? 'As soon as possible';
+    }
+    
+    return view('All_Orders', ['Order' => $orders]);
+}
+
+    public function showCart(PromocodeService $promocodeService)
     {
-        if ($Id) {
-            $Order = Order::where('status_id', $Id)->OrderBy('id')->get();
-        } else {
+        $cart = session('cart', []);
 
-            $Order = Order::OrderBy('id')
-                ->get();
-        }
+        $positions = collect($cart)->map(function ($item) {
+            $dish = Dish::find($item['dish_id']);
+            return (object) [
+                'dish' => $dish,
+                'quantity' => $item['quantity'],
+                'price' => $item['price'],
+            ];
+        });
 
-        $Status = Status::OrderBy('id')
-            ->get();
+        $total = $positions->sum(fn($item) => $item->price * $item->quantity);
 
-        foreach ($Order as $order) {
-            $order->status_name = $Status->where('id', $order->status_id)->first()->name;
-        }
+        // Промокод
+        $promocode = null;
+        $discountAmount = 0;
+        $totalWithDiscount = $total;
 
-        foreach ($Order as $order) {
-            if ($order->expected_at === null) {
-                $order->expected_at = 'As soon as possible';
+        if (session('promocode')) {
+            $promocode = $promocodeService->validate(session('promocode'));
+            if ($promocode) {
+                $totalWithDiscount = $promocodeService->apply($promocode, $total);
+                $discountAmount = $total - $totalWithDiscount;
             }
         }
 
-        return view('All_Orders', compact([
-            'Order'
-        ]));
+        return view('cart', compact(
+            'positions',
+            'promocode',
+            'discountAmount',
+            'totalWithDiscount'
+        ));
     }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-
-     public function showCart(PromocodeService $promocodeService)
-{
-    $cart = session('cart', []);
-
-    $positions = collect($cart)->map(function ($item) {
-        $dish = Dish::find($item['dish_id']);
-        return (object) [
-            'dish' => $dish,
-            'quantity' => $item['quantity'],
-            'price' => $item['price'],
-        ];
-    });
-
-    $total = $positions->sum(fn($item) => $item->price * $item->quantity);
-
-    // Промокод
-    $promocode = null;
-    $discountAmount = 0;
-    $totalWithDiscount = $total;
-
-    if (session('promocode')) {
-        $promocode = $promocodeService->validate(session('promocode'));
-        if ($promocode) {
-            $totalWithDiscount = $promocodeService->apply($promocode, $total);
-            $discountAmount = $total - $totalWithDiscount;
-        }
-    }
-
-    return view('cart', compact(
-        'positions',
-        'promocode',
-        'discountAmount',
-        'totalWithDiscount'
-    ));
-}
-
- 
 
     public function sendOrder(Request $request, PromocodeService $promocodeService)
     {
         $validatedData = $request->validate([
             'adress' => 'required|string|max:255',
             'comment' => 'nullable|string|max:255',
-            'time' => '|date_format:H:i|',
+            'time' => 'nullable|date_format:H:i',
         ]);
 
-        $userId = Auth::user()->id;
+        $cart = session('cart', []);
 
-        $lastOrder = Order::where('customer_id', $userId)
-            ->orderBy('created_at', 'desc')
-            ->first();
-
-        if ((int)$lastOrder->price == 0) {
-            return redirect()->route('Cart');
+        if (empty($cart)) {
+            return redirect()->route('Cart')->with('error', 'Корзина пуста');
         }
 
-        // Применение промокода
+        $positions = collect($cart)->map(function ($item) {
+            $dish = Dish::find($item['dish_id']);
+            return (object) [
+                'dish' => $dish,
+                'quantity' => $item['quantity'],
+                'price' => $item['price'],
+            ];
+        });
+
+        $total = $positions->sum(fn($item) => $item->price * $item->quantity);
+
+        if ($total == 0) {
+            return redirect()->route('Cart')->with('error', 'Корзина пуста');
+        }
+
+        // Промокод
+        $promocode = null;
+        $discountAmount = 0;
+        $totalWithDiscount = $total;
+
         if (session('promocode')) {
             $promocode = $promocodeService->validate(session('promocode'));
-            
             if ($promocode) {
-                $newTotal = $promocodeService->apply($promocode, $lastOrder->price);
-                $discountAmount = $lastOrder->price - $newTotal;
-                
-                // Обновляем заказ
-                $lastOrder->price = $newTotal;
-                $lastOrder->discount = $discountAmount;
-                $lastOrder->promocode_id = $promocode->id;
-                
-                // Увеличиваем счетчик использований
-                $promocodeService->incrementUsage($promocode);
+                $totalWithDiscount = $promocodeService->apply($promocode, $total);
+                $discountAmount = $total - $totalWithDiscount;
             }
-            
-            // Очищаем промокод из сессии
-            session()->forget('promocode');
         }
 
-        // Обновление данных заказа
-        $lastOrder->status_id = 1;
-        $lastOrder->address = $validatedData['adress'];
-        $lastOrder->comment = $validatedData['comment'];
-        $lastOrder->expected_at = $request->input('fast_value') == "0" 
+        $order = new Order();
+        $order->customer_id = Auth::id();
+        $order->status = OrderStatus::IN_PROGRESS->value;
+        $order->address = $validatedData['adress'];
+        $order->comment = $validatedData['comment'];
+        $order->expected_at = $request->input('fast_value') == "0" 
             ? $validatedData['time'] 
             : null;
+        $order->price = $totalWithDiscount;
+        $order->save();
 
-        $lastOrder->save();
+        foreach ($positions as $position) {
+            $orderPos = OrderPosition::create([
+                'dish_id' => $position->dish->id,
+                'price' => $position->price,
+                'quantity' => $position->quantity
+            ]);
+            $order->positions()->attach($orderPos);
+        }
+
+        if ($promocode) {
+            $promocodeService->incrementUsage($promocode);
+        }
+
+        session()->forget('cart');
+        session()->forget('promocode');
 
         return redirect()->route('Cart')->with('status', 'Заказ успешно оформлен');
     }
@@ -159,63 +156,39 @@ class OrderController extends Controller
         return back()->with('status', 'Промокод удален');
     }
 
-    function showOwnOrders()
+    public function showOwnOrders()
     {
-        $userId = Auth::user()->id;
+        $orders = Order::where('customer_id', Auth::id())
+            ->orderByDesc('created_at')
+            ->get()
+            ->each(function ($order) {
+                $order->expected_at = $order->expected_at ?? 'As soon as possible';
+            });
 
-        $Orders = Order::where('customer_id', $userId)
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        foreach ($Orders as $order) {
-        if ($order->expected_at === null) {
-            $order->expected_at = 'As soon as possible';
-        }
-    }
-
-        return view('Customer_Orders', compact( 'Orders'));
+        return view('Customer_Orders', ['Orders' => $orders]);
     }
 
     public function acceptOrder($id)
     {
-        $order = Order::find($id);
+        $order = Order::findOrFail($id);
+        $order->update(['status' => OrderStatus::IN_KITCHEN->value]);
 
-        if ($order) {
-            $order->status_id = 2;
-            $order->save();
-
-            return redirect()->back()->with('success', 'Order status updated successfully.');
-        }
-
-        return redirect()->back()->with('error', 'Order not found.');
+        return back()->with('success', 'Статус заказа успешно обновлен');
     }
 
     public function declineOrder($id)
     {
-        $order = Order::find($id);
+        $order = Order::findOrFail($id);
+        $order->update(['status' => OrderStatus::DECLINED->value]);
 
-        if ($order) {
-            $order->status_id = 8;
-            $order->save();
-
-            return redirect()->back()->with('success', 'Order status updated successfully.');
-        }
-
-        return redirect()->back()->with('error', 'Order not found.');
+        return back()->with('success', 'Статус заказа успешно обновлен');
     }
 
     public function declineByCustomer($id)
     {
-        $order = Order::find($id);
+        $order = Order::findOrFail($id);
+        $order->update(['status' => OrderStatus::DECLINED->value]);
 
-        if ($order) {
-            $order->status_id = 9;
-            $order->save();
-
-            return redirect()->back()->with('success', 'Order status updated successfully.');
-        }
-
-        return redirect()->back()->with('error', 'Order not found.');
+        return back()->with('success', 'Статус заказа успешно обновлен');
     }
-
 }

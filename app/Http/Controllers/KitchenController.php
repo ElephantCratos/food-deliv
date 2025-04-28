@@ -2,72 +2,33 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Enums\OrderStatus;
 use App\Models\Order;
-use App\Models\Status;
+use Illuminate\Http\RedirectResponse;
 
 class KitchenController extends Controller
 {
     public function showOrdersToKitchen()
     {
-
-        $orders = Order::whereIn('status_id', [2, 3, 4])
+        $orders = Order::whereIn('status', [
+                OrderStatus::IN_KITCHEN->value,
+                OrderStatus::WAITING_FOR_COURIER->value
+            ])
             ->orderBy('id')
-            ->get();
-        foreach ($orders as $order) {
-            if ($order->expected_at === null) {
-                $order->expected_at = 'As soon as possible';
-            }
-        }
-
-        return view('Kitchen_Orders', compact('orders'));
+            ->get()
+            ->each(function ($order) {
+                $order->expected_at_formatted = $order->expected_at ?? 'As soon as possible';
+            });
+        return view('Kitchen_Orders', ['orders' => $orders]);
     }
 
-    public function confirmPreparation($id)
+    public function markAsReady($id): RedirectResponse
     {
-        $order = Order::find($id);
+        $order = Order::findOrFail($id);
+        $order->update([
+            'status' => OrderStatus::WAITING_FOR_COURIER->value,
+        ]);
 
-        if ($order) {
-            // "Ожидает курьера"
-            $order->status_id = 3;
-            $order->save();
-
-            return redirect()->back()->with('success', 'Order preparation confirmed successfully.');
-        }
-
-        return redirect()->back()->with('error', 'Order not found.');
-    }
-
-
-    public function transferToCourier($id)
-    {
-        $order = Order::find($id);
-
-        if ($order) {
-            // "В пути"
-            $order->status_id = 4;
-            $order->save();
-
-            return redirect()->back()->with('success', 'Order transferred to courier successfully.');
-        }
-
-        return redirect()->back()->with('error', 'Order not found.');
-    }
-
-
-    public function courierArrived($id)
-    {
-
-        $order = Order::find($id);
-
-        if ($order) {
-            // "В пути"
-            $order->status_id = 5;
-            $order->save();
-
-            return redirect()->back()->with('success', 'Order transferred to courier successfully.');
-        }
-
-        return redirect()->back()->with('error', 'Order not found.');
+        return back()->with('success', 'Заказ готов к передаче курьеру');
     }
 }
