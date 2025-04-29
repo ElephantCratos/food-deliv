@@ -51,7 +51,7 @@
             <div class="hidden sm:flex items-center space-x-4">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
-                        <button class="flex items-center space-x-2 bg-white white:bg-gray-800 px-4 py-2 rounded-lg shadow-sm text-sm text-gray-700 white:text-gray-300 hover:bg-gray-100 white:hover:bg-gray-900 transition">
+                        <button class="flex items-center space-x-2 bg-white white:bg-gray-800 px-4 py-2 rounded-lg shadow-sm text-sm text-dark-700 white:text-dark-300 hover:bg-gray-100 white:hover:bg-gray-900 transition">
                             <span>{{ Auth::user()->name }}</span>
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
