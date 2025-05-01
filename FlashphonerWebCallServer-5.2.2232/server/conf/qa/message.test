@@ -1,0 +1,10 @@
+Id:4
+Name:Message
+Clients: 2
+
+$1 -> api.sendMessage({id:"12345", to:$2, body:"test1"});
+$s -> wait(3000);
+$2[true] -> isMessageReceived({body:"test1"});
+$2 -> api.sendMessage({id:"12345", to:$1, body:"test2"});
+$s -> wait(3000);
+$1[true] -> isMessageReceived({body:"test2"});

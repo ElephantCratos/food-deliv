@@ -1,0 +1,136 @@
+.fp-main {
+    border: 1px solid black;
+    width: 868px;
+    height: 484px;
+    max-width: 868px;
+    max-height: 484px;
+    display: table;
+    position: relative;
+}
+.fp-input {
+    position: absolute !important;
+    height: 50px;
+    width: inherit;
+    padding: 0;
+    margin: -1px 0 0 -1px;
+    text-align: center;
+    border: inherit;
+    border-bottom: 1px solid black;
+    z-index: 999999;
+}
+
+.fp-playStatus {
+    position: absolute;
+    margin: 20% 35%;
+    width: 250px;
+    text-align: center;
+    z-index: 2147483647;
+    font-size: 14pt;
+}
+
+.fp-playButton {
+    position: absolute !important;
+    margin-left: 401px;
+    margin-top: 209px;
+    z-index: 2147483647;
+}
+.fp-remoteVideo-sm {
+    position: absolute !important;
+    z-index: 0;
+}
+
+.fp-remoteVideo-sm:-webkit-full-screen {
+    position: initial !important;
+    margin-top: 0 !important;
+    margin-left: 0 !important;
+    width: 100%;
+    height: 100%;
+}
+
+.fp-remoteVideo-sm:-moz-full-screen {
+    position: initial !important;
+    margin-top: 0 !important;
+    margin-left: 0 !important;
+    width: 100%;
+    height: 100%;
+}
+
+.fp-remoteVideo-sm:fullscreen {
+    position: initial !important;
+    margin-top: 0 !important;
+    margin-left: 0 !important;
+    width: 100%;
+    height: 100%;
+}
+
+.fp-remoteVideo {
+    position: absolute !important;
+    top: 0;
+    object-fit: cover;
+}
+
+.fp-remoteVideo:-webkit-full-screen {
+    width: 100%;
+    height: 100%;
+}
+.fp-remoteVideo:-moz-full-screen {
+    width: 100%;
+    height: 100%;
+}
+.fp-remoteVideo:fullscreen {
+    width: 100%;
+    height: 100%;
+}
+
+.fp-fps {
+    text-align: right;
+    margin-right: 10px;
+    z-index: 2147483647;
+}
+
+.fp-footer {
+    position: absolute !important;
+    width: 866px;
+    height: 50px;
+    margin-top: 432px;
+    background: #EEEEEE;
+}
+.fp-footer >div {
+    display: inline-block;
+    vertical-align: middle;
+    float: none;
+}
+.fp-footer >div>button>i {
+    font-size: 32px;
+    color: #999999;
+}
+
+#waiting {
+    font-size: 48px;
+}
+
+.ui-slider {
+    height: 3px !important;
+    width: 100px !important;
+    left: 5px !important;
+    background: black;
+}
+
+.ui-slider-handle {
+    width: 12px !important;
+    height: 12px !important;
+    position:absolute;
+    -moz-border-radius: 50px;
+    -webkit-border-radius: 50px;
+    border-radius: 50px;
+}
+
+.ui-slider-range-min {
+    width:80px;
+    position:absolute;
+    top:-7px;
+    z-index:200;
+    background: black;
+}
+
+

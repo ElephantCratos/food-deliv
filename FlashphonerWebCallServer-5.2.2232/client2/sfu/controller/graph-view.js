@@ -1,0 +1,1 @@
+const createGraphView=function(e){const r=new sigma({renderer:{container:e,type:"canvas"},settings:{minArrowSize:3,edgeLabelSize:"fixed"}});return{s:r,bindNodeClickEvents:function(e){r.bind("clickNode doubleClickNode rightClickNode",e)},refreshSigma:function(e){r.graph.clear(),r.refresh(),r.graph.read(e),r.refresh()}}};

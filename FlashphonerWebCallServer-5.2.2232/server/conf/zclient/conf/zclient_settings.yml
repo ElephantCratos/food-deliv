@@ -1,0 +1,29 @@
+!!com.flashphoner.sfu.storage.yaml.settings.app.ZClientSettingsRoot
+personalIdFrom: 100000
+personalIdTo: 999999
+meetingIdFrom: 1000000
+meetingIdTo: 9999999
+tokenExpirationTimeInSec: 604800
+verifyLoggingInByEmail: false
+mongoConnectionTimeoutInSec: 5
+mongoKeepAliveIntervalInSec: 15
+examplesMode: false
+#default - 5 min
+examplesIssuedUserTimeoutInMs: 300000
+#default - 15 min
+examplesDisconnectedUserTimeoutInMs: 900000
+#default - 2 min
+examplesUserStateCleaningIntervalInMs: 120000
+recorder:
+  address: ws://127.0.0.1:8080
+  username: recorder@flashphoner.com
+  password: 123456
+  recordsDir: records/meetings
+  ffmpeg:
+    videoCodec: libx264
+    audioCodec: aac
+    frameRate: 30
+    width: 1920
+    height: 1080
+    preset: veryfast
+runMigrationOnStartup: true

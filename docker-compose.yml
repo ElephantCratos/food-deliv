@@ -1,69 +1,78 @@
+version: '3.8'
+
 services:
+  ####################################################################################################
+  # PHP
+  ####################################################################################################
+  php:
+    build: .docker/php
+    ports:
+      - 5173:5173
+    volumes:
+      - .:/var/www:cached
+      - ./hls:/var/www/html/live  # <-- Добавлено: том с HLS
 
-    ####################################################################################################
-    # PHP
-    ####################################################################################################
-    php:
-        build: .docker/php
-        ports:
-            - 5173:5173
-        volumes:
-            - .:/var/www:cached
-            - ./hls:/var/www/html/live  # <-- Добавлено: том с HLS
+  ####################################################################################################
+  # Nginx
+  ####################################################################################################
+  nginx:
+    image: nginx
+    ports:
+      - 80:80
+    volumes:
+      - .:/var/www
+      - .docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - .docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./hls:/var/www/html/live  # <-- Добавлено: том с HLS
+    depends_on:
+      - php
+      - webcallserver
 
-    ####################################################################################################
-    # Nginx
-    ####################################################################################################
-    nginx:
-        image: nginx
-        ports:
-            - 80:80
-        volumes:
-            - .:/var/www
-            - .docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
-            - .docker/nginx/nginx.conf:/etc/nginx/nginx.conf
-            - ./hls:/var/www/html/live  # <-- Добавлено: том с HLS
-        depends_on:
-            - php
+  ####################################################################################################
+  # PostgreSQL
+  ####################################################################################################
+  db:
+    image: postgres:16
+    ports:
+      - 5432:5432
+    volumes:
+      - .docker/db/data:/var/lib/postgresql/data
+      - .docker/db/sql:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_USER=refactorian
+      - POSTGRES_PASSWORD=refactorian
+      - POSTGRES_DB=refactorian
 
-    ####################################################################################################
-    # PostgreSQL
-    ###################################################################################################
-    db:
-        image: postgres:16
-        ports:
-            - 5432:5432
-        volumes:
-            - .docker/db/data:/var/lib/postgresql/data
-            - .docker/db/sql:/docker-entrypoint-initdb.d
-        environment:
-            - POSTGRES_USER=refactorian
-            - POSTGRES_PASSWORD=refactorian
-            - POSTGRES_DB=refactorian
+  ####################################################################################################
+  # pgAdmin
+  ####################################################################################################
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - 5050:80
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=password
+    depends_on:
+      - db
 
-    ###################################################################################################
-    # pgAdmin
-    ###################################################################################################
-    pgadmin:
-        image: dpage/pgadmin4
-        ports:
-            - 5050:80
-        environment:
-            - PGADMIN_DEFAULT_EMAIL=admin@admin.com
-            - PGADMIN_DEFAULT_PASSWORD=password
-        depends_on:
-            - db
+  ####################################################################################################
+  # Web Call Server (Flashphoner)
+  ####################################################################################################
+  webcallserver:
+    image: flashphoner/webcallserver:latest
+    container_name: webcallserver
+    ports:
+      - 8081:8080   # Web UI
+      - 8444:8443   # WebSocket Secure
+      - 1935:1935   # RTMP
+      - 554:554     # RTSP
+    volumes:
+      - wcs_data:/usr/local/FlashphonerWebCallServer/conf
+    environment:
+      - WCS_LICENSE=2DE3A24D-479C-4533-BBA5-3609D9BEE794
+      - LOCAL_IP=192.168.1.10   # Замените на актуальный IP вашего контейнера
+      - PASSWORD=password       # Убедитесь, что пароль корректный
 
-    ###################################################################################################
-    # FFmpeg (RTSP to HLS)
-    ###################################################################################################
-    ffmpeg:
-        image: jrottenberg/ffmpeg:latest
-        command: >
-          -re -i rtsp://edwj:7rw5at@192.168.1.10:554/cam/realmonitor?channel=1&subtype=0
-          -c:v libx264 -preset ultrafast -tune zerolatency
-          -f hls -hls_time 2 -hls_list_size 5 -hls_flags delete_segments
-          /output/stream.m3u8
-        volumes:
-            - ./hls:/output
-        restart: always
+volumes:
+  wcs_data:

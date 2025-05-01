@@ -1,0 +1,13 @@
+Id:8
+Name:Streaming Video
+Clients: 2
+AccountType:STREAM
+
+$1 -> api.publishStream({name:"testStream"});
+$s -> wait(5000);
+$2 -> api.playStream({name:"testStream"});
+$s -> wait(5000);
+$2[true] -> isStreamMediaReceived("testStream", "audio");
+$2[true] -> isStreamMediaReceived("testStream", "video");
+$1 -> api.unPublishStream({name:"testStream"});
+$2 -> api.stopStream({name:"testStream"});

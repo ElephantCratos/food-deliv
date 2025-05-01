@@ -1,0 +1,27 @@
+profiles:
+ -640x360:
+  audio:
+    codec : opus
+    rate : 48000
+  video:
+    width : 640
+    height : 360
+    gop : 90
+    fps : 30
+    codec : h264
+    codecImpl : OPENH264
+ -720p:
+  video:
+    height : 720
+    codec : h264
+ -720p-2Mbps:
+  video:
+    height : 720
+    bitrate : 2000
+    gop : 90
+    fps : 30
+    codec : h264
+    preset : superfast
+    profile : 77
+    level : 31
+    codecImpl : FF

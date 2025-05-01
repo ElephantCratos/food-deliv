@@ -1,0 +1,3762 @@
+#!/bin/bash
+#
+# Startup script for Flashphoner WebCallServer
+#
+# chkconfig: - 80 20
+# description: Flashphoner WebCallServer provides WEB to SIP gateway services
+#
+#### BEGIN INIT INFO
+# Provides:          WebCallServer
+# Required-Start:    $time $local_fs $remote_fs $network
+# Required-Stop:     $time $local_fs $remote_fs
+# Default-Start:     3 4 5
+# Default-Stop:      S 0 1 2 6
+# Short-Description: WebCallServer Init Script
+# Description:       WebCallServer Init Script
+### END INIT INFO
+
+# Import functions from init.d
+FUNCTIONS_EXIST=false
+if [ -f /etc/rc.d/init.d/functions ] ; then
+  . /etc/rc.d/init.d/functions
+  FUNCTIONS_EXIST=true
+fi
+if [ -f /etc/init.d/functions ] ; then
+  . /etc/init.d/functions
+  FUNCTIONS_EXIST=true
+fi
+
+if ! $FUNCTIONS_EXIST ; then
+  failure() {
+    return 0
+  }
+  success() {
+    return 0
+  }
+fi
+
+
+
+# Global variables configuration
+
+# Declare global variables
+function declareGlobals() {
+  declareCommonGlobals
+  LOCAL_VERSION=${LOCAL_VERSION:-}
+  LOCAL_HASH=${LOCAL_HASH:-}
+  setLocalVersion
+}
+
+# Get full path to WCS home directory
+function getFullHome() {
+  local fullHome=$WCS_HOME
+  
+  if [[ ! -z $fullHome ]]; then
+    fullHome=$(readlink -f $fullHome)
+  fi
+  echo "$fullHome"
+}
+
+# Get flashphoner.properties config
+function getWCSConfig() {
+  echo "$(getHome)/conf/flashphoner.properties"
+}
+
+# Get database.yml config
+function getDatabaseYml() {
+  echo "$(getHome)/conf/database.yml"
+}
+
+# Get wcs-core.properties config
+function getWCSCoreConfig() {
+  echo "$(getHome)/conf/wcs-core.properties"
+}
+
+# Get local version
+function getLocalVersion() {
+  echo "$LOCAL_VERSION"
+}
+
+# Get local hash
+function getLocalHash() {
+  echo "$LOCAL_HASH"
+}
+
+# Set local version
+function setLocalVersion() {
+  local localVersionFile="$(getHome)/conf/WCS.version"
+  local fullVersion=`cat $localVersionFile`
+
+  if [[ -z $LOCAL_VERSION ]]; then
+    LOCAL_VERSION=${fullVersion%-*}
+  fi
+  if [[ -z $LOCAL_HASH ]]; then
+    LOCAL_HASH=${fullVersion##*-}
+  fi
+}
+
+
+# Environment variables configuration
+
+# Configure environment variables
+function setUpEvironment() {
+  local envConfig="$(getHome)/bin/setenv.sh"
+
+  # Clean Java options to prevent dubbinng while re-initializing #WCS-3034
+  WCS_JAVA_OPTS=""
+  WCS_SERVER_OPTS=""
+  [ -r "$envConfig" ] && . "$envConfig"
+}
+
+# Get Java options
+function getJavaOpts() {
+  echo "$WCS_JAVA_OPTS"
+}
+
+# Get server options
+function getServerOpts() {
+  echo "$WCS_SERVER_OPTS"
+}
+
+# Get library path
+function getLdLibraryPath() {
+  echo "$LD_LIBRARY_PATH"
+}
+
+# Get preload libraries
+function getLdPreload() {
+  echo "$LD_PRELOAD"
+}
+
+# Get Java executable
+function getJavaExec() {
+  local javaExec=$_EXECJAVA
+
+  if [[ "$javaExec" == "" ]]; then
+    javaExec=`which java`
+  fi
+  echo "$javaExec"
+}
+
+# Get non root mode setting
+function getNonRoot() {
+  local nonRoot=$WCS_NON_ROOT
+
+  if [[ -z $nonRoot ]]; then
+    nonRoot=true
+  fi
+  echo "$nonRoot"
+}
+
+# Check root mode to use in conditions
+function isRootMode() {
+  local rootMode=$1
+
+  # Optional parameter overrides the environment settings #WCS-3513
+  if [ "$rootMode" == "true" ]; then
+    true; return
+  elif [ "$rootMode" == "false" ]; then
+    false; return
+  fi
+  
+  if [ "$(getNonRoot)" == "false" ]; then
+    true; return
+  else
+    false; return
+  fi
+}
+
+# Get PID file name depending on root mode
+function getPidFile() {
+  local rootMode=$1
+  local pidFile="FlashphonerMainWebCallServer.pid"
+  local pidPath=""
+
+  if isRootMode $rootMode; then
+    pidPath="/var/run"
+  else
+    pidPath="$(getHome)/bin"
+  fi
+  echo "$pidPath/$pidFile"
+}
+
+# Get lock file name depending on root mode
+function getLockFile() {
+  local rootMode=$1
+  local lockFile="$(getProduct)"
+  local lockPath=""
+ 
+  if isRootMode $rootMode; then
+    lockPath="/var/run"
+    [ -w "/var/lock/subsys" ] && lockPath=/var/lock/subsys
+  else
+    lockPath="$(getHome)/bin"
+  fi
+  echo "$lockPath/$lockFile"
+}
+
+# Get file descriptors limit
+function getFDLimit() {
+  local fdLimit=$WCS_FD_LIMIT
+
+  if [[ "$fdLimit" == "" ]]; then
+    fdLimit=20000
+  fi
+  echo "$fdLimit"
+}
+
+# Get startup log file name
+function getStartupLogFile() {
+  local startupLogFile=$WCS_STARTUP_LOG
+ 
+  if [[ "$startupLogFile" == "" ]]; then
+    startupLogFile=$(getHome)/logs/startup.log
+  fi
+  echo "$startupLogFile"
+}
+
+# Get enterprise builds URL
+function getEnterpriseUrl() {
+  echo "$ENTERPRISE_URL"
+}
+
+# Get login to download enterprise builds
+function getEnterpriseLogin() {
+  echo "$ENTERPRISE_LOGIN"
+}
+
+# Get password to download enterprise builds
+function getEnterprisePasswd() {
+  echo "$ENTERPRISE_PASSWD"
+}
+
+# Get JVM log file name
+function getJavaLogFile() {
+  local javaLogFile=$WCS_JAVA_LOG
+ 
+  if [[ "$javaLogFile" == "" ]]; then
+    javaLogFile=$(getHome)/logs/java.log
+  fi
+  echo "$javaLogFile"
+}
+
+
+# Standard error codes 
+
+# Declare error codes constans
+function declareErrors() {
+  EOK=0
+  EPERM=1
+  ENOENT=2
+  ESRCH=3
+  EINTR=4
+  EIO=5
+  ENXIO=6
+  E2BIG=7
+  ENOEXEC=8
+  EBADF=9
+  ECHILD=10
+  EAGAIN=11
+  ENOMEM=12
+  EACCES=13
+  EFAULT=14
+  ENOTBLK=15
+  EBUSY=16
+  EEXIST=17
+  EXDEV=18
+  ENODEV=19
+  ENOTDIR=20
+  EISDIR=21
+  EINVAL=22
+  ENFILE=23
+  EMFILE=24
+  ENOTTY=25
+  ETXTBSY=26
+  EFBIG=27
+  ENOSPC=28
+  ESPIPE=29
+  EROFS=30
+  EMLINK=31
+  EPIPE=32
+  EDOM=33
+  ERANGE=34
+
+  ERRORS_STRINGS=()
+  ERRORS_STRINGS[$EOK]="OK"
+  ERRORS_STRINGS[$EPERM]="Operation not permitted"
+  ERRORS_STRINGS[$ENOENT]="No such file or directory"
+  ERRORS_STRINGS[$ESRCH]="No such process"
+  ERRORS_STRINGS[$EINTR]="Interrupted system call"
+  ERRORS_STRINGS[$EIO]="I/O error"
+  ERRORS_STRINGS[$ENXIO]="No such device or address"
+  ERRORS_STRINGS[$E2BIG]="Argument list too long"
+  ERRORS_STRINGS[$ENOEXEC]="Exec format error"
+  ERRORS_STRINGS[$EBADF]="Bad file number"
+  ERRORS_STRINGS[$ECHILD]="No child processes"
+  ERRORS_STRINGS[$EAGAIN]="Try again"
+  ERRORS_STRINGS[$ENOMEM]="Out of memory"
+  ERRORS_STRINGS[$EACCES]="Permission denied"
+  ERRORS_STRINGS[$EFAULT]="Bad address"
+  ERRORS_STRINGS[$ENOTBLK]="Block device required"
+  ERRORS_STRINGS[$EBUSY]="Device or resource busy"
+  ERRORS_STRINGS[$EEXIST]="File exists"
+  ERRORS_STRINGS[$EXDEV]="Cross-device link"
+  ERRORS_STRINGS[$ENODEV]="No such device"
+  ERRORS_STRINGS[$ENOTDIR]="Not a directory"
+  ERRORS_STRINGS[$EISDIR]="Is a directory"
+  ERRORS_STRINGS[$EINVAL]="Invalid argument"
+  ERRORS_STRINGS[$ENFILE]="File table overflow"
+  ERRORS_STRINGS[$EMFILE]="Too many open files"
+  ERRORS_STRINGS[$ENOTTY]="Not a typewriter"
+  ERRORS_STRINGS[$ETXTBSY]="Text file busy"
+  ERRORS_STRINGS[$EFBIG]="File too large"
+  ERRORS_STRINGS[$ENOSPC]="No space left on device"
+  ERRORS_STRINGS[$ESPIPE]="Illegal seek"
+  ERRORS_STRINGS[$EROFS]="Read-only file system"
+  ERRORS_STRINGS[$EMLINK]="Too many links"
+  ERRORS_STRINGS[$EPIPE]="Broken pipe"
+  ERRORS_STRINGS[$EDOM]="Math argument out of domain of func"
+  ERRORS_STRINGS[$ERANGE]="Math result not representable"
+}
+
+# Get an error string by code
+function strError() {
+  local errorCode=$1
+  local errorString="No description"
+
+  if [ $errorCode -ge $EOK ] && [ $errorCode -le $ERANGE ]; then
+    errorString="${ERRORS_STRINGS[$errorCode]}"
+  fi
+  echo "$errorString"
+}
+
+
+# Common global variables configuration
+
+# Declare common global variables
+function declareCommonGlobals() {
+  declareErrors
+  PRODUCT=FlashphonerWebCallServer
+  LOCAL_DIR=/usr/local
+  WCS_HOME="$LOCAL_DIR/$PRODUCT"
+  FLASHPHONER_USER="flashphoner"
+  SILENT_MODE=${SILENT_MODE:-false}
+  SITE=${SITE:-flashphoner.com}
+  MIN_SPACE_THRESHOLD=${MIN_SPACE_THRESHOLD:-1048576}
+  MAIN_PID_FILE=${MAIN_PID_FILE:-FlashphonerMainWebCallServer.pid}
+  MAIN_BRANCH=5.2
+}
+
+# Get product name
+function getProduct() {
+  echo "$PRODUCT"
+}
+
+# Get local directory to install
+function getLocal() {
+  echo "$LOCAL_DIR"
+}
+
+# Get WCS home directory
+function getHome() {
+  echo "$WCS_HOME"
+}
+
+# Get WCS user name
+function getUser() {
+  echo "$FLASHPHONER_USER"
+}
+
+# Is installation non-interactive
+function isSilent() {
+  $SILENT_MODE; return
+}
+
+# Set install to be non-interactive
+function setSilent() {
+  SILENT_MODE=true
+}
+
+# Get site domain name
+function getSite() {
+  echo "$SITE"
+}
+
+# Get site URL
+function getSiteUrl() {
+  echo "https://$SITE"
+}
+
+# Get minimal free space to install/update/work
+function getMinSpaceThreshold() {
+  echo "$MIN_SPACE_THRESHOLD"
+}
+
+# Get main process pid file name
+function getMainPidFile() {
+  echo "$MAIN_PID_FILE"
+}
+
+# Get main product branch
+function getMainBranch() {
+  echo "$MAIN_BRANCH"
+}
+
+
+# Logging functions
+
+# Declare logging variables
+function declareLog() {
+  local logFile=$1
+
+  DEBUG=${DEBUG:-false}
+  DEFAULT_LOG=${DEFAULT_LOG:-}
+
+  setDefaultLogFile $logFile
+}
+
+# Check if debug log enabled
+function isDebugEnabled() {
+  if [[ ! -z $DEBUG ]]; then
+    $DEBUG; return
+  else
+    false; return
+  fi
+}
+
+# Enable debug logging
+function enableDebug() {
+  DEBUG=true
+}
+
+# Disable debug logging
+function disableDebug() {
+  DEBUG=false
+}
+
+# Get default log file
+function getDefaultLogFile() {
+  echo "$DEFAULT_LOG"
+}
+
+# Set default log file
+function setDefaultLogFile() {
+  local logFile=$1
+
+  [[ -z $logFile ]] && return 1
+  if checkLogPath $logFile; then
+    DEFAULT_LOG=$logFile
+  fi
+}
+
+# # Check if log file path exists and make the dir if needed
+function checkLogPath() {
+  local logFile=$1
+  local result=0
+
+  [[ -z $logFile ]] && return 1
+  logPath=$(dirname "$logFile")
+  if [[ ! -d $logPath ]]; then
+    mkdir -p $logPath
+    result=$?
+  fi
+  return $result
+}
+
+# Form log timestamp
+function logDate() {
+  local dateToLog=`echo "[$(date '+%Y-%m-%d %H:%M:%S')]"`
+ 
+  echo "$dateToLog"
+}
+
+# Write to a log file
+function writeLog() {
+  local level=$1
+  local message=$2
+  local logFile=$3
+  local owner=$(getCurrentUser)
+  local logPath=""
+  local callerFuncName=""
+
+  [[ -z $logFile ]] && logFile=$(getDefaultLogFile)
+  if [[ "$level" == "" || "$message" == "" || "$logFile" == "" ]]; then
+    return 1
+  fi
+  if [[ -f $logFile ]]; then
+    owner=$(stat -c "%U" $logFile)
+  else
+    checkLogPath $logFile
+    [[ $? -ne 0 ]] && return 1
+  fi
+  # Determine caller function name
+  for callerFuncName in ${FUNCNAME[@]}; do
+    if [[ "$callerFuncName" == "${FUNCNAME[0]}" || "$callerFuncName" =~ ^log  || "$callerFuncName" =~ ^display  ]]; then
+      continue
+    else
+      break
+    fi
+  done
+  if [[ "$owner" != "$(getCurrentUser)" && "$(command -v sudo 2>/dev/null)" != "" ]]; then
+    # The log file is owned by someone else, try to sudo to it if sudo available
+    sudo -u $owner echo -e "$(logDate) $level $callerFuncName - $message" >> $logFile
+  else
+    echo -e "$(logDate) $level $callerFuncName - $message" >> $logFile
+  fi
+ }
+
+# Write INFO level message
+function logInfo() {
+  local message=$1
+  local logFile=$2
+
+  writeLog "INFO" "$message" "$logFile"
+}
+
+# Write WARN level message
+function logWarn() {
+  local message=$1
+  local logFile=$2
+
+  writeLog "WARN" "$message" "$logFile"
+}
+
+# Write ERROR level message
+function logError() {
+  local message=$1
+  local logFile=$2
+
+  writeLog "ERROR" "$message" "$logFile"
+}
+
+# Write DEBUG level message
+function logDebug() {
+  local message=$1
+  local logFile=$2
+
+  if isDebugEnabled; then
+    writeLog "DEBUG" "$message" "$logFile"
+  fi
+}
+
+# Display INFO level message to user
+function displayInfo() {
+  local message=$1
+  local logFile=$2
+
+  echo -e "$message"
+  writeLog "INFO" "$message" "$logFile"
+}
+
+# Display WARN level message to user
+function displayWarn() {
+  local message=$1
+  local logFile=$2
+
+  echo -e "WARN: $message"
+  writeLog "WARN" "$message" "$logFile"
+}
+
+# Display ERROR level message to user
+function displayError() {
+  local message=$1
+  local logFile=$2
+
+  echo -e "ERROR: $message"
+  writeLog "ERROR" "$message" "$logFile"
+}
+
+
+# Various helper functions
+
+# Check if user exists in system
+function isUser() {
+  local user=$1
+  
+  if [[ -z $user ]]; then
+    user=$(getUser)
+  fi
+  if [[ "$(getent passwd $user)" =~ ^$user ]]; then
+    true; return
+  else
+    false; return
+  fi
+}
+
+# Get current user running script
+function getCurrentUser() {
+  echo "$(whoami)"
+}
+
+# Get daemon type
+function getDaemonType() {
+  local daemonType=`ps --no-headers -o comm 1`
+  echo "$daemonType"
+} 
+
+# Check if service is running
+function isService() {
+  # Check service only if systemd used #WCS-3034
+  if [[ $(getDaemonType) != 'systemd' ]]; then
+    false; return
+  fi
+  if systemctl is-active --quiet webcallserver.service; then
+    true; return
+  else
+    false; return
+  fi
+}
+
+# Check if the script is running from root
+function isScriptRunningFromRoot() {
+  if [[ "$(getCurrentUser)" == "root" ]]; then
+    true; return
+  else
+    false; return
+  fi
+}
+
+# Set file system item owner to user
+function setOwner() {
+  local user=$1
+  local object=$2
+  local rootMode=$3
+  local group=""
+  local changeUser=false
+
+  if [[ "$user" == "" || "$object" == "" ]]; then
+    return 1
+  fi
+  if [[ -z $rootMode ]]; then
+    changeUser=false
+  elif [[ "$rootMode" == "false" || "$rootMode" == "1" ]]; then
+    changeUser=true
+  fi
+  [[ ! isScriptRunningFromRoot ]] && return 1
+  [[ ! -e $object ]] && return 1
+  group=$(id -gn $user)
+  # Set owner to root if the main process starts from flashphoner user to prevent systemd errors #WCS-3682
+  if $changeUser; then
+    user="root"
+  fi
+  logDebug "Set $object permissions to $user:$group (rootMode: $rootMode)"
+  setOwnerAndGroup $user $group $object
+  # Make an object readable and writable by group #WCS-3682 #WCS-3718
+  chmod -R g+rw $object > /dev/null 2>&1
+}
+
+# Set file system item owner to user and group
+function setOwnerAndGroup() {
+  local user=$1
+  local group=$2
+  local object=$3
+
+  if [[ "$user" == "" || "$object" == "" ]]; then
+    return 1
+  fi
+  [[ ! isScriptRunningFromRoot ]] && return 1
+  [[ ! -e $object ]] && return 1
+  chown -RHL $user:$group $object > /dev/null 2>&1
+}
+
+# Get Java version
+function getJavaVersion() {
+  local javaCmd=`command -v java 2>/dev/null`
+  local jdkVersion=""
+  local javaFullVersion=""
+  local javaMajor=0
+  local javaMinor=0
+  local javaVersion=0
+
+  if [[ -z $javaCmd ]]; then
+    echo "$javaVersion"
+    return 1
+  fi
+  jdkVersion=`$javaCmd -version 2>&1`
+  javaFullVersion=`echo $jdkVersion | head -1 | cut -d" " -f 3 | tr -d \"`
+  javaMajor=`echo $javaFullVersion | cut -d \. -f 1`
+  if [[ $javaMajor -eq 1 ]]; then
+    javaMinor=`echo $javaFullVersion | cut -d \. -f 2`
+    if [[ $javaMinor -ge 8  ]]; then
+      javaVersion=$javaMinor
+    fi
+  elif [[ $javaMajor -ge 8 ]]; then
+    javaVersion=$javaMajor
+  fi
+  logDebug "Java version $javaVersion"
+  echo "$javaVersion"
+}
+
+# Get user running the process by pid
+function getUserByPid() {
+  local pid=$1
+  local user=`ps -o uname= -p "$pid"`
+ 
+  logDebug "Process $pid running as user $user"
+  echo "$user"
+}
+
+# Check if user is owner of the object
+function isOwned() {
+  local object=$1
+  local user=$2
+  local owner=""
+  
+  if [[ -z $user ]]; then
+    user=$(getUser)
+  fi
+  owner=$(stat -c "%U" "$object")
+  if [[ $owner == $user ]]; then
+    true; return
+  else
+    false; return
+  fi
+}
+
+# Get next file copy name as file.0, file.1 etc
+function getNextCopyName() {
+  local pattern=$1
+  local lastFile=""
+  local lastSuffix=""
+  local newSuffix=0
+  local nextCopyName=""
+  
+  if [[ -z $pattern ]]; then
+    echo ""
+    return 1
+  fi
+  lastFile=`ls $pattern.[0-9]* | sort -Vr | head -1`
+  [[ -z $lastFile ]] && lastFile=`ls $pattern | sort -Vr | head -1`
+  [[ -z $lastFile ]] && lastFile=$pattern
+  lastSuffix=`echo $lastFile | grep -o '[^.]*$'`
+  logDebug "lastSuffix: $lastSuffix"
+  if [[ $lastSuffix =~ ^[0-9]+$ ]]; then
+    newSuffix=$((lastSuffix+1))
+  else
+    lastSuffix=""
+  fi
+  logDebug "lastSuffix: $lastSuffix, newSuffix: $newSuffix"
+  if [[ ! -z $lastSuffix ]]; then
+    nextCopyName=`echo $lastFile | sed 's/\(.*\)'$lastSuffix'/\1'$newSuffix'/'`
+  else
+    nextCopyName=$lastFile.$newSuffix
+  fi
+  
+  echo "$nextCopyName"
+}
+
+# Check if user can write the object
+function isWritable() {
+  local object=$1
+  local user=$2
+  local asUser=""
+  
+  if [[ -z $user ]]; then
+    user=$(getUser)
+  fi
+  if [[ "$(getCurrentUser)" != $user ]]; then
+    asUser="sudo -u $user"
+  fi
+  if $asUser test -w "$object"; then
+    true; return
+  else
+    false; return
+  fi
+}
+
+# Check if site available
+function isSiteUp() {
+  ping -c1 -W1 -q $(getSite) &>/dev/null
+  if [[ $? -eq 0 ]]; then
+    true; return
+  else
+    false; return
+  fi
+}
+
+# Check free space available
+function checkFreeSpace() {
+  local spaceEstimated=$1
+  local fileToCheck=$2
+  local spaceEstimatedKbytes=0
+  local factor=0
+  local dirToCheck=$(getLocal)
+  
+  [ -z $spaceEstimated ] && return 1
+
+  [ ! -z $fileToCheck ] && dirToCheck=$(dirname $fileToCheck)
+
+  case "${spaceEstimated: -1}" in
+    k|K)
+      factor=1;;
+    m|M)
+      factor=1024;;
+    g|G)
+      factor=1048576;;
+  esac
+
+  if [ $factor -gt 0 ]; then
+    spaceEstimated=${spaceEstimated:0:-1}
+    spaceEstimatedKbytes=$((spaceEstimated*factor))
+  else
+    spaceEstimatedKbytes=$spaceEstimated
+  fi
+
+  spaceAvailable=`df -k $dirToCheck | awk 'NR==2 { print $4 }'`
+
+  if [ $spaceAvailable -le $spaceEstimatedKbytes ]; then
+    false; return
+  fi
+  true; return
+}
+
+# Get server pid from file or directly from the process
+function getServerPid() {
+  local pidFileRoot=/var/run/$(getMainPidFile)
+  local pidFileNonRoot=$(getHome)/bin/$(getMainPidFile)
+  local pid=""
+
+  if [ -f $pidFileRoot ]; then
+    pid=$(cat $pidFileRoot)
+  elif [ -f $pidFileNonRoot ]; then
+    pid=$(cat $pidFileNonRoot)
+  else
+    logWarn "Server is probably not running, looking for the process"
+    pid=$(pgrep -fn com.flashphoner.server.Server)
+  fi
+
+  echo "$pid"
+}
+
+
+# Functions to get OS parameters
+
+# Get OS name
+function getOsName() {
+  local osName="Linux"
+
+  if [[ -f /etc/os-release ]]; then
+    osName=$(grep -e "^ID=" /etc/os-release 2>/dev/null | cut -d"=" -f2 | tr -d '"')
+  elif [[ -f /proc/version ]]; then
+    # get OS name from /proc/version
+    if grep -e "Red Hat" /proc/version > /dev/null; then
+      osName="Red Hat"
+    elif grep -e "centos" /proc/version > /dev/null; then
+      osName="centos"
+    elif grep -e "[Dd]ebian" /proc/version > /dev/null; then
+      osName="Debian"
+    elif grep -e "[Uu]buntu" /proc/version > /dev/null; then
+      osName="Ubuntu"
+    fi
+  fi
+
+  echo $osName
+}
+
+# Get OS version
+function getOsVersion() {
+  local osVersion=""
+
+  if [[ -f /etc/os-release ]]; then
+    osVersion=$(grep -e "^VERSION_ID=" /etc/os-release 2>/dev/null | cut -d"=" -f2 | tr -d '"')
+  fi
+  if [[ -z $osVersion ]]; then
+    if [[ "$(getOsName)" == "Debian" ]]; then
+      # Debian may omit VERSION_ID in /etc/os-release, fallback to the legacy way
+      osVersion=$(cat /etc/debian_version 2>/dev/null)
+    else
+      # Get kernel release as version
+      osVersion=$(uname -r 2>/dev/null)
+    fi
+  fi
+
+  echo $osVersion
+}
+
+# Common user interface functions
+
+# Display a message to console if allowed
+function informUser() {
+  local message=$1
+
+  if ! isSilent; then
+    echo -e "$message"
+  fi
+}
+
+# Read user input
+function askUser() {
+  local message=$@
+  local prompt=""
+  local input=""
+
+  if [[ ! -z $message ]]; then
+    read -p "$message " input < /dev/tty
+  else
+    read input < /dev/tty
+  fi
+  echo "$input"
+}
+
+# Read user input with predefined answers
+function askUserToChoose() {
+  local message=$@
+  local answers=""
+  local input=""
+
+  if [[ ! -z $message ]]; then
+    answers=$(echo "$message" | sed 's/.*\[\(.*\)\].*/\1/' | tr '/' ' ')
+    while true
+    do
+      input=$(askUser $message)
+      if [[ "$answers" =~ $input ]]; then
+        break
+      fi
+    done
+  else
+    input=$(askUser)
+  fi
+  echo "$input"
+} 
+
+# Amazon cloud operations
+
+# Declare Amazon cloud constants
+function declareCloudConstants_Amazon() {
+  METADATA_URL_AMAZON=${METADATA_URL_AMAZON:-"http://169.254.169.254/latest/meta-data"}
+  METADATA_TOKEN_AMAZON=${METADATA_TOKEN_AMAZON:-}
+}
+
+# Set AWS metadata token
+function setAWSMetadataToken() {
+  METADATA_TOKEN_AMAZON=$(curl -s --request PUT "http://169.254.169.254/latest/api/token" --header "X-aws-ec2-metadata-token-ttl-seconds: 60")
+}
+
+# Detect a cloud
+function isCloud_Amazon() {
+  declareCloudConstants_Amazon
+  
+  local kernel=$(uname -r | grep amzn)
+  local os=$(cat /etc/issue | grep -e "Amazon\|AMI")
+  local metadata=""
+
+  if [[ $kernel || $os ]]; then
+    # Set the token as flag only, the real token must be received in the same shell session with the API call
+    setAWSMetadataToken
+  fi
+
+  if [ -z $METADATA_TOKEN_AMAZON ]; then
+    metadata=$(curl --max-time 1 --insecure -s -i -o /dev/null -w '%{http_code}' $METADATA_URL_AMAZON/)
+  else
+    metadata=$(token=`curl -s --request PUT 'http://169.254.169.254/latest/api/token' --header 'X-aws-ec2-metadata-token-ttl-seconds: 60'` && curl --max-time 1 --insecure -s -i -o /dev/null -w '%{http_code}' -H "X-aws-ec2-metadata-token: $token" $METADATA_URL_AMAZON/)
+  fi
+
+  logDebug "metadata: $metadata"
+  metadata=$(echo $metadata | grep 200)
+
+  if [[ $kernel || $os || $metadata == "200" ]]; then
+    true; return
+  else
+    false; return
+  fi
+}
+
+# Get cloud public IP
+function getPublicIp_Amazon() {
+  local publicIp=""
+  local message="Public IP detection without token"
+
+  if [ -z $METADATA_TOKEN_AMAZON ]; then
+    publicIp=$(curl -s -f $METADATA_URL_AMAZON/public-ipv4)
+  else
+    message="Public IP detection with token"
+    publicIp=$(token=`curl -s --request PUT 'http://169.254.169.254/latest/api/token' --header 'X-aws-ec2-metadata-token-ttl-seconds: 60'` && curl -s -f -H "X-aws-ec2-metadata-token: $token" $METADATA_URL_AMAZON/public-ipv4)
+  fi
+
+  if [[ $? -ne 0 ]]; then
+    publicIp=""
+  fi
+ 
+  logDebug "$message: $publicIp"
+
+  echo "$publicIp"
+}
+
+# Get cloud private IP
+function getPrivateIp_Amazon() {
+  local privateIp=""
+  local message="Private IP detection without token"
+
+  if [ -z $METADATA_TOKEN_AMAZON ]; then
+    privateIp=$(curl -s -f $METADATA_URL_AMAZON/local-ipv4)
+  else
+    message="Private IP detection with token"
+    privateIp=$(token=`curl -s --request PUT 'http://169.254.169.254/latest/api/token' --header 'X-aws-ec2-metadata-token-ttl-seconds: 60'` && curl -s -f -H "X-aws-ec2-metadata-token: $token" $METADATA_URL_AMAZON/local-ipv4)
+  fi
+
+  if [[ $? -ne 0 ]]; then
+    privateIp=""
+  fi
+ 
+  logDebug "$message: $privateIp"
+
+  echo "$privateIp"
+}
+
+# Set admin password to instanse id
+function setAdminPasswd_Amazon() {
+  local getInstanceCmd="curl -s -f $METADATA_URL_AMAZON/instance-id"
+  local instanceId=""
+
+  if [ -z $METADATA_TOKEN_AMAZON ]; then
+    instanceId=$(curl -s -f $METADATA_URL_AMAZON/instance-id)
+  else
+    instanceId=$(token=`curl -s --request PUT 'http://169.254.169.254/latest/api/token' --header 'X-aws-ec2-metadata-token-ttl-seconds: 60'` && curl -s -f -H "X-aws-ec2-metadata-token: $token" $METADATA_URL_AMAZON/instance-id)
+  fi
+
+  logDebug "Instance Id detected: $instanceId"
+
+  if [ ! -d "$(getHome)/logs/server_logs" ]; then
+    if grep "admin:" "$(getDatabaseYml)" > /dev/null 2>&1; then
+      # Set InstanceId as admin password
+      instanceId=$(echo -n $instanceId | md5sum | cut -f1 -d"-" | tr -d " ")
+      logDebug "Instance Id cyphered: $instanceId"
+      sed -i -e "/admin:/s/password:\ [0-9A-Za-z]*,/password:\ $instanceId,/" "$(getDatabaseYml)"
+    fi
+  fi
+}
+
+
+# Google cloud operations
+
+# Declare Amazon cloud constants
+function declareCloudConstants_Google() {
+  METADATA_URL_GOOGLE=${METADATA_URL_GOOGLE:-"http://metadata.google.internal/computeMetadata/v1/instance"}
+  HEADER_GOOGLE=${HEADER_GOOGLE:-'-H Metadata-Flavor:Google'}
+}
+
+# Detect a cloud
+function isCloud_Google() {
+  declareCloudConstants_Google
+  
+  local metadata=$(curl --insecure -s -i -o /dev/null -w '%{http_code}' $HEADER_GOOGLE $METADATA_URL_GOOGLE/ | grep 200)
+
+  if [[ $metadata == "200" ]]; then
+    true; return
+  else
+    false; return
+  fi
+}
+
+# Get cloud public IP
+function getPublicIp_Google() {
+  local publicIp=$(curl -s -f $HEADER_GOOGLE $METADATA_URL_GOOGLE/network-interfaces/0/access-configs/0/external-ip)
+
+  if [[ $? -ne 0 ]]; then
+    publicIp=""
+  fi
+ 
+  logDebug "Public ip detecting using command 'curl -s -f $HEADER_GOOGLE $METADATA_URL_GOOGLE/network-interfaces/0/access-configs/0/external-ip'"
+
+  echo "$publicIp"
+}
+
+# Get cloud public IP
+function getPrivateIp_Google() {
+  local privateIp=$(curl -s -f $HEADER_GOOGLE $METADATA_URL_GOOGLE/network-interfaces/0/ip)
+ 
+  if [[ $? -ne 0 ]]; then
+    privateIp=""
+  fi
+ 
+  logDebug "Public ip detecting using command 'curl -s -f $HEADER_GOOGLE $METADATA_URL_GOOGLE/network-interfaces/0/ip'"
+
+  echo "$privateIp"
+}
+
+# Set admin password to instanse id
+function setAdminPasswd_Google() {
+  return 0
+}
+
+
+# Abstarct cloud checking functions
+
+# Declare clouds list
+function declareClouds() {
+  CLOUDS=(
+    "Amazon"
+    "Google"
+  )
+  CLOUD=""
+}
+
+# Get clouds list
+function getClouds() {
+  echo "${CLOUDS[@]}"
+}
+
+# Add cloud to list
+function addCloud() {
+  CLOUDS+=($1)
+}
+
+# Get current cloud name
+function getCurrentCloud() {
+  echo "$CLOUD"
+}
+
+# Set current cloud name
+function setCurrentCloud() {
+  local currentCloud=$1
+  
+  if [[ ! -z $currentCloud ]]; then
+    CLOUD=$currentCloud
+  fi
+}
+
+# Check if certain cloud detector function exists
+function isCloudFunc() {
+  local func=$1
+
+  if [[ "$(declare -fF $func)" ]]; then
+    true; return
+  else
+    false; return
+  fi  
+}
+
+# Update settings to work behind NAT
+function updateSettings() {
+  local cloud=$1
+  local wcsConfig=$(getWCSConfig)  
+
+  if ! grep "client_mode" $wcsConfig > /dev/null ; then
+    echo -e "\nclient_mode=false" >> $wcsConfig
+  fi
+  if ! grep "rtc_ice_add_local_component" $wcsConfig > /dev/null ; then
+    echo -e "\nrtc_ice_add_local_component=true" >> $wcsConfig
+  fi
+  isCloudFunc updateSettings_$cloud && updateSettings_$cloud
+}
+
+# Helper function to update IP settings
+function updateIpSettings() {
+  local privateIp=$1
+  local publicIp=$2
+
+  # Use function from IP module to write IPs to the config
+  writeIps $privateIp $publicIp
+}
+
+# Update IP addresses if allowed
+function updateIps() {
+  local privateIp=$1
+  local publicIp=$2
+  local wcsConfig=$(getWCSConfig)
+  local holdIpSettings="hold_ip_settings"
+  local holdIpValue=""
+ 
+  holdIpValue=$(cat $wcsConfig | grep "$holdIpSettings" | cut -d"=" -f2)
+  if [[ $holdIpValue == "true" ]]; then
+    return 0
+  fi
+  logDebug "Cloud IPs detected: ip=$publicIp ip_local=$privateIp"
+  if [[ "$publicIp" != "" && "$privateIp" != "" ]]; then
+    updateIpSettings $privateIp $publicIp
+  elif [[ "$privateIp" != "" ]]; then
+    updateIpSettings $privateIp $privateIp
+  else
+    sed -i -e "s/^\(ip[ \t]*=\|ip_local[ \t]*=\|cdn_ip[ \t]*=\).*\$/\1/" $wcsConfig
+  fi
+}
+
+# Check a cloud
+function checkCloud() {
+  local cloud=$1
+  local publicIp=""
+  local privateIp=""
+
+  if isCloud_$cloud; then
+    isCloudFunc getPublicIp_$cloud && publicIp=$(getPublicIp_$cloud)
+    isCloudFunc getPrivateIp_$cloud && privateIp=$(getPrivateIp_$cloud)
+    updateIps $privateIp $publicIp
+    updateSettings $cloud
+    isCloudFunc setAdminPasswd_$cloud && setAdminPasswd_$cloud
+    true; return
+  else
+    false; return
+  fi
+}
+
+# Main cloud detection function: check clouds until the first match
+function checkClouds() {
+  local cloud=""
+ 
+  declareClouds
+
+  for cloud in $(getClouds); do
+    if checkCloud $cloud; then
+      setCurrentCloud $cloud
+      logInfo "Cloud environment detected like $cloud" $(getStartupLogFile)
+      break
+    fi 
+  done
+}
+
+# Cloud env detection checker to allow non-cloud specific operations
+function isNotInCloud() {
+  local currentCloud="$(getCurrentCloud)"
+  
+  if [[ -z $currentCloud ]]; then
+    true; return
+  else
+    false; return
+  fi
+}
+
+
+# Directories management functions
+
+# Declare directories management globals
+function declareDirs() {
+  if [[ ${#CUSTOM_DIR_PARAMETERS[@]} -eq 0 ]]; then
+    CUSTOM_DIR_PARAMETERS=(
+      core_standalone_web_dir
+      depacketizer_dump_dir
+      hls_dir
+      ll_hls_dir
+      hls_debug_dir
+      record_dir
+      rtmp_dump_dir
+      snapshot_auto_dir
+      mp4_cutter_dir
+      record_tmp_dir
+      multi_record_dir
+    )
+  fi
+  if [[ ${#WRITABLE_OBJECTS} -eq 0 ]]; then
+    WRITABLE_OBJECTS=(
+      conf/database.yml
+      conf/flashphoner.license
+      conf/flashphoner.properties
+      conf/flashphoner.serverid
+      conf/node_id
+      conf/wss.jks
+      conf/wss.jks.backup
+      conf/zclient/chats
+      conf/zclient/conf
+      conf/zclient/conf/*.yml
+      conf/zclient/spaces
+      hls
+      hls-debug
+      ll-hls
+      logs
+      logs/cdr/cdr.log
+      logs/cdr/conndr.log
+      logs/cdr/mdr.log
+      logs/cdr/routerdr.log
+      logs/cdr/sdr.log
+      logs/cdr/statdr.log
+      logs/client_logs
+      logs/client_logs/$(date '+%Y-%m-%d')
+      logs/rels/*/*.csv
+      logs/rels/*/*.json
+      logs/sfu
+      logs/sfu/*/flashphoner.log
+      logs/server_logs
+      logs/server_logs/flashphoner.log
+      logs/stats
+      metrics
+      records
+      snapshots
+    )
+  fi
+}
+
+# Get custom dirs parameters list
+function getCustomDirParameters() {
+  echo "${CUSTOM_DIR_PARAMETERS[@]}"
+}
+
+# Get writable objects list
+function getWritableObjects() {
+  echo "${WRITABLE_OBJECTS[@]}"
+}
+
+
+# Make a dir if not exists and set owner if needed
+function makeDir() {
+  local dirName=$1
+  local rootMode=true
+
+  [ -z $dirName ] && return 1
+  [ ! -d "$dirName" ] && mkdir -p $dirName
+  [ ! isRootMode ] && rootMode=false
+  [ isDirActionRequired ] && setOwner $(getUser) $dirName $rootMode
+}
+
+# Helper function to check if access rights action required
+function isDirActionRequired() {
+  if [[ isUser && isScriptRunningFromRoot ]]; then
+    true; return
+  else
+    false; return
+  fi
+}
+
+# Helper function to add a slash to dir or link path
+function addEndSlash() {
+  local object=$1
+
+  if [[ -d "$object" ]] || [[ -L "$object" ]]; then
+    [[ "${object: -1}" != "/" ]] && object="$object/"
+  fi
+
+  echo "$object"
+}
+
+# Check if user has permissions to file or folder
+function checkObjectPermissions() {
+  local user=$1
+  local objects=$2
+  local object=""
+
+  [[ -z $objects ]] && objects=$(getHome)
+  [[ -z $user ]] && user=$(getUser)
+  if [[ "$user" == "root" ]]; then
+    true; return
+  fi
+  for object in $objects; do
+    if [[ ! -e "$object" ]]; then
+      logWarn "$object not exists, skipping"
+      true; return
+    fi
+    object=$(addEndSlash "$object")
+    logDebug "Check if $object is owned or writable by $user"
+    if ! isWritable "$object" "$user"; then
+      logError "$object is not writable by $user"
+      false; return
+    fi
+  done
+  true; return
+}
+
+# Get object from settings
+function getObjectFromSettings() {
+  local parameter=$1
+  local config="$(getWCSConfig)"
+  local value=""
+
+  if [[ -z $parameter ]]; then
+    echo ""
+    return 1
+  fi
+  value=`sed -n -e "s/^"$parameter"[ \t]*=[ \t]*\(.*\)/\1/p" $config`
+  
+  if [[ -z $value || $value =~ ^/ ]]; then
+    echo "$value"
+  else
+    echo "$(getHome)/$value"
+  fi
+}
+
+# Check if user has server home dir and custom dirs permissions
+function hasPermissions() {
+  local user=$1
+  local homeDir=$(getHome)
+  local customDir=""
+  local customParameter=""
+  local object=""
+
+  declareDirs
+  [[ -z $user ]] && user=$(getUser)
+  logDebug "Check if $homeDir is owned by $user"
+  if ! checkObjectPermissions $user $homeDir/; then
+    false; return
+  fi
+  logDebug "Check if writable objects are owned by $user"
+  for object in $(getWritableObjects); do
+    if ! checkObjectPermissions $user "$homeDir/$object"; then
+      false; return
+    fi    
+  done
+  for customParameter in $(getCustomDirParameters); do
+    customDir=$(getObjectFromSettings $customParameter)
+    [[ -z $customDir ]] && continue
+    if ! checkObjectPermissions $user $customDir true; then
+      false; return
+    fi
+  done
+  true; return
+}
+
+# Set permissions to server home dir and custom dirs to user
+function setPermissions() {
+  local user=$1
+  local force=$2
+  local rootMode=true
+  local homeDir=$(getHome)
+  local customDir=""
+  local customParameter=""
+  local errorMsg="You must be root to set permissions!"
+  local successMsg="Permissions are set, please restart WCS"
+  local dontNeedMsg="Permissions are already set to user"
+
+  declareDirs
+  [[ -z $user ]] && user=$(getUser)
+  if ! isScriptRunningFromRoot; then
+    displayError "$errorMsg"
+    return 1
+  fi
+  if ! $force && hasPermissions $user; then
+    displayInfo "$dontNeedMsg $user"
+    return 0
+  fi
+  if ! isRootMode; then
+    rootMode=false
+  fi
+  setOwner $user $homeDir $rootMode
+  for customParameter in $(getCustomDirParameters); do
+    customDir=$(getObjectFromSettings $customParameter)
+    [[ -z $customDir ]] && continue
+    if ! isWritable $customDir $user; then
+      setOwner $user $customDir $rootMode
+    fi
+  done
+  # Fix a typo in function name #WCS-3752
+  displayInfo "$successMsg"
+  return 0
+}
+
+
+# Licence checking function 
+function checkLicense() {
+  local user=$1
+  local licenseFile="$(getHome)/conf/flashphoner.license"
+  if [ ! -f "$licenseFile" ]; then
+    echo ""
+    echo "ERROR: Missing license file: (${licenseFile})"
+    echo "You must activate license."
+    echo "Execute the following commands to do it:"
+    echo ""
+    echo "cd $WCS_APP_HOME/bin"
+    echo "./activation.sh"
+    echo ""
+    return 1
+  fi
+  if [[ "$user" == "$(getCurrentUser)" ]]; then
+    $(getJavaExec)  $(getJavaOpts) -Dcom.flashphoner.fms.AppHome="$(getHome)" -cp "$(getHome)/lib/*" com.flashphoner.server.license.ExpiredUpdates
+  else
+    sudo -u $user env LD_LIBRARY_PATH=$(getLdLibraryPath) $(getJavaExec)  $(getJavaOpts) -Dcom.flashphoner.fms.AppHome="$(getHome)" -cp "$(getHome)/lib/*" com.flashphoner.server.license.ExpiredUpdates
+  fi
+  if [ "$?" -eq "1" ]; then
+    exit 1;
+  fi
+}
+
+
+# Server state checking functions
+
+# Check if server is running
+function isServerRunning() {
+  pidFile=$(getPidFile)
+  lockFile=$(getLockFile)
+
+  if [[ -f $pidFile && -f $lockFile && -d /proc/$(cat $pidFile) ]]; then
+    logInfo "Server is running, pid $(cat $pidFile)"
+    true; return
+  else
+    logDebug "Server is not running"
+    false; return
+  fi 
+}
+
+# Check if server is healthy and server its ports
+function isServerHealthy() {
+  local httpPort=`sed -n -e "s/^http.port[ \t]*=[ \t]*\(.*\)/\1/p" $(getWCSConfig)`
+  local url=""
+  local response=""
+
+  [[ -z $httpPort ]] && httpPort=8081
+  # Use a special "health-check" endpoint which works even when license is not activated yet on first start
+  url="http://localhost:$httpPort/health-check"
+  response=`curl --max-time 1 --insecure -s -i -o /dev/null -w '%{http_code}' $url`
+  if [[ $response == "200" ]]; then
+    true; return
+  else
+    logInfo "Server health check URL $url response code: $response"
+    false; return
+  fi
+}
+
+# Check local status
+function localStatus() {
+  pidOnly=${1:-false}
+  pidFile=$(getPidFile)
+  lockFile=$(getLockFile)
+
+  if isServerRunning; then
+    $pidOnly && echo "$(cat $pidFile)" && return 0
+    informUser "$(getProduct)-$(getLocalVersion) started, pid $(cat $pidFile)"
+  else
+    $pidOnly && return 0
+    if [[ -f $lockFile ]]; then
+      informUser "$(getProduct)-$(getLocalVersion) not running but subsys locked"
+    else
+      informUser "$(getProduct)-$(getLocalVersion) not running"
+    fi
+  fi
+  return 0
+}
+
+
+
+# WCS starting functions
+
+# Declare startup global variables
+function declareStart() {
+  SERVER_PID=${SERVER_PID:-}
+  HEALTH_TIMEOUT=${HEALTH_TIMEOUT:-10}
+  JAVA_LIBS_PATH="$(getHome)/lib"
+  NATIVE_LIBS_PATH="$(getHome)/lib/so"
+  USER_LIBS_PATH="$(getHome)/lib/custom"
+  [[ -z $JAVA_LOG_ENABLED ]] && JAVA_LOG_ENABLED=false
+}
+
+# Get server pid
+function getServerPid() {
+  echo "$SERVER_PID"
+}
+
+# Set server pid
+function setServerPid() {
+  local pid=$1
+
+  if [[ ! -z $pid ]]; then
+    SERVER_PID=$pid
+  fi
+}
+
+# Get health check timeout
+function getHealthTimeout() {
+  echo "$HEALTH_TIMEOUT"
+}
+
+# Set health check timeout
+function setHealthTimeout() {
+  local timeout=$1
+
+  if [[ ! -z $timeout ]]; then
+    HEALTH_TIMEOUT=$timeout
+  fi
+}
+
+# Get Java class path
+function getClassPath() {
+  if [[ -d $USER_LIBS_PATH ]] && [[ ! -z "$(ls -A $USER_LIBS_PATH/*.jar 2>/dev/null)" ]]; then
+    echo "$JAVA_LIBS_PATH/*:$USER_LIBS_PATH/*"
+  else
+    echo "$JAVA_LIBS_PATH/*"
+  fi
+}
+
+# Get libraries path
+function getLibsPath() {
+  if [[ -d $USER_LIBS_PATH ]] && [[ ! -z "$(ls -A $USER_LIBS_PATH/*.jar 2>/dev/null)" ]]; then
+    echo "$NATIVE_LIBS_PATH:$JAVA_LIBS_PATH:$USER_LIBS_PATH"
+  else
+    echo "$NATIVE_LIBS_PATH:$JAVA_LIBS_PATH"
+  fi
+}
+
+# Is Java log enabled
+function isJavaLogEnabled() {
+  if [[ ! -z $JAVA_LOG_ENABLED ]]; then
+    $JAVA_LOG_ENABLED; return
+  else
+    false; return
+  fi
+}
+
+# Enable Java log
+function enableJavaLog() {
+  JAVA_LOG_ENABLED=true
+}
+
+# Disable Java log
+function disableJavaLog() {
+  JAVA_LOG_ENABLED=false
+}
+
+# Check Java optiions before start
+function checkJavaOptions() {
+  local user=$1
+  local startupLog=$(getStartupLogFile)
+  local javaVersion="$(getJavaVersion)"
+  local javaExec=$(getJavaExec)
+  local runOptions=$(getRunOptions)
+  local libPath=$(getClassPath)
+  local msgJavaOptionsFail="$(getProduct) can't start due to incorrect java options"
+  local message=""
+  local result=0
+
+  logInfo "Checking JVM options" $startupLog
+  [[ -z $user ]] && user=$(getCurrentUser)
+  if [[ $javaVersion -lt 11 ]]; then
+    message=$($javaExec -version $runOptions  2>&1)
+  elif [[ "$user" == "$(getCurrentUser)" ]]; then
+    message=$($javaExec --show-version --dry-run $runOptions -cp "$libPath" com.flashphoner.server.Server  2>&1)
+  else
+    message=$(sudo -u $user $javaExec --show-version --dry-run $runOptions -cp "$libPath" com.flashphoner.server.Server  2>&1)
+  fi
+  result=$?
+  echo "$message" >> $startupLog
+  if [ $result -ne 0 ]; then
+    echo "$message"
+    displayError "$msgJavaOptionsFail"
+    failure "$msgJavaOptionsFail"
+  fi
+
+  return $result
+}
+
+# Form WCS running options
+function getRunOptions() {
+  local wcsRunOptions="$(getJavaOpts) -Dcom.flashphoner.fms.AppHome=$(getHome) -Djava.library.path=$(getLibsPath) -DWCS_NON_ROOT=$(getNonRoot) $(getServerOpts)"
+ 
+  echo "$wcsRunOptions"
+}
+
+# Start WCS sudoing to default user
+function startWithSudo() {
+  local user=$1
+  local standalone=$2
+  local pid=""
+  local parent=""
+  local osName=$(getOsName)
+  local osVersion=$(getOsVersion)
+  local javaOutput=/dev/null
+
+  [[ -z $user ]] && user=$(getUser)
+  logDebug "user=$user, standalone=$standalone, startup options=$(getRunOptions)"
+  if [[ "$standalone" == "standalone" ]]; then
+    sudo -u $user env LD_PRELOAD=$(getLdPreload) LD_LIBRARY_PATH=$(getLdLibraryPath) $(getJavaExec) $(getRunOptions) -cp "$(getClassPath)" com.flashphoner.server.Server
+    # Exit right after server stops because it is runnning interactive
+    exit $?
+  else
+    logInfo "Starting $(getProduct)-$(getLocalVersion)-$(getLocalHash) as user $user on $osName $osVersion"
+    # JVM console output will be redirected to log file if enabled #WCS-3716
+    if isJavaLogEnabled && [[ -e $(getJavaLogFile) ]]; then
+      javaOutput=$(getJavaLogFile)
+    fi
+    # Start sudo child process in background in Ubuntu 22.04 to prevent stopping when main script ends #WCS-3664
+    nohup sudo -u $user env LD_PRELOAD=$(getLdPreload) LD_LIBRARY_PATH=$(getLdLibraryPath) $(getJavaExec) $(getRunOptions) -cp "$(getClassPath)" com.flashphoner.server.Server >> "$javaOutput" 2>&1 &
+  fi
+  # Get sudo command pid
+  parent=$!
+  sleep 1
+  # Get main process pid
+  pid=$(ps -o pid= --ppid "$parent" 2>/dev/null)
+ 
+  setServerPid "$pid"
+}
+
+# Start WCS as current user
+function startAsCurrentUser() {
+  local standalone=$1
+  local pid=""
+  local osName=$(getOsName)
+  local osVersion=$(getOsVersion)
+  local javaOutput=/dev/null
+
+  logDebug "user=$user, standalone=$standalone, startup options=$(getRunOptions)"
+  if [[ "$standalone" == "standalone" ]]; then
+    $(getJavaExec) $(getRunOptions) -cp "$(getClassPath)" com.flashphoner.server.Server
+    # Exit right after server stops because it is runnning interactive
+    exit $?
+  else
+    logInfo "Starting $(getProduct)-$(getLocalVersion)-$(getLocalHash) on $osName $osVersion"
+    # Enable JVM logging when running from root #WCS-4123
+    if isJavaLogEnabled && [[ -e $(getJavaLogFile) ]]; then
+      javaOutput=$(getJavaLogFile)
+    fi
+    nohup $(getJavaExec) $(getRunOptions) -cp "$(getClassPath)" com.flashphoner.server.Server >> "$javaOutput" 2>&1 &
+  fi
+  pid=$!
+
+  setServerPid "$pid"
+}
+
+# Get user to start depending on mode
+function getUserToStart() {
+  local userToStart=""
+
+  # When runing from root, start depending on WCS_NON_ROOT mode
+  if isRootMode; then
+    userToStart="root"
+  else
+    userToStart=$(getUser)
+  fi
+
+  echo "$userToStart"
+}
+
+# Start WCS depending on user and mode
+function startServer() {
+  local standalone=$1
+  local userToStart=$(getUserToStart)
+  local msgRootMode="$(getProduct) cannot be started from user $(getCurrentUser), please switch WCS_NON_ROOT in setenv.sh to true!"
+  local msgPermissions="$(getProduct) cannot be started from user $userToStart, please fix the permissions to the folders or run 'webcallserver set-permissions'!"
+ 
+  if ! isScriptRunningFromRoot && isRootMode; then
+    # When running as non root fail if server is in root mode
+    displayError "$msgRootMode"
+    return 1
+  fi
+
+  if ! hasPermissions $userToStart; then
+    displayError "$msgPermissions"
+    return 1
+  fi
+
+  # Check Java options as current user
+  ! checkJavaOptions $userToStart && return 1
+  # Check license as current user
+  checkLicense $userToStart
+  if [[ "$userToStart" == "$(getCurrentUser)" ]]; then
+    # We cannot use sudo if running from the same user
+    startAsCurrentUser $standalone
+  else
+    # Trying to sudo if running from other user whether it's root or non-root
+    startWithSudo $userToStart $standalone
+  fi
+}
+
+# Tweak hosts file for hostname if needed
+function tweakHostsFile() {
+  if [[ ! `getent hosts \`hostname\`` ]]; then
+    echo "127.0.0.1		$(hostname)" >> /etc/hosts
+  fi	
+}
+
+# Make symlink to records folder
+function makeRecordsSymlink() {
+  local fullHome=$(getFullHome)
+  local recordsSymlink="$fullHome/client/records"
+  local recordsDir="$fullHome/records"
+  local customRecordsDir=$(getObjectFromSettings record_dir)
+
+  [[ ! -z $customRecordsDir ]] && recordsDir=$customRecordsDir
+  recordsDir=$(readlink -f $recordsDir)
+  if [[ ! -d $recordsDir ]]; then
+    mkdir -p $recordsDir > /dev/null 2>&1
+    [[ $? -ne 0 ]] && return 1
+    if ! isRootMode && [[ "root" == "$(getCurrentUser)" ]]; then
+      setOwner $(getUser) $recordsDir false
+    fi
+  fi
+  if [[ ! -L $recordsSymlink ]] || [[ "$recordsDir" != "$(readlink -f $recordsSymlink)" ]]; then
+    rm -f $recordsSymlink
+    ln -sf $recordsDir $recordsSymlink
+  fi
+}
+
+# Helper function to create a file
+function createFile() {
+  local user=$1
+  local file=$2
+  local payload=$3
+  local currentUser=$(getCurrentUser)
+
+  if isRootMode || [[ "$user" == "$currentUser" ]]; then
+    logDebug "Create file $file from user $currentUser"
+    if [[ -z $payload ]]; then
+      touch $file
+    else
+      echo $payload > $file
+    fi
+  elif ! isRootMode; then
+    logDebug "Create file $file from user $user"
+    if [[ -z $payload ]]; then
+      sudo -u $user touch $file
+    else
+      sudo -u $user echo $payload > $file
+    fi
+  fi
+}
+
+
+# Create pid file
+function createPidFile() {
+  local pid=$1
+  local pidFile=$(getPidFile)
+  local user=$(getUser)
+
+  [[ -z $pid ]] && return 1
+  if [[ -f $pidFile ]]; then
+    logDebug "Pid file $pidFile already exists"
+  else
+    createFile "$user" "$pidFile" "$pid"
+  fi
+  if ! isRootMode; then
+    # Change pid file owner #WCS-3682
+    setOwner "$user" "$pidFile" false
+  fi
+}
+
+# Create lock file
+function createLockFile() {
+  createFile "$(getUser)" "$(getLockFile)"
+}
+
+# Wait for health response
+function waitForHealth() {
+  local timeout=$1
+
+  [[ -z $timeout ]] && timeout=$(getHealthTimeout)
+  if [ $timeout -le 0 ]; then
+    logInfo "Server health check is disabled, response timeout is $timeout"
+    true; return
+  fi
+  logInfo "Will wait for server response at least $timeout seconds"
+  while [ $timeout -gt 0 ]; do
+    if isServerHealthy; then
+      true; return
+    else
+      logDebug "Server seems to be unhealthy, waiting..."
+      timeout=$((timeout-1))
+      sleep 1
+    fi
+  done
+  false; return
+}
+
+# Main startup function
+function start() {
+  local standalone=$1
+  local msgAlreadyRunning="$(getProduct) is already running"
+  local msgIpAddressesFail="$(getProduct) can't start due to incorrect IP options"
+  local msgCantStart="$(getProduct) can't start"
+  local msgIsNotHealthy="$(getProduct) started, but is not healthy, please try to restart"
+  local msgStart="$(getProduct) started"
+  local pid=""
+
+  declareStart
+
+  #Check if server is already running
+  if isServerRunning; then
+    displayInfo "$msgAlreadyRunning"
+    return 0
+  fi
+
+  # If we have enough permissions
+  if isScriptRunningFromRoot; then
+    # Tweak hosts file
+    tweakHostsFile
+    # set open file descriptors limit
+    ulimit -n $(getFDLimit)
+  fi
+
+  # Update Java options depending on Java version #WCS-3100
+  if updateJavaProperties; then
+    setUpEvironment
+  fi
+
+  # Check cloud environment
+  checkClouds
+
+  # If we are not in cloud, check and detect IP addresses if they are not set
+  if isNotInCloud; then
+    setIp
+    # Do not start if setIp failed
+    [[ $? -ne 0 ]] && failure "$msgIpAddressesFail" && return 1
+  fi
+
+  echo $"$(getProduct)-$(getLocalVersion): starting"
+
+  # Set signal trapper when starting in standalone mode
+  if [[ "$standalone" == "standalone" ]]; then
+    trap 'echo -e "\n######### Stop standalone mode #########\n"; exit 0' 2
+    echo -e "\n######### Start standalone mode #########\n"
+  fi
+
+  # Start with user choosing logic
+  if startServer $standalone; then
+    pid=$(getServerPid)
+  else
+    failure "$msgCantStart"
+    return 1
+  fi
+ 
+  # Fail if no pid returned
+  if [[ -z $pid ]]; then
+    failure "$msgCantStart"
+    return 1
+  fi
+ 
+  # Check if process is started
+  sleep 1
+  if [[ `ps -p $pid | grep -c $pid` == '0' ]]; then
+    failure "$msgCantStart"
+    return 1
+  fi
+
+  # Save pid to file if not exists yet    
+  createPidFile $pid
+  # Create lock file
+  createLockFile
+  # Let WCS fully start with self-testing SIP call
+  if ! waitForHealth $(getHealthTimeout); then
+    displayError "$msgIsNotHealthy"
+    failure "$msgIsNotHealthy"
+    stop true
+    return 1
+  fi
+  success "$msgStart"
+  echo
+  logInfo "$msgStart, pid $pid"
+  
+  # Clean up obsolete GC logs
+  rm -rf $(getHome)/logs/*.0
+ 
+  # Make symlink to records folder
+  makeRecordsSymlink
+
+  return 0
+}
+
+
+# WCS stopping functions
+
+# Declare stopping globals
+function declareStop() {
+  local product="$(getProduct)"
+
+  MSG_STOPPING=${MSG_STOPPING:-"$product: stopping"}
+  MSG_STOPPED=${MSG_STOPPED:-"$product stopped"}
+  MSG_NOT_RUNNING=${MSG_NOT_RUNNING:-"$product: not running"}
+  MSG_SHUTDOWN=${MSG_SHUTDOWN:-"$product: shutdown"}
+}
+
+# Get stopping message
+function getMsgStopping() {
+  echo "$MSG_STOPPING"
+}
+
+# Get stopped message
+function getMsgStopped() {
+  echo "$MSG_STOPPED"
+}
+
+# Get "not running" message
+function getMsgNotRunning() {
+  echo "$MSG_NOT_RUNNING"
+}
+
+# Get shutdown message
+function getMsgShutdown() {
+  echo "$MSG_SHUTDOWN"
+}
+
+# Forcefully stop the process
+function stopForce() {
+  local pid=""
+
+  declareStop
+  pid=$(pgrep -fn com.flashphoner.server.Server)
+  if [[ -z $pid ]]; then
+    logInfo "No process found to stop forcefully"
+    echo -n $"$(getMsgNotRunning)"
+    false; return
+  else
+    echo -e $"$(getMsgStopping) forcefully"
+    kill -9 $pid
+    stopped=true
+    logInfo "$(getMsgStopped) forcefully"
+    true; return
+  fi
+}
+
+# Stop WCS process
+function stop() { 
+  local force=${1:-false}
+  local pid=""
+  local stopped=false
+
+  declareStop 
+  if isServerRunning; then
+    echo -e $"$(getMsgStopping)"
+    read pid < $(getPidFile)
+    userRunFrom=$(getUserByPid $pid)
+    kill -15 $pid
+    rm -f $(getPidFile)
+    rm -f $(getLockFile)
+    stopped=true
+    logInfo "$(getMsgStopped)"
+  elif $force; then
+    # Process seems like not running, check for orphan and kill it forcefully
+    stopForce && stopped=true
+  else
+    echo -n $"$(getMsgNotRunning)"
+  fi
+
+  if $stopped; then
+    success "$(getMsgShutdown)"
+  fi
+  echo
+  return 0
+}
+
+
+# IP configuration functions
+
+# Declare IP variables
+function declareIp() {
+  CONST_IP_UNDEFINED="undefined"
+  IP_EXTERNAL=${IP_EXTERNAL:-$CONST_IP_UNDEFINED}
+  IP_LOCAL=${IP_LOCAL:-$CONST_IP_UNDEFINED}
+  LOCAL_IP_COUNT=${LOCAL_IP_COUNT:-0}
+}
+
+# Get external IP value
+function getExternalIp() {
+  echo "$IP_EXTERNAL"
+}
+
+# Set external IP value
+function setExternalIp() {
+  local externalIp=$1
+
+  if [[ ! -z $externalIp ]]; then
+    IP_EXTERNAL=$externalIp
+  fi
+}
+
+# Get internal IP value
+function getInternalIp() {
+  echo "$IP_INTERNAL"
+}
+
+# Set external IP value
+function setInternalIp() {
+  local internalIp=$1
+
+  if [[ ! -z $internalIp ]]; then
+    IP_INTERNAL=$internalIp
+  fi
+}
+
+# Get local IP count
+function getLocalIpCount() {
+  echo "$LOCAL_IP_COUNT"
+}
+
+# Set local IP count
+function setLocalIpCount() {
+  local localIpCount=$1
+
+  if [[ ! -z $localIpCount ]]; then
+    LOCAL_IP_COUNT=$localIpCount
+  fi
+}
+
+# Check if address is empty or undefined
+function isEmptyOrUndef() {
+  local ip=$1
+
+  if [[ -z $ip || "$ip" == "$CONST_IP_UNDEFINED" ]]; then
+    true; return
+  else
+    false; return
+  fi
+}
+
+# Count local interfaces
+function countLocalIfaces() {
+  local localIpCount=0
+  local i
+
+  for i in $(hostname -I); do
+    ((localIpCount++))
+  done
+  setLocalIpCount $localIpCount
+}
+
+# Find local IP in hostname generated list
+function findLocalIp() {
+  local ip=$1
+  local localIp=$CONST_IP_UNDEFINED
+  local i
+
+  for i in $(hostname -I) ; do
+    if [[ "$ip" == "$i" ]]; then		
+      localIp=$ip
+    fi
+  done
+  
+  echo "$localIp"
+}
+
+# Get external IP from public detector site with error code checking
+function getIpByUrl() {
+  local url=$1
+  local httpResponse=""
+  local httpBody=""
+  local httpStatus=400
+
+  if [[ -z $url ]]; then
+    echo ""
+    return 1
+  fi
+  httpResponse=`/usr/bin/curl -s -w "HTTPSTATUS:%{http_code}" $url`
+  httpBody=$(echo "$httpResponse" | sed -E 's/HTTPSTATUS\:[0-9]{3}$//')
+  httpStatus=$(echo "$httpResponse" | tr -d '\n' | sed -E 's/.*HTTPSTATUS:([0-9]{3})$/\1/')
+
+  if [[ $httpStatus -eq 200 ]]; then
+    echo "$httpBody"
+    return 0
+  fi
+  echo ""
+  return 1
+}
+
+# Detect external IP
+function detectExternalIp() {
+  local extIp1="$(getIpByUrl https://api.ipify.org)"
+  local extIp2="$(getIpByUrl ipinfo.io/ip)"
+  local extIp=$CONST_IP_UNDEFINED
+
+  if [[ $extIp1 != '' ]]; then
+    extIp=$extIp1
+  elif [[ $extIp2 != '' ]]; then
+    extIp=$extIp2
+  fi
+
+  echo "$extIp"
+}
+
+# Get IPs from hostname list
+function getIpsFromHostname() {
+  local localIp=$(getInternalIp)
+  local externalIp=$(getExternalIp)
+
+  logDebug "localIp=$localIp, externalIp=$externalIp"
+  if isEmptyOrUndef $localIp; then
+   localIp=$(hostname -I | tr -d '[:space:]')
+  fi	
+  if isEmptyOrUndef $externalIp; then
+   setExternalIp $localIp
+  fi    
+  setInternalIp $localIp
+}
+
+# Ask user for IPs
+function askUserForIps() {
+  local localIp=$(getInternalIp)
+  local externalIp=$(getExternalIp)
+  local prompt=""
+  local addr=""
+
+  if [[ "$localIp" == "$CONST_IP_UNDEFINED" ]];then
+    prompt="What is your server LAN IP?"
+  else
+    prompt="We have found $(getLocalIpCount) IPs, what should be used for WCS: $(hostname -I)?"
+  fi
+  addr=$(askUser $prompt)  
+  logDebug "User choose address $addr"
+  if isEmptyOrUndef $externalIp; then
+   setExternalIp $addr
+  fi    
+  setInternalIp $addr
+}
+
+# Try to configure IPs manually or semi-manually
+function configureIps() {
+  local localIpCount=$(getLocalIpCount)
+
+  logDebug "Configuring IP: localIpCount=$localIpCount"
+  if [[ $localIpCount -eq 1 ]]; then
+    getIpsFromHostname
+  else
+    askUserForIps
+  fi
+}
+
+# Ask user to confirm the server is in private network
+function askUserForLan() {
+  local extIp=$1
+  local confirm=""
+
+  informUser "We have found these IP on your server\n"
+  informUser "External IP\t\tLocal IPs" 
+  informUser "$extIp\t\t$(hostname -I)\n"
+  confirm=$(askUserToChoose "Is your server located in your LAN? [yes/no]")
+  if [[ $confirm = n* ]]; then
+    logDebug "extIp=$extIp"
+    [[ $extIp != "$CONST_IP_UNDEFINED" ]] && setExternalIp $extIp
+  fi	
+  configureIps
+  informUser "Thanks. We have configured:\n"
+  informUser "ip = $(getExternalIp)"
+  informUser "ip_local = $(getInternalIp)"  	
+  informUser "\n"
+  informUser "Press any key to continue..."
+}
+
+# Main IP detection function
+function detectIps {
+  local interactive=$1
+  local extIp="$(detectExternalIp)"
+  local localIp="$(findLocalIp $extIp)"
+
+  logDebug "Detecting IP: extIp=$extIp, localIp=$localIp"
+  if [[ "$extIp" == "$localIp" && "$extIp" != "$CONST_IP_UNDEFINED" ]]; then
+    setExternalIp $extIp
+    setInternalIp $localIp
+  elif [[ ! -z $interactive ]]; then
+    # Ask user in intercative mode only, if set-ip command is used
+    askUserForLan $extIp
+  fi
+}	
+
+# Check if IPs are not configured in settings
+function isIpsEmpty() {
+  local privateIp=""
+  local publicIp=""
+  local wcsConfig=$(getWCSConfig)
+
+  publicIp=`sed -n -e "s/^ip[ \t]*=[ \t]*\(.*\)/\1/p" $wcsConfig`
+  privateIp=`sed -n -e "s/^ip_local[ \t]*=[ \t]*\(.*\)/\1/p" $wcsConfig`
+  if [[ -z $publicIp || -z $privateIp ]]; then
+    true; return
+  else
+    false; return
+  fi
+}
+
+# Helper function to write IP settings
+function writeIp() {
+  local setting=$1
+  local value=$2
+  local wcsConfig="$(getWCSConfig)"
+
+  [[ -z $setting || -z $value ]] && return 1
+
+  if [[ "$(grep -e "^$setting[ \t]*=" $wcsConfig)" != "" ]]; then
+    logDebug "There is $setting setting, replacing $setting=$value"
+    sed -i -e "s/^\($setting[ \t]*=\).*\$/\1$value/" $wcsConfig
+  else
+    logDebug "No $setting setting, adding $setting=$value"
+    echo -e "\n$setting=$value" >> $wcsConfig
+  fi
+  return 0
+}
+
+# Write IPs to config file
+function writeIps() {
+  local privateIp=$1
+  local publicIp=$2
+  local wcsConfig="$(getWCSConfig)"
+  local result=1
+
+  if isEmptyOrUndef "$publicIp" || isEmptyOrUndef "$privateIp"; then
+    # Do not write undefined addresses
+    return 1
+  fi
+  if writeIp "ip" "$publicIp" && writeIp "ip_local" "$privateIp"; then
+    result=0
+    sed -i -e "s/^\(cdn_ip[ \t]*=\).*\$/\1$privateIp/" $wcsConfig
+  fi
+  return $result
+}
+
+# IP configuration main function
+function setIp() {
+  local override=$1
+  local confirm="no"
+  local result=0
+  local msgFail="Cannot detect IP addresses automatically, please edit flashphoner.properties file to set them manually or run 'webcallserver set-ip' command"
+  local msgSuccess="IP addresses are set"
+  local msgAskRestart="$msgSuccess, please restart WCS to apply"
+
+  declareIp
+  countLocalIfaces
+  
+  if isIpsEmpty; then
+    confirm="yes"
+  elif [[ "$override" == "override" ]]; then
+    confirm=$(askUserToChoose "IP adresses are already set, re-configure them? [yes/no]")
+  fi
+  if [[ $confirm = y* ]]; then
+    detectIps $override
+    writeIps "$(getInternalIp)" "$(getExternalIp)"
+    result=$?
+  else
+    # Cancelled or no need to change IPs, just return
+    return 0
+  fi
+  if [[ $result -eq 0 ]]; then
+    [[ "$override" == "override" ]] && echo "$msgAskRestart"
+    logInfo "$msgSuccess"
+  else
+    displayError "$msgFail"
+  fi
+  return $result
+}
+
+
+# Java setup functions
+
+# Declare Java globals
+function declareJava() {
+  local replaceXloggc="-Xloggc,-Xloggc"
+  local replaceExprXloggc="/\(^[^#]*\)-Xloggc:\(.*\)/\1-Xlog:gc\*:\2:time/,/\(^[^#]*\)-Xloggc:/\1-Xlog:gc\*:/"
+  local removeJava8Opts="-XX:+PrintGCDateStamps,-XX:+UseConcMarkSweepGC,-XX:+PrintGCDetails"
+  local removeCMSOpts="-XX:+UseCMSInitiatingOccupancyOnly,-XX:CMSInitiatingOccupancyFraction="
+  local java16Opts="--illegal-access=permit"
+  local removeJava16Opts="--illegal-access="
+  local java17Opts="--add-exports java.base/sun.security.provider=ALL-UNNAMED,--add-opens java.base/java.lang=ALL-UNNAMED"
+  local removeJava17Opts="--add-exports ,--add-opens "
+
+  OPTS_REMOVE[8]="-XX:+UseZGC,-XX:+UseLargePages,-XX:ZPath=,-XX:AllocateHeapAt=,$removeJava16Opts,$removeJava17Opts"
+  OPTS_REPLACE[8]="-Xlog:gc,-Xlog:gc"
+  OPTS_REPLACE_EXPR[8]="/\(^[^#]*\)-Xlog:gc\*:\(.*\):time/\1-Xloggc:\2/,/\(^[^#]*\)-Xlog:gc\*:/\1-Xloggc:/"
+  OPTS_ADD[8]="-XX:+PrintGCDateStamps,-XX:+PrintGCDetails,-XX:+UseConcMarkSweepGC,-XX:+UseCMSInitiatingOccupancyOnly,-XX:CMSInitiatingOccupancyFraction=70"
+  OPTS_REMOVE[12]="$removeJava8Opts,$removeJava16Opts,$removeJava17Opts"
+  OPTS_REPLACE[12]="$replaceXloggc,-XX:AllocateHeapAt"
+  OPTS_REPLACE_EXPR[12]="$replaceExprXloggc,/\(^[^#]*\)-XX:AllocateHeapAt/\1-XX:ZPath/"
+  OPTS_ADD[12]="-XX:+UseCMSInitiatingOccupancyOnly,-XX:CMSInitiatingOccupancyFraction=70"
+  OPTS_REMOVE[14]="${OPTS_REMOVE[12]},$removeCMSOpts,$removeJava16Opts,$removeJava17Opts"
+  OPTS_REPLACE[14]="${OPTS_REPLACE[12]}"
+  OPTS_REPLACE_EXPR[14]="${OPTS_REPLACE_EXPR[12]}"
+  OPTS_ADD[14]=""
+  OPTS_REMOVE[15]="${OPTS_REMOVE[14]}"
+  OPTS_REPLACE[15]="$replaceXloggc,-XX:ZPath"
+  OPTS_REPLACE_EXPR[15]="$replaceExprXloggc,/\(^[^#]*\)-XX:ZPath/\1-XX:AllocateHeapAt/"
+  OPTS_ADD[15]=""
+  OPTS_REMOVE[16]="$removeJava8Opts,$removeCMSOpts,$removeJava17Opts"
+  OPTS_REPLACE[16]="${OPTS_REPLACE[15]}"
+  OPTS_REPLACE_EXPR[16]="${OPTS_REPLACE_EXPR[15]}"
+  OPTS_ADD[16]="$java16Opts"
+  OPTS_REMOVE[17]="$removeJava8Opts,$removeCMSOpts,$removeJava16Opts"
+  OPTS_REPLACE[17]="${OPTS_REPLACE[15]}"
+  OPTS_REPLACE_EXPR[17]="${OPTS_REPLACE_EXPR[15]}"
+  OPTS_ADD[17]="$java17Opts"
+
+  STORE_IFS=$IFS
+}
+
+# Set field separator
+function setIFS() {
+  STORE_IFS=$IFS
+  IFS=$1
+}
+
+# Restore field separator
+function restoreIFS() {
+  IFS=$STORE_IFS
+}
+
+# Options to remove when changing Java
+function getOptionsToRemove() {
+  local javaVersion=$1
+  local options=""
+
+  if [[ ! -z "${OPTS_REMOVE[$javaVersion]}" ]]; then
+    options="${OPTS_REMOVE[$javaVersion]}"
+  fi
+  echo "$options"
+}
+
+# Options to replace when changing Java
+function getOptionsToReplace() {
+  local javaVersion=$1
+  local options=""
+
+  if [[ ! -z "${OPTS_REPLACE[$javaVersion]}" ]]; then
+    options="${OPTS_REPLACE[$javaVersion]}"
+  fi
+  echo "$options"
+}
+
+# Regexps to replace when changing Java
+function getRegexpsToReplace() {
+  local javaVersion=$1
+  local options=""
+
+  if [[ ! -z "${OPTS_REPLACE_EXPR[$javaVersion]}" ]]; then
+    options="${OPTS_REPLACE_EXPR[$javaVersion]}"
+  fi
+  echo "$options"
+}
+
+# Options to add when changing Java
+function getOptionsToAdd() {
+  local javaVersion=$1
+  local options=""
+
+  if [[ ! -z "${OPTS_ADD[$javaVersion]}" ]]; then
+    options="${OPTS_ADD[$javaVersion]}"
+  fi
+  echo "$options"
+}
+
+# Check for obsolete options
+function isOptionsConfigured() {
+  local wcsCoreConfig=$1
+  local stripComments=$2
+  shift
+  shift
+  local options=$@
+  local fileContent=""
+  local option=""
+  local searchResult=""
+  
+  if [[ -z $options ]]; then
+    logDebug "Empty options set"
+    false; return
+  fi
+  if $stripComments; then
+    fileContent=`grep -v "^#" $wcsCoreConfig`
+  else
+    fileContent=`cat $wcsCoreConfig`
+  fi
+  for option in ${options[@]}; do
+    searchResult=`echo "$fileContent" | sed -n 's@'$option'@&@p'`
+    if [[ ! -z $searchResult ]]; then
+      logDebug "Option found: $option"
+      true; return
+    fi
+  done
+  false; return
+}
+
+# Update options to given Java version
+function updateToJava() {
+  local wcsCoreConfig=$1
+  local wcsCoreConfigCopy=$2
+  local javaVersion=$3
+  local optionsToRemove="$(getOptionsToRemove $javaVersion)"
+  local optionsToReplace="$(getOptionsToReplace $javaVersion)"
+  local regexpsToReplace="$(getRegexpsToReplace $javaVersion)"
+  local optionsToAdd="$(getOptionsToAdd $javaVersion)"
+  local hasToChange=false
+  local option=""
+  local regexp=""
+  local replaceArray=($optionsToReplace)
+  local replaceIndex=0
+  local noComments=true
+  local withComments=false
+  local owner=""
+  local rootMode=true
+
+  if [[ ! -z $optionsToRemove ]]; then
+    for option in $optionsToRemove; do
+      if isOptionsConfigured $wcsCoreConfig $noComments "$option"; then
+        hasToChange=true
+        break
+      fi
+    done
+  fi
+  if [[ ! -z $optionsToReplace ]]; then
+    for option in $optionsToReplace; do
+      if isOptionsConfigured $wcsCoreConfig $noComments "$option"; then
+        hasToChange=true
+        break
+      fi
+    done
+  fi
+  if [[ ! -z $optionsToAdd ]]; then
+    for option in $optionsToAdd; do
+      if ! isOptionsConfigured $wcsCoreConfig $withComments "$option"; then
+        hasToChange=true
+        break
+      fi
+    done
+  fi
+  if ! $hasToChange; then
+    false; return
+  fi
+  if ! isRootMode; then
+    rootMode=false
+  fi
+  logDebug "Use options for Java $javaVersion"
+  if [[ ! -f $wcsCoreConfigCopy ]]; then
+    owner=$(stat -c "%U" $wcsCoreConfig)
+    if [[ "$owner" != "$(getCurrentUser)"  && "$(command -v sudo 2>/dev/null)" != "" ]]; then
+      # Workaround for Ubuntu 18 on WSL2 to run internal bash command #WCS-3427
+      sudo -u $owner bash -c "command cp -f $wcsCoreConfig $wcsCoreConfigCopy"
+    else
+      command cp -f $wcsCoreConfig $wcsCoreConfigCopy
+      setOwner $(getUser) $wcsCoreConfigCopy $rootMode 
+    fi
+    logInfo "$wcsCoreConfig is copied to $wcsCoreConfigCopy"
+  fi
+  for option in $optionsToRemove; do
+    if ! isOptionsConfigured $wcsCoreConfig $noComments "$option"; then
+      continue
+    fi
+    if [[ "$option" =~ "=" ]]; then
+      sed -i 's/\(^[^#]*\)'$option'[a-zA-Z0-9\/]* /\1/g' $wcsCoreConfig
+      sed -i 's/\(^[^#]*\)'$option'[a-zA-Z0-9\/]*$/\1/g' $wcsCoreConfig
+    elif [[ "$option" =~ " " ]]; then
+      sed -i 's/\(^[^#]*\)'$option'.*$/\1/g' $wcsCoreConfig
+    else
+      sed -i 's/\(^[^#]*\)'$option'/\1/g' $wcsCoreConfig
+    fi
+  done
+  for regexp in $regexpsToReplace; do
+    if isOptionsConfigured $wcsCoreConfig $noComments "${replaceArray[replaceIndex]}"; then
+      sed -i 's'$regexp'g' $wcsCoreConfig
+    fi
+    replaceIndex=$((replaceIndex+1))
+  done
+  # Add LF to the end of config file to prevent options gluing #WCS-4153
+  if [[ ! -z $optionsToAdd ]] && $hasToChange; then
+    echo -e "" >> $wcsCoreConfig
+  fi
+  for option in $optionsToAdd; do
+    if ! isOptionsConfigured $wcsCoreConfig $withComments "$option"; then
+      echo -e "$option" >> $wcsCoreConfig
+    fi
+  done
+  true; return
+}
+
+# Helper function to update properties for Java 8-10
+function update8() {
+  local wcsCoreConfig=$1
+  local wcsCoreConfigCopy=$2
+  local javaVersion=$3
+
+  if [[ $javaVersion -ge 8 && $javaVersion -le 10 ]]; then    
+    if updateToJava $wcsCoreConfig $wcsCoreConfigCopy 8; then
+      true; return
+    fi
+  fi
+  false; return
+}
+
+# Helper function to update properties for Java 12
+function update12() {
+  local wcsCoreConfig=$1
+  local wcsCoreConfigCopy=$2
+  local javaVersion=$3
+
+  if [[ $javaVersion -eq 11 || $javaVersion -eq 12 ]]; then    
+    if updateToJava $wcsCoreConfig $wcsCoreConfigCopy 12; then
+      true; return
+    fi
+  fi
+  false; return
+}
+
+# Helper function to update properties for Java 14
+function update14() {
+  local wcsCoreConfig=$1
+  local wcsCoreConfigCopy=$2
+  local javaVersion=$3
+
+  if [[ $javaVersion -eq 14 ]]; then    
+    if updateToJava $wcsCoreConfig $wcsCoreConfigCopy 14; then
+      true; return
+    fi
+  fi
+  false; return
+}
+
+# Helper function to update properties for Java 15
+function update15() {
+  local wcsCoreConfig=$1
+  local wcsCoreConfigCopy=$2
+  local javaVersion=$3
+
+  if [[ $javaVersion -eq 15 ]]; then    
+    if updateToJava $wcsCoreConfig $wcsCoreConfigCopy 15; then
+      true; return
+    fi
+  fi
+  false; return
+}
+
+# Helper function to update properties for Java 16
+function update16() {
+  local wcsCoreConfig=$1
+  local wcsCoreConfigCopy=$2
+  local javaVersion=$3
+
+  if [[ $javaVersion -eq 16 ]]; then    
+    if updateToJava $wcsCoreConfig $wcsCoreConfigCopy 16; then
+      true; return
+    fi
+  fi
+  false; return
+}
+
+# Helper function to update properties for Java 17
+function update17() {
+  local wcsCoreConfig=$1
+  local wcsCoreConfigCopy=$2
+  local javaVersion=$3
+
+  if [[ $javaVersion -ge 17 ]]; then    
+    if updateToJava $wcsCoreConfig $wcsCoreConfigCopy 17; then
+      true; return
+    fi
+  fi
+  false; return
+}
+
+# Get heap mount point
+function getHeapMountPoint() {
+  local wcsCoreConfig="$(getWCSCoreConfig)"
+  local javaVersion="$(getJavaVersion)"
+  local keyword="ZPath"
+  local heapConfig=""
+  local mountPoint=""
+
+  # Since JDK 15 ZPath renamed to AllocateHeapAt #WCS-3094
+  if [[ $javaVersion -ge 15 ]]; then
+    keyword="AllocateHeapAt"
+  fi
+  if ! isOptionsConfigured "$wcsCoreConfig" "$keyword"; then
+    echo "$mountPoint"
+    return 1
+  fi
+  heapConfig=`grep -Eo "$keyword=.*" $wcsCoreConfig`
+  if [[ $heapConfig =~ "$keyword=" ]]; then
+    mountPoint=`echo $heapConfig | cut -d" " -f 1 | cut -d"=" -f 2`
+  fi
+  logDebug "Heap mount point: $mountPoint"
+
+  echo "$mountPoint"
+}
+
+# Main Java properties update function
+function updateJavaProperties() {
+  local wcsCoreConfig="$(getWCSCoreConfig)"
+  local javaVersion="$(getJavaVersion)"
+  local wcsCoreConfigCopy="$(getNextCopyName $wcsCoreConfig.backup 2> /dev/null)"
+  local jdkList=(
+    8
+    12
+    14
+    15
+    16
+    17
+  )
+  local jdk=0
+  local result=1
+
+  declareJava
+  # Set IFS to comma to prevent options splitting by space #WCS-3427
+  setIFS ","
+  for jdk in ${jdkList[@]}; do
+    if update$jdk $wcsCoreConfig $wcsCoreConfigCopy $javaVersion; then
+      logInfo "Java properties are updated to support Java $javaVersion"
+      result=0
+    fi
+  done
+  restoreIFS
+
+  if [[ $result -eq 0 ]]; then
+    logInfo "Please review wcs-core.properties for changes"
+  fi
+  return $result
+}
+
+# Heap mount point access rights update (from webcallserver set-java-opts only)
+function updateMountPointAccess() {
+  local mountPoint=$(getHeapMountPoint)
+  local rcLocal=/etc/rc.local
+
+  [[ ! isScriptRunningFromRoot ]] && return 1
+  [[ -z $mountPoint ]] && return 1
+
+  if [[ -d $mountPoint ]]; then
+    # Update hugepages mount point access rights
+    chmod o+w $mountPoint
+  fi
+  # There is no rc.local on Ubuntu #WCS-3034
+  if [[ -e $rcLocal ]]; then
+   [[ -L $rcLocal ]] && rcLocal=$(readlink $rcLocal)
+   sed -i 's@mount -t hugetlbfs -o uid=0 nodev '$mountPoint'@mount -t hugetlbfs -o uid=0,mode=0757 nodev '$mountPoint'@g' $rcLocal
+   return 0
+  fi
+  
+  logInfo "Please update $mountPoint access rights setting on server startup manually"
+  return 1
+}
+
+
+# WCS update functions
+
+# Declare update globals
+function declareUpdate() {
+  REMOTE_VERSION=${REMOTE_VERSION:-}
+  UPDATE_LOG_FILE=${UPDATE_LOG_FILE:-"/tmp/wcs_update.log"}
+  UPDATE_FULL_URL=${UPDATE_FULL_URL:-}
+  UPDATE_LOGIN=${UPDATE_LOGIN:-}
+  UPDATE_PASSWD=${UPDATE_PASSWD:-}
+  START_AS_SERVICE=${START_AS_SERVICE:-false}
+  UPDATE_TIMEOUT=${UPDATE_TIMEOUT:-10}
+}
+
+# Get major local version
+function getMajorVersion() {
+  local localVersion="$(getLocalVersion)"
+  local majorVersion="${localVersion%.*}"
+  
+  # Update should work in main branch only
+  if [[ $majorVersion != [0-9]* ]]; then
+    majorVersion="$(getMainBranch)"
+  fi
+
+  echo "$majorVersion"
+}
+
+# Get remote version
+function getRemoteVersion() {
+  echo "$REMOTE_VERSION"
+}
+
+# Set remote version
+function setRemoteVersion() {
+  local remoteVersion=$1
+
+  if [[ ! -z $remoteVersion ]]; then
+    REMOTE_VERSION=$remoteVersion
+  fi
+}
+
+# Get update log file name
+function getUpdateLog() {
+  echo "$UPDATE_LOG_FILE"
+}
+
+# Get full url to download build
+function getFullUpdateUrl() {
+  echo "$UPDATE_FULL_URL"
+}
+
+# Set full url to download build
+function setFullUpdateUrl() {
+  local fullUrl=$1
+
+  if [[ ! -z $fullUrl ]]; then
+    UPDATE_FULL_URL=$fullUrl
+  fi
+}
+
+# Get login to download build
+function getLogin() {
+  echo "$UPDATE_LOGIN"
+}
+
+# Set login to download build
+function setLogin() {
+  local credentials=$1
+
+  if [[ ! -z $credentials ]]; then
+    UPDATE_LOGIN=$credentials
+  fi
+}
+
+# Get passwd to download build
+function getPasswd() {
+  echo "$UPDATE_PASSWD"
+}
+
+# Set passwd to download build
+function setPasswd() {
+  local credentials=$1
+
+  if [[ ! -z $credentials ]]; then
+    UPDATE_PASSWD=$credentials
+  fi
+}
+
+# Get start as service status
+function getRunService() {
+  $START_AS_SERVICE; return
+}
+
+# Set start as service status
+function setRunService() {
+  START_AS_SERVICE=$1
+}
+
+# Get update timeout
+function getUpdateTimeout() {
+  echo "$UPDATE_TIMEOUT"
+}
+
+# Set update timeout
+function setUpdateTimeout() {
+  local timeout=$1
+
+  if [[ ! -z $timeout ]]; then
+    UPDATE_TIMEOUT=$timeout
+  fi
+}
+
+# Stop server carefully before update
+function stopBeforeUpdate() {
+ logDebug "Stopping before update"
+ if isService; then
+  # We should carefully stop service before updating #WCS-3024
+  systemctl stop webcallserver
+  setRunService true
+ else
+  stop
+ fi
+}
+
+# Ask user to stop server if running
+function tryToStopServer() {
+  local arg=""
+  local confirm=""
+
+  # Stop if "yes" is passed in commandline
+  for arg in "$@"; do
+    if [[ $arg == "yes" ]]; then
+      stopBeforeUpdate
+      return 0
+    fi
+  done
+  # Ask user to stop
+  informUser ">>> You have to stop $(getProduct) before update."
+  confirm=$(askUserToChoose ">>> Stop now ? [yes/no]")
+  if [[ $confirm = y* ]]; then
+    stopBeforeUpdate
+  else
+    informUser "  Abort updating"
+    return 1
+  fi  
+
+  return 0
+}
+
+# Get common wget download options
+function getCommonDownloadOptions() {
+  local timeout="$(getUpdateTimeout)"
+  local options="--tries=1 --waitretry=0 --no-check-certificate"
+
+  if [[ ! -z $timeout ]]; then
+    logDebug "Use http timeout $timeout"
+    options="$options --timeout=$timeout"
+  fi
+
+  echo "$options"
+}
+
+# Get latest available version number
+function getLatestVersion() {
+  local remoteVersionFile="$(getSiteUrl)/downloads/builds/WCS/$(getMajorVersion)/currentVersion"
+  local remoteVersion=""
+
+  if isSiteUp ; then
+    logDebug "Getting $remoteVersionFile"
+    remoteVersion=`wget $(getCommonDownloadOptions) -q -O - $remoteVersionFile`
+  fi
+
+  echo "$remoteVersion"
+}
+
+# Execute download command
+function executeDownloadCommand() {
+  local url=$1
+  local login=$2
+  local passwd=$3
+
+  logDebug "Downloading $url"
+  wget $login $passwd $(getCommonDownloadOptions) $url -O wcs5-server.tar.gz -o $(getUpdateLog)
+}
+
+# Execute build extstance check command
+function executeCheckCommand() {
+  local url=$1
+  local login=$2
+  local passwd=$3
+
+  logDebug "Checking $url"
+  wget $login $passwd $(getCommonDownloadOptions) -S --spider $url 2>&1 | grep 'HTTP/1.1 200 OK' > /dev/nul 2>&1
+}
+
+# Prepare enterprise download URL and credentials
+function prepareEnterpriseDownload() {
+  local build=$1
+  local url=""
+  local majorVersion=$(getMajorVersion)
+  local enterpriseUrl=$(getEnterpriseUrl)
+  local enterpriseLogin=$(getEnterpriseLogin)
+  local enterprisePasswd=$(getEnterprisePasswd)
+
+  if [[ "$enterpriseUrl" != "" ]]; then
+    setRemoteVersion $majorVersion.$build-enterprise
+    url=`echo $enterpriseUrl | sed s/build-enterprise/$build-enterprise/`
+    setFullUpdateUrl $url
+    setLogin "--user=$(echo $enterpriseLogin | base64 --decode)"
+    setPasswd "--password=$(echo $enterprisePasswd | base64 --decode)"
+  else
+    informUser ">>> You have no access to enterprise builds"
+  fi
+}
+
+# Prepare certain build doenload URL
+function prepareBuildDownload() {
+  local build=$1
+  local enterprise=$2
+  local url=""
+  local majorVersion=$(getMajorVersion)
+
+  if [[ "$enterprise" == "enterprise" ]]; then
+    prepareEnterpriseDownload $build
+  else
+    setRemoteVersion $majorVersion.$build
+    url=$(getSiteUrl)/downloads/builds/WCS/$majorVersion/FlashphonerWebCallServer-$majorVersion.$build.tar.gz
+    setFullUpdateUrl $url
+  fi
+}
+
+# Compare versions: major, minor, build separately #WCS-3469
+function isNewerVersion() {
+  local localVersionString=$1
+  local remoteVersionString=$2
+  local MAJOR=0
+  local MINOR=1
+  local BUILD=2
+
+  [[ -z $localVersion ]] && return 1
+  [[ -z $remoteVersion ]] && return 1
+  
+  local -a localVersion=($(echo $localVersionString | tr "." " "))
+  local -a remoteVersion=($(echo $remoteVersionString | tr "." " "))
+
+  if [[ ${localVersion[$MAJOR]} -lt ${remoteVersion[$MAJOR]} ]]; then
+    return 0
+  elif [[ ${localVersion[$MINOR]} -lt ${remoteVersion[$MINOR]} ]]; then
+    return 0
+  elif [[ ${localVersion[$BUILD]} -lt ${remoteVersion[$BUILD]} ]]; then
+    return 0  
+  fi
+  return 1
+}
+
+
+# Check if there is update
+function checkUpdate() {
+  local localVersion=""
+  local remoteVersion=""
+
+  declareUpdate
+
+  if ! isSiteUp; then
+    informUser ">>> $(getSiteUrl) is not available, cannot check new version"
+    return 1;
+  fi
+
+  localVersion=$(getLocalVersion)
+  remoteVersion=$(getLatestVersion)
+  if [[ -z $remoteVersion ]]; then
+   informUser ">>> Latest version description is not available, cannot check new version"
+   return 1
+  elif [[ $localVersion == [0-9]* ]] && isNewerVersion $localVersion $remoteVersion; then
+   informUser ">>> Your version: $localVersion"
+   informUser ">>> Latest version available: $remoteVersion"
+   setRemoteVersion $remoteVersion
+  elif [[ $localVersion != [0-9]* ]]; then
+   informUser ">>> Cannot compare developer build with production build, would be updated to latest production build available"
+   informUser ">>> Latest version available: $remoteVersion"
+   setRemoteVersion $remoteVersion
+  else
+   informUser ">>> You have latest version: $localVersion"
+   return 1
+  fi
+
+  return 0
+}
+
+# Prepare and launch update script
+function launchUpdate() {
+  local restart=$1
+  local isService=false
+  local product=$(getProduct)
+  local remoteVersion=$(getRemoteVersion)
+  local wcsScript=$(getHome)/bin/webcallserver
+  local updateScript="/tmp/update_wcs.sh"
+
+  getRunService && isService=true
+  cat << 'EOF' > $updateScript
+#!/bin/bash
+updateScript=$0
+restart=$1
+isService=$2
+product=$3
+remoteVersion=$4
+wcsScript=$5
+result=0
+mkdir -p /tmp/wcs_latest
+rm -rf /tmp/wcs_latest/*
+tar xzf wcs5-server.tar.gz -C /tmp/wcs_latest --strip-components 1
+result=$?
+if [ $result -eq 0 ]; then
+  cd /tmp/wcs_latest
+  chmod +x install.sh
+  /bin/bash ./install.sh -silent 
+  cd /tmp
+  rm -rf /tmp/wcs_latest /tmp/wcs5-server.tar.gz
+  echo ">>> $product updated to $remoteVersion"
+  $wcsScript set-permissions > /dev/null 2>&1
+else
+  echo ">>> Archive seems to be broken (tar error: $result), cannot update"
+fi
+if $restart; then
+  echo ">>> Starting $product"
+  if $isService; then
+    systemctl restart webcallserver
+  else
+    $wcsScript start
+ fi
+fi
+rm -f $updateScript
+exit $result
+EOF
+  exec /bin/bash $updateScript $restart $isService $product $remoteVersion $wcsScript
+}
+
+# Main update function
+function update() {
+  local restart=false
+
+  declareUpdate
+
+  if ! isScriptRunningFromRoot; then
+    informUser ">>> You must be root to update, try to use sudo"
+    return 1
+  fi
+  if ! isSiteUp; then
+    informUser ">>> $(getSiteUrl) is not available, cannot update"
+    return 1
+  fi
+
+  if [ "$1" -eq "$1" ] 2>/dev/null; then
+    # A build number is set as first parameter, get download command for it
+    prepareBuildDownload "$@"
+  else
+    # Check for a new version
+    checkUpdate
+    # Return if there is no updates
+    [ $? -ne 0 ] && return 1
+    setFullUpdateUrl $(getSiteUrl)/download-wcs$(getMainBranch)-server.tar.gz
+  fi
+
+  if [[ -z $(getFullUpdateUrl) ]]; then
+    informUser ">>> Cannot build download URL, abort update"
+    return 1
+  fi
+
+  # Check if build is available to download
+  if executeCheckCommand $(getFullUpdateUrl) $(getLogin) $(getPasswd); then
+    informUser ">>> Version $(getRemoteVersion) is available, try to update"
+  else
+    informUser ">>> Version $(getRemoteVersion) is not available"
+    return 1
+  fi
+
+  # Check if server is running
+  if isServerRunning; then
+    restart=true
+    tryToStopServer $@
+    # Return if server is not stopped
+    [ $? -ne 0 ] && return 1
+  fi
+
+  informUser ">>> Updating $(getProduct)"
+  cd /tmp
+  informUser ">>> Downloading $(getRemoteVersion) build"
+  executeDownloadCommand $(getFullUpdateUrl) $(getLogin) $(getPasswd)
+  if [ $? -eq 0 ]; then
+    # Make update actions in a separate script to prevent webcallserver script corruption while update #WCS-3256
+    launchUpdate $restart
+  else
+    informUser ">>> Error during downloading tar, please, check $(getUpdateLog)"
+    return 1
+  fi  
+
+  return $?
+}
+
+
+# WCS launch setup functions
+
+# Change service parameters
+function changeService() {
+  local changeFunc=$1
+  shift
+  local successMsg="Service parameters is changed successfully"
+  local nonRootMsg="You must be root to change service parameters!"
+  local noFuncMsg="No function defined to change service parameters!"
+  local servicePaths=(
+    /etc/systemd/system/
+    /usr/lib/systemd/system/
+  )
+  local serviceFile=webcallserver.service
+  local path=""
+  local result=1
+
+  if [ -z $changeFunc ]; then
+    displayError "$noFuncMsg"
+    return 1
+  fi
+
+  if ! isScriptRunningFromRoot; then
+    displayError "$nonRootMsg"
+    return 1
+  fi
+  for path in ${servicePaths[@]}; do
+    if [[ -f $path$serviceFile ]]; then
+      $changeFunc $path$serviceFile $@
+      result=$?
+    fi
+  done
+  if [ $result -eq 0 ]; then
+    systemctl daemon-reload
+    displayInfo "$successMsg"
+  fi
+  return $result
+}
+
+# Change service user and group
+function changeServiceUser() {
+  local serviceFile=$1
+  local errorMsg="No service file to change!"
+
+  if [ -z $serviceFile ]; then
+    displayError "$errorMsg"
+    return 1
+  fi
+
+  sed -i -e "s/^\(User[ \t]*=\).*\$/\1root/" $serviceFile
+  sed -i -e "s/^\(Group[ \t]*=\).*\$/\1root/" $serviceFile
+}
+
+# Change service PID file location
+function changeServicePidFile() {
+  local serviceFile=$1
+  local pidFile=$2
+  local errorMsg="No service file to change!"
+
+  if [ -z $serviceFile ]; then
+    displayError "$errorMsg"
+    return 1
+  fi
+
+  sed -i -e "s@^\(PIDFile[ \t]*=\).*\$@\1"$pidFile"@" $serviceFile
+}
+
+# Change service file descriptors limit
+function changeServiceFdLimit() {
+  local serviceFile=$1
+  local fdLimit=$2
+  local errorMsg="No service file to change!"
+
+  if [ -z $serviceFile ]; then
+    displayError "$errorMsg"
+    return 1
+  fi
+
+  sed -i -e "s/^\(LimitNOFILE[ \t]*=\).*\$/\1"$fdLimit"/" $serviceFile
+}
+
+# Change service type
+function changeServiceType() {
+  local serviceFile=$1
+  local fdLimit=$2
+  local errorMsg="No service file to change!"
+
+  if [ -z $serviceFile ]; then
+    displayError "$errorMsg"
+    return 1
+  fi
+
+  sed -i -e "s/^\(Type[ \t]*=\).*\$/\1forking/" $serviceFile
+}
+
+# Change service restart condition
+function changeServiceRestart() {
+  local serviceFile=$1
+  local condition=$2
+  local errorMsg="No service file to change!"
+
+  if [ -z $serviceFile ]; then
+    displayError "$errorMsg"
+    return 1
+  fi
+
+  sed -i -e "s/^\(Restart[ \t]*=\).*\$/\1"$condition"/" $serviceFile
+}
+
+# Fix service parameters from previous installation by changing user
+function fixService() {
+  local successMsg="Service description is fixed, please restart WCS"
+
+  if changeService "changeServiceUser" && changeService "changeServiceType"; then
+    displayInfo "$successMsg"
+    return 0
+  fi
+  return 1
+}
+
+# Stop server carefully before changing service parameters
+function stopBeforeSetup() {
+  displayInfo "Stopping before changing service parameters..."
+  if isService; then
+   # We should carefully stop service before changing parameters #WCS-3513
+    systemctl stop webcallserver
+  else
+    stop
+  fi
+}
+
+# Start server after changing service parameters
+function startAfterSetup() {
+  local service=$1
+  displayInfo "Starting after changing service parameters..."
+  if $service; then
+    systemctl start webcallserver
+  else
+    setUpEvironment
+    start
+  fi
+}
+
+
+# Set root mode on and off #WCS-3513
+function setRootMode() {
+  local enable=$1
+  local userErrorMsg="You must be root to change launch configuration!"
+  local argErrorMsg="Please set 'enable' or 'disable' to enable or disable root mode"
+  local successMsg=""
+  local wcsNonRoot=""
+  local pidFile=""
+  local envConfig="$(getHome)/bin/setenv.sh"
+  local restart=false
+  local service=false
+  local result=1
+
+  if ! isScriptRunningFromRoot; then
+    displayError "$userErrorMsg"
+    return 1
+  fi
+
+  if [[ -z $enable ]]; then
+    displayError "$argErrorMsg"
+    return 1
+  fi
+
+  if isService; then
+    service=true
+  fi
+  if isServerRunning; then
+    restart=true
+    stopBeforeSetup
+  fi
+
+  case $enable in
+    enable|true)
+      wcsNonRoot=false
+      pidFile="$(getPidFile true)"
+      successMsg="Root mode is set"
+      ;;
+    disable|false)
+      wcsNonRoot=true
+      pidFile="$(getPidFile false)"
+      successMsg="Non root mode is set"
+      ;;
+  esac
+
+  # Change WCS_NON_ROOT 
+  sed -i -e "s/^\(WCS_NON_ROOT[ \t]*=\).*\$/\1"$wcsNonRoot"/" $envConfig
+
+  if [[ $(getDaemonType) != 'systemd' ]]; then
+    result=0
+  elif changeService "changeServicePidFile" $pidFile; then
+    result=0
+  fi
+
+  if [ $result -eq 0 ]; then
+    displayInfo "$successMsg"
+  fi
+
+  if $restart; then
+    startAfterSetup $service
+  fi
+
+  return $result
+}
+
+# Set file descriptors limit #WCS-3513
+function setFdLimit() {
+  local fdLimit=$1
+  local defaultLimit=20000
+  local userErrorMsg="You must be root to change launch configuration!"
+  local argErrorMsg="Please set a value to change file descriptors limit (at least $defaultLimit)"
+  local successMsg=""
+  local envConfig="$(getHome)/bin/setenv.sh"
+  local restart=false
+  local service=false
+  local result=1
+
+  if ! isScriptRunningFromRoot; then
+    displayError "$userErrorMsg"
+    return 1
+  fi
+
+  if [[ -z $fdLimit || $fdLimit -lt $defaultLimit ]]; then
+    displayError "$argErrorMsg"
+    return 1
+  fi
+
+  if isService; then
+    service=true
+  fi
+  if isServerRunning; then
+    restart=true
+    stopBeforeSetup
+  fi
+
+  successMsg="File descriptor limit is set to $fdLimit"
+
+  # Change limit in setenv.sh
+  sed -i -e "s/^\(WCS_FD_LIMIT[ \t]*=\).*\$/\1"$fdLimit"/" $envConfig
+
+  if [[ $(getDaemonType) != 'systemd' ]]; then
+    result=0
+  elif changeService "changeServiceFdLimit" $fdLimit; then
+    result=0
+  fi
+
+  if [ $result -eq 0 ]; then
+    displayInfo "$successMsg"
+  fi
+
+  if $restart; then
+    startAfterSetup $service
+  fi
+
+  return $result
+}
+
+# Set service restart condition #WCS-3716
+function setServiceRestart() {
+  local enable=$1
+  local userErrorMsg="You must be root to change launch configuration!"
+  local argErrorMsg="Please set 'enable' or 'disable' to enable or disable service automatic restart"
+  local successMsg=""
+  local condition=""
+  local restart=false
+  local service=false
+  local result=1
+
+  if ! isScriptRunningFromRoot; then
+    displayError "$userErrorMsg"
+    return 1
+  fi
+
+  if [[ -z $enable ]]; then
+    displayError "$argErrorMsg"
+    return 1
+  fi
+
+  if isService; then
+    service=true
+  fi
+  if isServerRunning; then
+    restart=true
+    stopBeforeSetup
+  fi
+
+  case $enable in
+    enable|true)
+      condition="on-failure"
+      successMsg="Service restart on failure is enabled"
+      ;;
+    disable|false)
+      condition="no"
+      successMsg="Service restart on failure is disabled"
+      ;;
+  esac
+
+  if [[ $(getDaemonType) != 'systemd' ]]; then
+    result=0
+  elif changeService "changeServiceRestart" $condition; then
+    result=0
+  fi
+
+  if [ $result -eq 0 ]; then
+    displayInfo "$successMsg"
+  fi
+
+  if $restart; then
+    startAfterSetup $service
+  fi
+
+  return $result
+}
+
+
+# WCS static data downloading functions
+
+# Declare static data globals
+function declareStaticData() {
+  STATIC_DATA_DIR=${STATIC_DATA_DIR:-"downloads"}
+  DOWNLOAD_LOG_FILE=${DOWNLOAD_LOG_FILE:-"/tmp/wcs_static_data_download.log"}
+  TAR_LOG_FILE=${TAR_LOG_FILE:-"/tmp/wcs_static_data_unpack.log"}
+  EMOJI_DIR=${EMOJI_DIR:-"emoji"}
+  EMOJI_PACK=${EMOJI_PACK:-"emoji.tar.gz"}
+  LOCAL_STATIC_DATA_DIR=${LOCAL_STATIC_DATA_DIR:-"client2"}
+}
+
+# Get static data URL
+function getStaticDataUrl() {
+  echo "$(getSiteUrl)/$STATIC_DATA_DIR"
+}
+
+# Get download log file name
+function getDownloadLog() {
+  echo "$DOWNLOAD_LOG_FILE"
+}
+
+# Get tar log file name
+function getTarLog() {
+  echo "$TAR_LOG_FILE"
+}
+
+# Get emoji dir
+function getEmojiDir() {
+  echo "$EMOJI_DIR"
+}
+
+# Get emoji pack name
+function getEmojiPack() {
+  echo "$EMOJI_PACK"
+}
+
+# Get local static data base folder
+function getLocalStaticDataDir() {
+  echo "$LOCAL_STATIC_DATA_DIR"
+}
+
+# Ask user to replace the folder if exists
+function askForReplaceIfExists() {
+  local folder=$1
+  local request=""
+  local answer=""
+
+  if [[ -d $folder ]]; then
+    logDebug "$folder exists, ask for replace"
+    request="The $folder folder already exists, replace? [yes/no]"
+    answer=$(askUserToChoose $request)
+  else
+    logDebug "$folder not exists"
+    true; return
+  fi
+
+  if [[ "$answer" == "yes" ]]; then
+    true; return
+  fi
+  false; return
+}
+
+# Unpack downloaded package
+function unpackArchive() {
+  local archive=$1
+  local dir=$2
+  local localBaseFolder="$(getHome)/$(getLocalStaticDataDir)"
+  local tarLog="$(getTarLog)"
+  local successMsg="$archive unpacked successfully to $localBaseFolder/$dir"
+  local errorMsg="Failed to unpack $archive, check $tarLog"
+  local abortMsg="User not allowed to replace already existing folder, aborting"
+  local result=0
+
+  if askForReplaceIfExists "$localBaseFolder/$dir"; then
+    logDebug "Unpacking $archive"
+    rm -rf "$localBaseFolder/$dir"
+    cd $localBaseFolder
+    tar -xzf $archive > $tarLog 2>&1
+    result=$?
+    if [[ $result -eq 0 ]]; then
+      displayInfo "$successMsg"
+    else
+      displayError "$errorMsg"
+    fi
+  else
+    displayWarn "$abortMsg"
+    result=1
+  fi
+
+  return $result
+}
+
+# Download package
+function downloadPackage() {
+  local url=$1
+  local target=$2
+  local downloadLog="$(getDownloadLog)"
+  local successMsg="Archive is successfully downloaded to $target"
+  local errorMsg="Failed to download archive, check $downloadLog"
+  local result=0
+
+  logDebug "Downloading $url"
+  wget --timeout=10 --no-check-certificate $url -O $target -o $downloadLog
+  result=$?
+
+  if [[ $result -eq 0 ]]; then
+    displayInfo "$successMsg"
+  else
+    displayError "$errorMsg"
+  fi
+
+  return $result
+}
+
+# Download emoji pack to use it locally
+function deployEmoji() {
+  local fullPackUrl=""
+  local archive=""
+  local result=0
+
+  declareStaticData
+
+  fullPackUrl="$(getStaticDataUrl)/$(getEmojiDir)/$(getEmojiPack)"
+  archive="/tmp/$(getEmojiPack)"
+
+  informUser ">>> Downloading emoji pack..."
+  if downloadPackage $fullPackUrl $archive; then
+    informUser ">>> Deploying emoji pack..."
+    unpackArchive $archive $(getEmojiDir)
+  fi
+  result=$?
+
+  return $result
+}
+
+# Main function to download and deploy static data
+function deployStaticData() {
+  local kind=$1
+  local result=0
+
+  if ! isScriptRunningFromRoot; then
+    displayError "You must be root to deploy, try to use sudo"
+    return 1
+  fi
+  if ! isSiteUp $(getSite); then
+    displayError "$(getSiteUrl) is not available, cannot deploy anything"
+    return 1;
+  fi
+
+  case $kind in
+    emoji)
+      deployEmoji
+      result=$?
+      ;;
+    *)
+      displayError "Incorrect static data type"
+      result=1
+      ;;
+  esac
+
+  return $result
+}
+
+
+# Main module
+
+# Usage displaying
+function usage() {
+  echo "Usage: $(basename $0) [OPTIONS]"
+  echo -e "  start [standalone]\t\t\tstart WCS (add standalone to display stdout for debugging purposes)"
+  echo -e "  stop [--force]\t\t\tstop WCS (optionally forceful)"
+  echo -e "  restart [--force]\t\t\trestart WCS (optionally forceful)"
+  echo -e "  --health-timeout <timeout>\t\ttimeout in seconds to check server health after start (0 to disable health check)"
+  echo -e "  --java-log\t\t\t\tenable JVM console output to java.log file (for debugging purposes only)"
+  echo -e "  status [--pid]\t\t\tdisplay WCS status (optionally print a PID only)"
+  echo -e "  check_update\t\t\t\tcheck if WCS update available"
+  echo -e "  update [<build> [enterprise]] [yes]\tupdate WCS (add build number to update to this build)"
+  echo -e "  --update-timeout <timeout>\t\ttimeout in seconds to check if build is available or to download it (10 seconds by default)"
+  echo -e "  set-ip\t\t\t\tdetect and set IP parameters"
+  echo -e "  set-java-opts\t\t\t\tdetect Java version and set parameters properly"
+  echo -e "  set-permissions\t\t\tset permissions to WCS home dir and to all the custom dirs according to the config"
+  echo -e "  set-root-mode <enable|disable>\tset WCS to be launched as root (it starts as flashphoner by default)"
+  echo -e "  set-fd-limit <number>\t\t\tset file descriptors limit for WCS main process"
+  echo -e "  set-service-restart <enable|disable>\tset WCS systemd unit to be restarted on failure (enablde by default)"
+  echo -e "  fix-service\t\t\t\tset user to run webcallserver.service to root after update (it's safe because the service starts the main process as non-root user)"
+  echo -e "  deploy-static-data <emoji>\t\tdownload static data (emoji etc) and deploy them locally to use from own server instance"
+  echo -e "  --debug\t\t\t\tenable debug information output to startup.log file (WCS may start slightly slower)"
+  return 1
+}
+
+# Prepare log file
+function prepareLogFile() {
+  local logFile=$1
+  local rootMode=true
+
+  [[ -z $logFile ]] && return 1
+
+  makeDir "$(dirname $logFile)"
+  touch $logFile
+  if ! isRootMode; then
+    rootMode=false
+  fi
+  if isDirActionRequired; then
+    setOwner $(getUser) $logFile $rootMode
+  fi
+}
+
+# Main script function
+function main() {
+  local action=""
+  local standalone=""
+  local build=""
+  local enterprise=""
+  local forceUpdate=""
+  local pidOnly=false
+  local forceStop=false
+  local rootMode=""
+  local fdLimit=""
+  local forceSetPermissions=false
+  local serviceRestart=""
+  local staticData=""
+
+  declareGlobals
+  setUpEvironment
+  declareLog $(getStartupLogFile)
+  prepareLogFile $(getStartupLogFile)
+
+  # Parse command line arguments
+  action=$1
+  shift
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+      standalone)
+        [[ "$action" == "start" ]] && standalone=$1
+        shift
+        ;;
+      --debug)
+        enableDebug
+        shift
+        ;;
+      --pid)
+        [[ "$action" == "status" ]] && pidOnly=true
+        shift
+        ;;
+      --force)
+        [[ "$action" == "stop" || "$action" == "restart" ]] && forceStop=true
+        [[ "$action" == "set-permissions" ]] && forceSetPermissions=true
+        shift
+        ;;
+      --health-timeout)
+        [[ "$action" == "start" || "$action" == "restart" ]] && setHealthTimeout $2
+        shift
+        shift
+        ;;
+      --java-log)
+        [[ "$action" == "start" || "$action" == "restart" ]] && prepareLogFile $(getJavaLogFile) && enableJavaLog
+        shift
+        ;;
+      [0-9]*)
+        [[ "$action" == "update" ]] && build=$1
+        [[ "$action" == "set-fd-limit" ]] && fdLimit=$1
+        shift
+        ;;
+      enterprise)
+        [[ "$action" == "update" ]] && enterprise=$1
+        shift
+        ;;
+      yes)
+        [[ "$action" == "update" ]] && forceUpdate=$1
+        shift
+        ;;
+      --update-timeout)
+        [[ "$action" == "check_update" || "$action" == "update" ]] && setUpdateTimeout $2
+        shift
+        shift
+        ;;
+      enable|disable)
+        [[ "$action" == "set-root-mode" ]] && rootMode=$1
+        [[ "$action" == "set-service-restart" ]] && serviceRestart=$1
+        shift
+        ;;
+      emoji)
+        [[ "$action" == "deploy-static-data" ]] && staticData=$1
+        shift
+        ;;
+      *)
+        usage
+        return 1
+        ;;
+    esac
+  done
+
+  # Do the action
+  case $action in
+    start)
+      start $standalone
+      ;;
+    stop)
+      stop $forceStop
+      ;;
+    status)
+      localStatus $pidOnly
+      ;;
+    restart)
+      stop
+      start
+      ;;
+    check_update)
+      checkUpdate
+      ;;
+    update)
+      update $build $enterprise $forceUpdate
+      ;;
+    set-ip)
+      setIp override
+      ;;
+    set-java-opts)
+      if updateJavaProperties; then
+        echo "Java options are set, please restart WCS"
+        setPermissions
+      fi
+      updateMountPointAccess
+      ;;
+    set-permissions)
+      setPermissions $(getUser) $forceSetPermissions
+      ;;
+    set-root-mode)
+      setRootMode $rootMode
+      ;;
+    set-fd-limit)
+      setFdLimit $fdLimit
+      ;;
+    set-service-restart)
+      setServiceRestart $serviceRestart
+      ;;
+    fix-service)
+      fixService
+      ;;
+    deploy-static-data)
+      deployStaticData $staticData
+      ;;
+    *)
+      usage
+      ;;
+  esac
+}
+
+main "$@"
+
+exit $?
+
+

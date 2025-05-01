@@ -1,0 +1,15 @@
+{
+  "threadTickInMs": "200",
+  "maxConcurrencyRequests": "50",
+  "streamName": "test.*",
+  "clientsNumber": "100",
+  "host": "localhost",
+  "port": "8445",
+  "statsPeriod": "3000",
+  "testTime": "180000",
+  "timeoutRequestSeconds": "25",
+  "skipPreloadHints": true,
+  "abr": true,
+  "http2": true,
+  "partialSegmentRequests": false
+}

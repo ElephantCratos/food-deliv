@@ -1,0 +1,19 @@
+Id:3
+Name:Transfer
+Clients: 3
+
+$1 -> call({callee:$2});
+$s -> wait(3000);
+$2 -> api.answer(currentCall);
+$s -> wait(7000);
+$1[true] -> isAudioReceived();
+$2[true] -> isAudioReceived();
+$1 -> api.holdForTransfer(currentCall);
+$s -> wait(2000);
+$1 -> api.transfer({callId:currentCall.callId, target:$3});
+$s -> wait(3000);
+$3 -> api.answer(currentCall);
+$s -> wait(7000);
+$2[true] -> isAudioReceived();
+$3[true] -> isAudioReceived();
+$3 -> api.hangup(currentCall);

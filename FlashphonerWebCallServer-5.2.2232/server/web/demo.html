@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Flashphoner Web Call Server</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/veritcal-menu.css">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <link rel="icon" href="img/favicon.png">
+    <script src="js/jquery-3.7.1.js"></script>
+    <script src="js/jquery.cookie.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script>
+	var currentDemoInterval = -1;
+	var countDemoInterval = 0;
+	var demoLinks;
+        function changeIFrame(target) {
+    	    $("#demo").attr('src', demoLinks[target]);
+            $("#sharedLink").attr('href', demoLinks[target]);
+        }
+        function resizeIframe(obj) {
+    	    var demoIFrame = document.getElementById('demo');
+	    if (currentDemoInterval != -1) {
+                clearInterval(currentDemoInterval);
+                currentDemoInterval = -1;
+                countDemoInterval = 0;
+            }
+	    var fn = function () {
+                if (demoIFrame.contentWindow && demoIFrame.contentWindow.document && demoIFrame.contentWindow.document.body) {
+                    demoIFrame.height = (demoIFrame.contentWindow.document.body.scrollHeight) + "px";
+                }
+                countDemoInterval++;
+            };
+            fn();
+	                                                                                                                                        currentDemoInterval = setInterval(fn, 100);	                                                                                    	    
+        }
+        $(document).ready(function() {
+            $("#username").text($.cookie("wcs_user"));
+            $("#version").text($.cookie("wcs_version"));
+	    $.ajax({
+                url: "/admin/api/demo/get_links",
+                type: "POST",
+                dataType: "json",
+                contentType : "application/json",
+                success: function(data) {
+                    if (data.result.links) {
+                	demoLinks = data.result.links;
+                	changeIFrame('demo/embed-player');
+                    }
+                }
+            });
+            $("#logout").click(function(){
+               $.ajax({
+                   type: "POST",
+                   url: "/admin/api/logout",
+                   success: function (data, status, xhr) {
+                       document.location = "/admin/"
+                   }
+               })
+            });
+        });
+
+    </script>
+    <style>
+        .navbar-nav > li {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+        #username {
+            padding-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand navbar-fixed-top navbar-light bg-light" role="navigation">
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="demo.html"><i class="fa fa-play-circle-o fa-lg" aria-hidden="true"></i> Demo</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" id="securityDrpdwn" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user-secret fa-lg"></i> Security</a>
+                    <div class="dropdown-menu" aria-labelledby="securityDrpdwn">
+                        <a class="dropdown-item" href="certificates.html"><i class="fa fa-certificate fa-lg"></i> Certificates</a>
+                        <a class="dropdown-item" href="passwords.html"><i class="fa fa-key fa-lg"></i> Set password</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="license.html"><i class="fa fa-files-o fa-lg"></i> License</a>
+                </li>
+
+            </ul>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link"><span id="version"></span></a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" id="user" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user fa-lg"> </i><span id="username"> </span></a>
+                    <div class="dropdown-menu" aria-labelledby="user">
+                        <a class="dropdown-item" href="#" id="logout"><i class="fa fa-sign-out fa-lg"></i> Logout</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-sm-1">
+                <div class="vertical-menu">
+                    <div class="">Streaming</div>
+                    <a href="#" onclick="changeIFrame('demo/streamer')">Streamer</a>
+                    <a href="#" onclick="changeIFrame('demo/player')">Player</a>
+                    <a href="#" onclick="changeIFrame('demo/two-way-streaming')">Two-Way Streaming</a>
+                    <a href="#" onclick="changeIFrame('demo/firewall-traversal-streaming')">Firewall Streaming</a>
+                    <a href="#" onclick="changeIFrame('demo/webrtc-as-rtmp-republishing')">WebRTC as RTMP</a>
+                    <a href="#" onclick="changeIFrame('demo/stream-recording')">Stream Recording</a>
+                    <a href="#" onclick="changeIFrame('demo/several-streams-recording')">Several Streams Recording</a>
+                    <a href="#" onclick="changeIFrame('demo/stream-snapshot')">Stream Server Snapshot</a>
+                    <a href="#" onclick="changeIFrame('demo/stream-local-snapshot')">Stream Local Snapshot</a>
+                    <a href="#" onclick="changeIFrame('demo/stream-diagnostic')">Stream Diagnostic</a>
+                    <a href="#" onclick="changeIFrame('demo/screen-sharing')">Screen Sharing</a>
+                    <a href="#" onclick="changeIFrame('demo/screen-camera-mixer')">Screen and Camera</a>
+                    <a href="#" onclick="changeIFrame('demo/embed-player')">Embed Player</a>
+                    <a href="#" onclick="changeIFrame('demo/2players')">2 Players</a>
+                    <a href="#" onclick="changeIFrame('demo/media-devices')">Media Devices</a>
+                    <a href="#" onclick="changeIFrame('demo/video-chat')">Video Chat</a>
+                    <a href="#" onclick="changeIFrame('demo/video-chat-and-screen-sharing')">Video Chat & Screen</a>
+					<a href="#" onclick="changeIFrame('demo/mcu_client')">MCU Client</a>
+                    <a href="#" onclick="changeIFrame('demo/conference')">Conference</a>
+                    <a href="#" onclick="changeIFrame('demo/canvas-streaming')">Canvas Streaming</a>
+                    <a href="#" onclick="changeIFrame('demo/stream-filter')">Stream Filter</a>
+                    <a href="#" onclick="changeIFrame('demo/hls-player')">HLS VideoJS Player</a>
+                    <a href="#" onclick="changeIFrame('demo/hls-js-player')">HLS.JS Player</a>
+                    <a href="#" onclick="changeIFrame('demo/hls-native')">HLS Native Player</a>
+                    <a href="#" onclick="changeIFrame('demo/stream-auto-restore')">Streaming Auto Restore</a>
+                    <a href="#" onclick="changeIFrame('demo/console')">Console</a>
+                </div>
+                <div class="vertical-menu">
+                    <div class="">SFU</div>
+                    <a href="#" onclick="changeIFrame('demo/webrtc-abr-player')">WebRTC ABR Player</a>
+                    <a href="#" onclick="changeIFrame('demo/sfu-client')">SFU Client</a>
+                    <a href="#" onclick="changeIFrame('demo/sfu-two-way-streaming')">SFU Two Way Streaming</a>
+                    <a href="#" onclick="changeIFrame('demo/sfu-player')">SFU Player</a>
+                </div>
+                <div class="vertical-menu">
+                    <div class="">SIP</div>
+                    <a href="#" onclick="changeIFrame('demo/phone')">Phone</a>
+                    <a href="#" onclick="changeIFrame('demo/phone-video')">Phone Video</a>
+                    <a href="#" onclick="changeIFrame('demo/phone-ui')">Phone UI</a>
+                    <a href="#" onclick="changeIFrame('demo/click-to-call')">Click to Call</a>
+                    <a href="#" onclick="changeIFrame('demo/sip-as-rtmp-3')">SIP as RTMP</a>
+                    <a href="#" onclick="changeIFrame('demo/sip-as-rtmp-2')">SIP as RTMP 2</a>
+                    <a href="#" onclick="changeIFrame('demo/sip-as-rtmp-4')">SIP as RTMP 3</a>
+                </div>
+            </div>
+            <div class="col-sm-10">
+                <iframe id="demo" onload="resizeIframe(this)" style="width: 100%; margin-top: 10px" scrolling="no" frameborder="false" seamless="true" allowfullscreen></iframe>
+            </div>
+            <div class="col-sm-1">
+                <div style="padding-top: 10px">
+                    <a style="color: gray" href="#" id="sharedLink" target="_blank"><i class="fa fa-share fa-3x"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

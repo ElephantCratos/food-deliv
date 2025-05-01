@@ -1,0 +1,29 @@
+{
+  "room": {
+    "url": "ws://127.0.0.1:8080",
+    "name": "ROOM1",
+    "pin": "1234",
+    "nickName": "Bob"
+  },
+  "media": {
+    "audio": {
+      "tracks": [
+      ]
+    },
+    "video": {
+      "tracks": [{
+        "source": "camera",
+        "width": 1280,
+        "height": 720,
+        "codec": "vp9",
+        "encodings": [
+          {
+            "rid": "nonsense",
+            "active": true,
+            "scalabilityMode": "L1T3"
+          }
+        ]
+      }]
+    }
+  }
+}

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BWE Stats</title>
+    <style>
+        div    {width: auto; height: 300px}
+        canvas    {width: auto; height: 300px}
+    </style>
+</head>
+<script src="viewer.js"></script>
+<body onload="Viewer.init()">
+    <div style="width: 100%; height: 100px">
+        <input type="file" id="fileinput" multiple />
+        <input type="checkbox" id="composite_charts" value="true">composite_charts<br>
+        <input type="text" id="from"/>
+        <input type="text" id="to"/>
+        <button id="filter" onclick="Viewer.filter()">Filter</button>
+    </div>
+    <div id="charts"></div>
+</body>
+</html>
+

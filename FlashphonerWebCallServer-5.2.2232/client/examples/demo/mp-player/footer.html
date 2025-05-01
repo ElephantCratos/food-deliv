@@ -1,0 +1,42 @@
+<div style="margin-left: 20px" id="timer">00:00:00</div>
+<div style="margin-left: 20px"><i class="fa fa-volume-up" aria-hidden="true" style="font-size: 20px; margin-left: -10px"></i></div>
+<div style="margin-left: 10px" id="volumeControl"></div>
+<div style="margin-left: 40px">
+    <div class="form-group">
+        <select class="form-control" id="proto" style="margin-top: 5px; bottom: 100%">
+            <option value="WebRTC">WebRTC</option>
+            <option value="WebSocket">WebSocket</option>
+            <option value="RTMP">RTMP</option>
+            <option value="RTMFP">RTMFP</option>
+            <option value="HLS">HLS</option>
+        </select>
+    </div>
+</div>
+<div style="margin-left: 20px;">
+    <div class="form-group" >
+        <select class="form-control" id="resolutions" style="margin-top: 5px; bottom: 100%">
+            <option value="1280x720">1280x720</option>
+            <option value="1024x576">1024x576</option>
+            <option value="800x450">800x450</option>
+            <option value="640x360">640x360</option>
+            <option value="512x288">512x288</option>
+            <option value="320x180">320x180</option>
+            <option value="256x144">256x144</option>
+        </select>
+    </div>
+</div>
+<div style="margin-left: 110px">
+    <button id="menuButton" type="button" class="btn btn-link">
+        <i class="fa fa-bars"></i>
+    </button>
+</div>
+<div style="margin-left: 20px">
+    <button id="scaleButton" type="button" class="btn btn-link">
+        <i class="fa fa-arrows-alt"></i>
+    </button>
+</div>
+<div style="margin-left: 20px">
+    <button id="stopButton" type="button" class="btn btn-link">
+        <i class="fa fa-stop" style="color: #cf2a28"></i>
+    </button>
+</div>

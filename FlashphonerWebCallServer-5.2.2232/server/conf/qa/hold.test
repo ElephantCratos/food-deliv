@@ -1,0 +1,19 @@
+Id:2
+Name:Hold
+Clients: 2
+
+$1 -> call({callee:$2});
+$s -> wait(3000);
+$2 -> api.answer(currentCall);
+$s -> wait(7000);
+$1[true] -> isAudioReceived();
+$2[true] -> isAudioReceived();
+$1 -> api.hold(currentCall);
+$s -> wait(2000);
+$1[false] -> isAudioReceived();
+$2[false] -> isAudioReceived();
+$1 -> api.unhold(currentCall);
+$s -> wait(2000);
+$1[true] -> isAudioReceived();
+$2[true] -> isAudioReceived();
+$2 -> api.hangup(currentCall);

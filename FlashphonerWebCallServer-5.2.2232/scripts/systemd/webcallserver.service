@@ -1,0 +1,25 @@
+[Unit]
+Description=Flashphoner WebCallServer
+After=syslog.target network-online.target local-fs.target remote-fs.target
+Wants=network-online.target
+StartLimitIntervalSec=120
+StartLimitBurst=5
+
+[Service]
+User=root
+Group=root
+LimitNOFILE=20000
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+SuccessExitStatus=143
+Type=forking
+PIDFile=/usr/local/FlashphonerWebCallServer/bin/FlashphonerMainWebCallServer.pid
+ExecStart=/bin/bash webcallserver start
+ExecStop=/bin/bash webcallserver stop
+ExecReload=/bin/bash webcallserver restart
+WorkingDirectory=/usr/local/FlashphonerWebCallServer/bin
+RemainAfterExit=no
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

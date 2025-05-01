@@ -1,0 +1,19 @@
+profiles:
+ s :
+  width : 320
+  height : 240
+  bitrate : 500
+  gop : 60
+  fps : 30
+ m :
+  width : 640
+  height : 480
+  bitrate : 800
+  gop : 60
+  fps : 30
+ h :
+  width : 960
+  height : 720
+  bitrate : 1300
+  gop : 60
+  fps : 30

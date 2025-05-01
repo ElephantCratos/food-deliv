@@ -1,0 +1,17 @@
+Id:6
+Name:Upgrade To Video Call
+Clients: 2
+
+$1 -> call({callee:$2});
+$s -> wait(3000);
+$2 -> api.answer(currentCall);
+$s -> wait(7000);
+$1[true] -> isAudioReceived();
+$2[true] -> isAudioReceived();
+$2[false] -> isVideoReceived();
+$1 -> api.changeVideoState(currentCall, true);
+$s -> wait(5000);
+$1[true] -> isAudioReceived();
+$2[true] -> isAudioReceived();
+$2[true] -> isVideoReceived();
+$2 -> api.hangup(currentCall);

@@ -1,0 +1,138 @@
+users:
+  admin: {username: admin, password: 21232f297a57a5a743894a0e4a801fc3, active: true}
+  demo: {username: demo, password: fe01ce2a7fbac8fafaed7c982a04e229, active: true}
+apps:
+  flashStreamingApp: {name: flashStreamingApp, key: flashStreamingApp, url: 'http://localhost:8081/apps/EchoApp',
+    handler: com.flashphoner.server.client.handler.wcs4.FlashStreamingHandler, callback: com.flashphoner.server.client.handler.wcs4.FlashStreamingCallbackHandler}
+  conferenceApp: {name: conferenceApp, key: conferenceApp, url: 'http://localhost:8081/apps/ConferenceApp',
+    handler: com.flashphoner.server.client.handler.wcs4.WCS4Handler, callback: com.flashphoner.server.client.handler.wcs4.WCS4CallbackHandler}
+  flashChatApp: {name: flashChatApp, key: flashChatApp, url: 'http://localhost:8081/apps/ChatApp',
+    handler: com.flashphoner.server.client.handler.wcs4.FlashStreamingHandler, callback: com.flashphoner.server.client.handler.wcs4.FlashStreamingCallbackHandler}
+  clickToCallApp: {name: clickToCallApp, key: clickToCallApp, url: 'http://localhost:8081/apps/ClickToCallApp',
+    handler: com.flashphoner.server.client.handler.wcs4.WCS4Handler, callback: com.flashphoner.server.client.handler.wcs4.WCS4CallbackHandler}
+  flashRoomApp: {name: chatRoomApp, key: flashRoomApp, url: 'http://localhost:8081/apps/RoomApp',
+    handler: com.flashphoner.server.client.handler.wcs4.FlashRoomHandler, callback: com.flashphoner.server.client.handler.wcs4.FlashStreamingCallbackHandler}
+  callApp: {name: callApp, key: callApp, url: 'http://localhost:8081/apps/CallApp', handler: com.flashphoner.server.client.handler.wcs4.WCS4Handler,
+    callback: com.flashphoner.server.client.handler.wcs4.WCS4CallbackHandler}
+  defaultApp: {name: defaultApp, key: defaultApp, url: 'http://localhost:8081/apps/EchoApp',
+    handler: com.flashphoner.server.client.handler.wcs4.WCS4Handler, callback: com.flashphoner.server.client.handler.wcs4.WCS4CallbackHandler}
+  qaApp: {name: qaApp, key: qaApp, url: 'http://localhost:8081/apps/QAApp', handler: com.flashphoner.server.client.handler.wcs4.WCS4Handler,
+    callback: com.flashphoner.server.client.handler.wcs3.WCS3CallbackHandler}
+  wcs3App: {name: wcs3App, key: wcs3App, url: 'http://localhost:8081/apps/EchoApp', handler: com.flashphoner.server.client.handler.wcs3.WCS3Handler,
+    callback: com.flashphoner.server.client.handler.wcs3.WCS3CallbackHandler}
+  websocketChatApp: {name: websocketChatApp, key: websocketChatApp, url: 'http://localhost:8081/apps/ChatApp',
+    handler: com.flashphoner.server.client.handler.wcs4.WCS4Handler, callback: com.flashphoner.server.client.handler.wcs4.WCS4CallbackHandler}
+  roomApp: {name: chatRoomApp, key: roomApp, url: 'http://localhost:8081/apps/RoomApp',
+    handler: com.flashphoner.server.client.handler.wcs4.WCS4Handler, callback: com.flashphoner.server.client.handler.wcs4.WCS4CallbackHandler}
+  chatRoomApp: {name: chatRoomApp, key: chatRoomApp, url: 'http://localhost:8081/apps/ChatRoomApp',
+    handler: com.flashphoner.server.client.handler.wcs4.WCS4Handler, callback: com.flashphoner.server.client.handler.wcs4.WCS4CallbackHandler}
+  sfuApp: {name: sfuApp, key: sfuApp, url: 'http://localhost:8081/apps/EchoApp',
+    handler: com.flashphoner.sfu.handler.SFUHandler, callback: com.flashphoner.sfu.handler.SFUCallbackHandler}
+  sfuZClientApp: {name: sfuZClientApp, key: sfuZClientApp, url: 'http://localhost:8081/apps/EchoApp',
+    handler: com.flashphoner.sfu.handler.SFUZClientHandler, callback: com.flashphoner.sfu.handler.SFUCallbackHandler}
+  sfuZUserManagementApp: {name: sfuZUserManagementApp, key: sfuZUserManagementApp,
+    url: 'http://localhost:8081/apps/EchoApp', handler: com.flashphoner.sfu.handler.SFUZUserManagement,
+    callback: com.flashphoner.sfu.handler.SFUCallbackHandler}
+  sfuZExamplesManagementApp: {name: sfuZExamplesManagementApp, key: sfuZExamplesManagementApp,
+    url: 'http://localhost:8081/apps/EchoApp', handler: com.flashphoner.sfu.handler.SFUZExamplesManagement,
+    callback: com.flashphoner.sfu.handler.SFUCallbackHandler}
+  sfuZAttachmentsTransferHandler: {name: sfuZAttachmentsTransferHandler, key: SFUZAttachmentsTransferHandlerApp,
+    url: 'http://localhost:8081/apps/EchoApp', handler: com.flashphoner.sfu.handler.SFUZAttachmentsTransferHandler,
+    callback: com.flashphoner.sfu.handler.SFUCallbackHandler}
+restMethods:
+  flashStreamingApp: [OnMessageEvent, XcapStatusEvent, sendDtmf, StreamEvent, DataStatusEvent,
+    ConnectionStatusEvent, sessionDebug, pauseStream, playStream, StreamTranscodingGroupEvent,
+    hangup, hold, StreamStatusEvent, MessageStatusEvent, OnCallEvent, RecordingStatusEvent,
+    ErrorStatusEvent, StreamsStatEvent, OnTransferEvent, availableStream, SessionDebugStatusEvent,
+    BugReportStatusEvent, connect, subscribe, CallStatusEvent, sendMessage, publishStream,
+    RegistrationStatusEvent, OnDataEvent, sendXcapRequest, unPublishStream, call,
+    transfer, answer, stopStream, StreamKeepAliveEvent, SubscriptionStatusEvent, unhold,
+    TransferStatusEvent, snapshot, pushLogs, submitBugReport]
+  conferenceApp: [OnMessageEvent, XcapStatusEvent, sendDtmf, DataStatusEvent, ConnectionStatusEvent,
+    sessionDebug, pauseStream, playStream, StreamTranscodingGroupEvent, hangup, hold,
+    StreamStatusEvent, MessageStatusEvent, OnCallEvent, RecordingStatusEvent, ErrorStatusEvent,
+    StreamsStatEvent, OnTransferEvent, availableStream, SessionDebugStatusEvent, BugReportStatusEvent,
+    connect, subscribe, CallStatusEvent, sendMessage, publishStream, RegistrationStatusEvent,
+    OnDataEvent, sendXcapRequest, unPublishStream, call, transfer, answer, stopStream,
+    StreamKeepAliveEvent, SubscriptionStatusEvent, unhold, TransferStatusEvent, snapshot,
+    pushLogs, submitBugReport]
+  flashChatApp: [OnMessageEvent, XcapStatusEvent, sendDtmf, DataStatusEvent, ConnectionStatusEvent,
+    sessionDebug, pauseStream, playStream, StreamTranscodingGroupEvent, hangup, hold,
+    StreamStatusEvent, MessageStatusEvent, OnCallEvent, RecordingStatusEvent, ErrorStatusEvent,
+    StreamsStatEvent, OnTransferEvent, availableStream, SessionDebugStatusEvent, BugReportStatusEvent,
+    connect, subscribe, CallStatusEvent, sendMessage, publishStream, RegistrationStatusEvent,
+    OnDataEvent, sendXcapRequest, unPublishStream, call, transfer, answer, stopStream,
+    StreamKeepAliveEvent, SubscriptionStatusEvent, unhold, TransferStatusEvent, snapshot,
+    pushLogs, submitBugReport]
+  clickToCallApp: [OnMessageEvent, XcapStatusEvent, sendDtmf, DataStatusEvent, ConnectionStatusEvent,
+    sessionDebug, pauseStream, playStream, StreamTranscodingGroupEvent, hangup, hold,
+    StreamStatusEvent, MessageStatusEvent, OnCallEvent, RecordingStatusEvent, ErrorStatusEvent,
+    StreamsStatEvent, OnTransferEvent, availableStream, SessionDebugStatusEvent, BugReportStatusEvent,
+    connect, subscribe, CallStatusEvent, sendMessage, publishStream, RegistrationStatusEvent,
+    OnDataEvent, sendXcapRequest, unPublishStream, call, transfer, answer, stopStream,
+    StreamKeepAliveEvent, SubscriptionStatusEvent, unhold, TransferStatusEvent, snapshot,
+    pushLogs, submitBugReport]
+  flashRoomApp: [OnMessageEvent, XcapStatusEvent, sendDtmf, DataStatusEvent, ConnectionStatusEvent,
+    sessionDebug, pauseStream, playStream, StreamTranscodingGroupEvent, hangup, hold,
+    StreamStatusEvent, MessageStatusEvent, OnCallEvent, RecordingStatusEvent, ErrorStatusEvent,
+    StreamsStatEvent, OnTransferEvent, availableStream, SessionDebugStatusEvent, BugReportStatusEvent,
+    connect, subscribe, CallStatusEvent, sendMessage, publishStream, RegistrationStatusEvent,
+    OnDataEvent, sendXcapRequest, unPublishStream, call, transfer, answer, stopStream,
+    StreamKeepAliveEvent, SubscriptionStatusEvent, unhold, TransferStatusEvent, snapshot,
+    pushLogs, submitBugReport]
+  callApp: [OnMessageEvent, XcapStatusEvent, sendDtmf, DataStatusEvent, ConnectionStatusEvent,
+    sessionDebug, pauseStream, playStream, StreamTranscodingGroupEvent, hangup, hold,
+    StreamStatusEvent, MessageStatusEvent, OnCallEvent, RecordingStatusEvent, ErrorStatusEvent,
+    StreamsStatEvent, OnTransferEvent, availableStream, SessionDebugStatusEvent, BugReportStatusEvent,
+    connect, subscribe, CallStatusEvent, sendMessage, publishStream, RegistrationStatusEvent,
+    OnDataEvent, sendXcapRequest, unPublishStream, call, transfer, answer, stopStream,
+    StreamKeepAliveEvent, SubscriptionStatusEvent, unhold, TransferStatusEvent, snapshot,
+    pushLogs, submitBugReport]
+  defaultApp: [OnMessageEvent, XcapStatusEvent, sendDtmf, DataStatusEvent, ConnectionStatusEvent,
+    sessionDebug, pauseStream, playStream, StreamTranscodingGroupEvent, hangup, hold,
+    StreamStatusEvent, MessageStatusEvent, OnCallEvent, RecordingStatusEvent, ErrorStatusEvent,
+    StreamsStatEvent, OnTransferEvent, availableStream, SessionDebugStatusEvent, BugReportStatusEvent,
+    connect, subscribe, CallStatusEvent, StreamEvent, sendMessage, publishStream, RegistrationStatusEvent,
+    OnDataEvent, sendXcapRequest, unPublishStream, call, transfer, answer, stopStream,
+    StreamKeepAliveEvent, SubscriptionStatusEvent, unhold, TransferStatusEvent, snapshot,
+    pushLogs, submitBugReport]
+  qaApp: [OnMessageEvent, XcapStatusEvent, sendDtmf, DataStatusEvent, ConnectionStatusEvent,
+    sessionDebug, pauseStream, playStream, StreamTranscodingGroupEvent, hangup, hold,
+    StreamStatusEvent, MessageStatusEvent, OnCallEvent, RecordingStatusEvent, ErrorStatusEvent,
+    StreamsStatEvent, OnTransferEvent, availableStream, SessionDebugStatusEvent, BugReportStatusEvent,
+    connect, subscribe, CallStatusEvent, sendMessage, publishStream, RegistrationStatusEvent,
+    OnDataEvent, sendXcapRequest, unPublishStream, call, transfer, answer, stopStream,
+    StreamKeepAliveEvent, SubscriptionStatusEvent, unhold, TransferStatusEvent, snapshot,
+    pushLogs, submitBugReport]
+  wcs3App: [OnMessageEvent, XcapStatusEvent, sendDtmf, DataStatusEvent, ConnectionStatusEvent,
+    sessionDebug, pauseStream, playStream, StreamTranscodingGroupEvent, hangup, hold,
+    StreamStatusEvent, MessageStatusEvent, OnCallEvent, RecordingStatusEvent, ErrorStatusEvent,
+    StreamsStatEvent, OnTransferEvent, availableStream, SessionDebugStatusEvent, BugReportStatusEvent,
+    connect, subscribe, CallStatusEvent, sendMessage, publishStream, RegistrationStatusEvent,
+    OnDataEvent, sendXcapRequest, unPublishStream, call, transfer, answer, stopStream,
+    StreamKeepAliveEvent, SubscriptionStatusEvent, unhold, TransferStatusEvent, snapshot,
+    pushLogs, submitBugReport]
+  websocketChatApp: [OnMessageEvent, XcapStatusEvent, sendDtmf, DataStatusEvent, ConnectionStatusEvent,
+    sessionDebug, pauseStream, playStream, StreamTranscodingGroupEvent, hangup, hold,
+    StreamStatusEvent, MessageStatusEvent, OnCallEvent, RecordingStatusEvent, ErrorStatusEvent,
+    StreamsStatEvent, OnTransferEvent, availableStream, SessionDebugStatusEvent, BugReportStatusEvent,
+    connect, subscribe, CallStatusEvent, sendMessage, publishStream, RegistrationStatusEvent,
+    OnDataEvent, sendXcapRequest, unPublishStream, call, transfer, answer, stopStream,
+    StreamKeepAliveEvent, SubscriptionStatusEvent, unhold, TransferStatusEvent, snapshot,
+    pushLogs, submitBugReport]
+  roomApp: [OnMessageEvent, XcapStatusEvent, sendDtmf, DataStatusEvent, ConnectionStatusEvent,
+    sessionDebug, pauseStream, playStream, StreamTranscodingGroupEvent, hangup, hold,
+    StreamStatusEvent, MessageStatusEvent, OnCallEvent, RecordingStatusEvent, ErrorStatusEvent,
+    StreamsStatEvent, OnTransferEvent, availableStream, SessionDebugStatusEvent, BugReportStatusEvent,
+    connect, subscribe, CallStatusEvent, sendMessage, publishStream, RegistrationStatusEvent,
+    OnDataEvent, sendXcapRequest, unPublishStream, call, transfer, answer, stopStream,
+    StreamKeepAliveEvent, SubscriptionStatusEvent, unhold, TransferStatusEvent, snapshot,
+    pushLogs, submitBugReport]
+  chatRoomApp: [OnMessageEvent, XcapStatusEvent, sendDtmf, DataStatusEvent, ConnectionStatusEvent,
+    sessionDebug, pauseStream, playStream, StreamTranscodingGroupEvent, hangup, hold,
+    StreamStatusEvent, MessageStatusEvent, OnCallEvent, RecordingStatusEvent, ErrorStatusEvent,
+    StreamsStatEvent, OnTransferEvent, availableStream, SessionDebugStatusEvent, BugReportStatusEvent,
+    connect, subscribe, CallStatusEvent, sendMessage, publishStream, RegistrationStatusEvent,
+    OnDataEvent, sendXcapRequest, unPublishStream, call, transfer, answer, stopStream,
+    StreamKeepAliveEvent, SubscriptionStatusEvent, unhold, TransferStatusEvent, snapshot,
+    pushLogs, submitBugReport]

@@ -1,0 +1,1 @@
+cat flashphoner.log | grep "CommonStatSamplerThread" > stats

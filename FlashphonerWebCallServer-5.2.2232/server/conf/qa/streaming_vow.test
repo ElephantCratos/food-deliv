@@ -1,0 +1,24 @@
+Id:9
+Name:Streaming Video, receive as VOW
+Clients: 2
+AccountType:STREAM
+Publishers:1
+
+$1 -> api.publishStream({name:"testStream"});
+$s -> wait(5000);
+$2 -> api.playStream({name:"testStream", mediaProvider:"WSPlayer", sdp: "v=0\r\n" +
+                                             "o=- 1988962254 1988962254 IN IP4 0.0.0.0\r\n" +
+                                             "c=IN IP4 0.0.0.0\r\n" +
+                                             "t=0 0\r\n" +
+                                             "a=sdplang:en\r\n"+
+                                             "m=video 0 RTP/AVP 32\r\n" +
+                                             "a=rtpmap:32 MPV/90000\r\n" +
+                                             "a=recvonly\r\n" +
+                                             "m=audio 0 RTP/AVP 0\r\n" +
+                                             "a=rtpmap:0 PCMU/8000\r\n" +
+                                             "a=recvonly\r\n"});
+$s -> wait(20000);
+$2[true] -> isStreamMediaReceived("testStream", "audio");
+$2[true] -> isStreamMediaReceived("testStream", "video");
+$1 -> api.unPublishStream({name:"testStream"});
+$2 -> api.stopStream({name:"testStream"});
