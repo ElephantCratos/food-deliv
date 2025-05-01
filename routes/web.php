@@ -11,6 +11,7 @@ use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PromocodeController;
 use App\Http\Controllers\CourierAssignmentController;
+use App\Http\Controllers\CameraController;
 
 
 Route::get('/', function () {
@@ -28,7 +29,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
-
+    Route::get('/kitchen-camera', [CameraController::class, 'showCamera'])->name('kitchen.camera');
     Route::delete('/order_position/delete/{id}',[OrderPositionController::class, 'destroy']) ->name('delete-order-position');
     Route::post('/add_to_cart', [OrderPositionController::class, 'store']) -> name('add_to_cart');
     Route::get('/Cart', [OrderController::class,'showCart'])->name('Cart');

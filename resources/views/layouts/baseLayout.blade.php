@@ -14,7 +14,7 @@
         {{-- Верхняя навигация --}}
         <div class="container mx-auto px-4 lg:px-8 py-2 flex flex-wrap justify-between items-center text-sm text-gray-800">
             <div class="flex items-center gap-4 flex-wrap">
-                <span class="text-red-600 font-semibold">🔴 Кухня LIVE</span>
+                <a href="{{ route('kitchen.camera') }}" class="text-red-600 font-semibold hover:underline">🔴 Кухня LIVE</a>
                 <a href="#" class="hover:underline">О нас</a>
                 <a href="#" class="hover:underline">Контакты</a>
                 <a href="#" class="hover:underline">Корпоративные заказы</a>
