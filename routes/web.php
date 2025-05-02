@@ -37,6 +37,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     ->name('cart.apply-promocode');
     Route::post('/cart/remove-promocode', [OrderController::class, 'removePromocode'])
     ->name('cart.remove-promocode');
+    Route::post('/cart/update/{dish}', [OrderPositionController::class, 'updateQuantity'])->name('cart.update');
     Route::post('send_cart', [OrderController::class, 'sendOrder'])->name('send_order');
 
     Route::middleware(['can:access to kitchen panel'])->group(function () {
@@ -58,12 +59,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('Courier_Orders/{id}/delivered', [CourierController::class, 'confirmDelivery']) -> name('courier.delivered');
     });
 
-    Route::middleware(['can:access to chat'])->group(function() {
-        Route::get('/users', [ChatController::class, 'showUsers'])->name('Users_list');
-        Route::get('/chat/user/{user}', [ChatController::class, 'openChat'])->name('chats.open');
-        Route::get('/chat/{chat}', [ChatController::class, 'showChat']) ->name('chats.show');
-        Route::post('/chat/{chat}', [ChatController::class, 'sendMessage'])->name('chats.send');
-    });
+    Route::get('/chats', [ChatController::class, 'index'])
+    ->name('chats.index');
+
+// Создать или открыть чат с конкретным клиентом
+Route::get('/chats/open/{userId}', [ChatController::class, 'openChat'])
+    ->name('chats.open');
+
+// Просмотр конкретного чата (интерфейс диалога)
+Route::get('/chats/{chat}', [ChatController::class, 'show'])
+    ->name('chats.show');
+
+// Отправка сообщения в чат
+Route::post('/chats/{chat}/send', [ChatController::class, 'send'])
+    ->name('chats.send');
 
     Route::middleware(['can:access to manager panel'])->group(function () {
         //Route::get('/Edit_menu', function () {

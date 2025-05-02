@@ -40,12 +40,6 @@
                     </x-nav-link>
                 @endcan
 
-                @can('access to chat')
-                    <x-nav-link :href="route('Users_list')" :active="request()->routeIs('dashboard')">
-                        {{ __('Чат') }}
-                    </x-nav-link>
-                @endcan
-            </div>
 
             <!-- Настройки пользователя -->
             <div class="hidden sm:flex items-center space-x-4">

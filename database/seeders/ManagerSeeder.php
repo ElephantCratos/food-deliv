@@ -35,5 +35,6 @@ class ManagerSeeder extends Seeder
 
         $managerRole->givePermissionTo('access to manager panel', 'access to chat');
         $manager->assignRole('manager');
+        $manager->assignRole('support');
     }
 }

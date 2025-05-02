@@ -147,13 +147,13 @@ class OrderController extends Controller
         
         session(['promocode' => $promocode->code]);
         
-        return back()->with('success', 'Промокод успешно применен!');
+        return response()->json(['success' => 'true', 'message' => 'Промокод успешно применен!']);
     }
 
     public function removePromocode()
     {
         session()->forget('promocode');
-        return back()->with('status', 'Промокод удален');
+        return response()->json(['success' => 'true', 'message' => 'Промокод успешно удалён!']);
     }
 
     public function showOwnOrders()
