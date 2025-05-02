@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             PermissionSeeder::class,
             AdminSeeder::class,
+            SupportSeeder::class,
             ManagerSeeder::class,
             KitchenSeeder::class,
             CourierSeeder::class,

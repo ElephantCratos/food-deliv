@@ -1,3 +1,4 @@
+<!-- resources/views/support/user-list.blade.php -->
 <x-app-layout>
     <div class="py-12 flex justify-center items-center" style="margin: 50px;">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 w-full">
@@ -26,8 +27,8 @@
                           onchange="filterUsers()"
                         >
                             <option value="">Все роли</option>
-                            <option value="2">Менеджеры</option>
-                            <option value="4">Курьеры</option>
+                            <option value="manager">Менеджеры</option>
+                            <option value="courier">Курьеры</option>
                         </select>
                     </div>
                 </div>
@@ -35,10 +36,7 @@
                 <!-- Список пользователей -->
                 <ul id="user-list">
                     @foreach ($users as $user)
-                        <li
-                          class="user-item mb-4"
-                          data-roles="{{ $user->roles->pluck('id')->implode(',') }}"
-                        >
+                        <li class="user-item mb-4" data-roles="{{ $user->roles->pluck('name')->implode(',') }}">
                             <a
                               href="{{ route('chats.open', $user->id) }}"
                               class="bg-white hover:bg-gray-300 rounded-lg py-2 px-4 ml-4 flex items-center"

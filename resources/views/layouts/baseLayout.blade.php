@@ -22,7 +22,7 @@
                 <a href="#" class="hover:underline">Корпоративные заказы</a>
             </div>
         </div>
-    
+
         {{-- Основной блок шапки --}}
         <div class="container mx-auto px-4 lg:px-8 py-4 flex flex-col lg:flex-row justify-between items-center gap-4 lg:gap-12">
             {{-- Логотип и описание --}}
@@ -33,37 +33,39 @@
                     <p class="text-sm lg:text-base text-red-500 font-medium">Лучшее мясо в г. Нягань</p>
                 </div>
             </div>
-    
+
             {{-- Инфо о доставке --}}
             <div class="text-center lg:text-left text-sm lg:text-base">
                 <p class="font-semibold text-gray-700 uppercase">Доставка по городу</p>
                 <p class="text-gray-700">30 мин · <span class="text-yellow-500 font-bold">★ 4.6</span></p>
             </div>
-    
+
             {{-- Иконки профиля --}}
             <div class="flex items-center gap-6 text-sm text-gray-800 text-center">
-                <div class="flex flex-col items-center">
+                <a href="{{ route('chats.open', \App\Http\Controllers\ChatController::SUPPORT_USER_ID) }}"
+                   class="flex flex-col items-center hover:text-red-600 transition">
                     <div class="text-2xl lg:text-3xl">🎧</div>
                     <span class="mt-1">Поддержка</span>
-                </div>
-                <div class="flex flex-col items-center">
+                </a>
+                <a href="#"
+                   class="flex flex-col items-center hover:text-red-600 transition">
                     <div class="text-2xl lg:text-3xl">🎟️</div>
                     <span class="mt-1">Мои акции</span>
-                </div>
-                <div class="flex flex-col items-center">
+                </a>
+                <a href="#"
+                   class="flex flex-col items-center hover:text-red-600 transition">
                     <div class="text-2xl lg:text-3xl">👤</div>
                     <span class="mt-1">Профиль</span>
-                </div>
+                </a>
             </div>
         </div>
-    
+
         {{-- Категории и корзина --}}
         <div class="container mx-auto px-4 lg:px-8 pt-3 pb-4 border-t flex flex-wrap items-center gap-4 lg:gap-6">
             @isset($categoriesList)
-            <x-categories :categoriesList="$categoriesList" />
+                <x-categories :categoriesList="$categoriesList" />
             @endisset
 
-    
             {{-- Кнопка корзины --}}
             <a href="{{ route('Cart') }}"
                class="ml-auto bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-5 py-2 rounded-full transition whitespace-nowrap">
@@ -72,8 +74,8 @@
         </div>
     </header>
 
-     {{-- Контент страницы --}}
-     <main class="flex-grow">
+    {{-- Контент страницы --}}
+    <main class="flex-grow">
         @yield('content')
     </main>
 
@@ -85,7 +87,5 @@
     {{-- Скрипты --}}
     @yield('scripts')
 </body>
-    
 
-    
 </html>

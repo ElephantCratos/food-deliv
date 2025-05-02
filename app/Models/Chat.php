@@ -11,25 +11,15 @@ class Chat extends Model
 
     protected $fillable = ['user_1_id', 'user_2_id'];
 
-    public function user1()
+    public function users()
     {
-        return $this->belongsTo(User::class, 'user_1_id');
-    }
-
-    public function user2()
-    {
-        return $this->belongsTo(User::class, 'user_2_id');
+        return $this->belongsToMany(User::class)
+                    ->withPivot('last_read_at')
+                    ->withTimestamps();
     }
 
     public function messages()
     {
         return $this->hasMany(Message::class);
-    }
-
-    public function getInterlocutor($userId)
-    {
-        if ($this->user_1_id == $userId) return $this->user2;
-        if ($this->user_2_id == $userId) return $this->user1;
-        return null;
     }
 }
