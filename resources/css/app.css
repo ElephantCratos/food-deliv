@@ -177,3 +177,11 @@ footer a:hover {
 .card .flex {
     margin-bottom: 0.5rem;
 }
+
+/* серый цвет текста при наведении(футер) */
+a {
+  text-decoration: none;
+}
+a:hover {
+  color: gray;
+}

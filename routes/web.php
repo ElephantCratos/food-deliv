@@ -10,6 +10,8 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PromocodeController;
+use App\Http\Controllers\CourierAssignmentController;
+use App\Http\Controllers\CameraController;
 
 
 Route::get('/', function () {
@@ -27,7 +29,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
-
+    Route::get('/kitchen-camera', [CameraController::class, 'showCamera'])->name('kitchen.camera');
     Route::delete('/order_position/delete/{id}',[OrderPositionController::class, 'destroy']) ->name('delete-order-position');
     Route::post('/add_to_cart', [OrderPositionController::class, 'store']) -> name('add_to_cart');
     Route::get('/Cart', [OrderController::class,'showCart'])->name('Cart');
@@ -40,8 +42,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::middleware(['can:access to kitchen panel'])->group(function () {
         Route::get('/Kitchen_Orders', [KitchenController::class, 'showOrdersToKitchen'])->name('Kitchen_Orders');
-        Route::post('/Kitchen_Orders/{id}/confirm', [KitchenController::class, 'confirmPreparation'])->name('kitchen.confirm');
-        Route::post('/Kitchen_Orders{id}/transfer', [KitchenController::class, 'transferToCourier'])->name('kitchen.transfer');
+        Route::post('/Kitchen_Orders{id}/transfer', [KitchenController::class, 'markAsReady'])
+        ->name('kitchen.ready');
         Route::post('/Kitchen_Orders{id}/courier-arrived', [KitchenController::class, 'courierArrived'])->name('kitchen.courier-arrived');
     });
 
@@ -53,9 +55,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::middleware(['can:access to courier panel'])->group(function () {
         Route::get('/Courier_Orders', [CourierController::class, 'showOrdersToCourier'])->name('Courier_Orders');
-        Route::post('/Courier_Orders/{id}/confirm-delivery', [CourierController::class, 'confirmDelivery'])->name('courier.confirm');
-        Route::post('Courier_Orders/{id}/get-order', [CourierController::class, 'acceptOrder']) -> name('courier.accept-order');
-        Route::post('Courier_Orders/{id}/delivered', [CourierController::class, 'orderHasDelivered']) -> name('courier.delivered');
+        Route::post('/Courier_Orders/{id}/confirm', [CourierController::class, 'acceptOrder'])->name('courier.confirm');
+        Route::post('Courier_Orders/{id}/delivered', [CourierController::class, 'confirmDelivery']) -> name('courier.delivered');
     });
 
     Route::get('/chats', [ChatController::class, 'index'])
@@ -78,7 +79,11 @@ Route::post('/chats/{chat}/send', [ChatController::class, 'send'])
         //    return view('Edit_menu');
         //})->name('Edit_menu');
 
-
+        Route::get('/courier-assignment', [CourierAssignmentController::class, 'index'])
+        ->name('courier.assignment');
+        
+        Route::post('/orders/{order}/assign-courier', [CourierAssignmentController::class, 'assignCourier'])
+        ->name('courier.assign');
         Route::get('/All_Orders/{category?}', [OrderController::class, 'showOrders'])->name('All_Orders');
         Route::post('/orders/{id}/accept', [OrderController::class, 'acceptOrder'])->name('orders.accept');
         Route::post('/orders/{id}/decline', [OrderController::class, 'declineOrder'])->name('orders.decline');

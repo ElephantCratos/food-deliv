@@ -11,12 +11,10 @@
 </head>
 
 <body class="bg-[#f9f9f9] text-gray-900 font-sans flex flex-col min-h-screen">
-
-    <header class="bg-white shadow-sm border-b">
         {{-- Верхняя навигация --}}
         <div class="container mx-auto px-4 lg:px-8 py-2 flex flex-wrap justify-between items-center text-sm text-gray-800">
             <div class="flex items-center gap-4 flex-wrap">
-                <span class="text-red-600 font-semibold">🔴 Кухня LIVE</span>
+                <a href="{{ route('kitchen.camera') }}" class="text-red-600 font-semibold hover:underline">🔴 Кухня LIVE</a>
                 <a href="#" class="hover:underline">О нас</a>
                 <a href="#" class="hover:underline">Контакты</a>
                 <a href="#" class="hover:underline">Корпоративные заказы</a>
@@ -24,6 +22,7 @@
         </div>
 
         {{-- Основной блок шапки --}}
+    <header class="sticky top-0 z-50 bg-white shadow-sm border-b">
         <div class="container mx-auto px-4 lg:px-8 py-4 flex flex-col lg:flex-row justify-between items-center gap-4 lg:gap-12">
             {{-- Логотип и описание --}}
             <div class="flex items-center gap-4 min-w-0">
@@ -51,8 +50,9 @@
                    class="flex flex-col items-center hover:text-red-600 transition">
                     <div class="text-2xl lg:text-3xl">🎟️</div>
                     <span class="mt-1">Мои акции</span>
+
                 </a>
-                <a href="#"
+                <a href="{{ route('profile.edit') }}"
                    class="flex flex-col items-center hover:text-red-600 transition">
                     <div class="text-2xl lg:text-3xl">👤</div>
                     <span class="mt-1">Профиль</span>

@@ -36,7 +36,7 @@ Food Delivery Catalog
     <div class="relative overflow-x-hidden">
         <div id="scroll-popular" class="flex space-x-4 py-4 overflow-x-auto scrollbar-hide select-none cursor-grab">
             @foreach ($dishes as $dish)
-            <div class="dish-card bg-white rounded-2xl shadow-md hover:shadow-lg transition flex-shrink-0 w-60 h-[320px] flex flex-col overflow-hidden select-none">
+            <div class="dish-card bg-white rounded-2xl shadow-md hover:shadow-lg transition flex-shrink-0 w-60 h-[260px] flex flex-col overflow-hidden select-none">
                 {{-- Картинка --}}
                 <div class="w-full h-32 overflow-hidden">
                     <img src="{{ asset($dish['image_path']) }}" alt="{{ $dish['name'] }}" class="w-full h-full object-cover">

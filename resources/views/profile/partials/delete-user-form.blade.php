@@ -1,6 +1,6 @@
-<section class="space-y-6">
+<section class="space-y-6 bg-white dark:bg-white p-6 rounded-lg shadow-sm">
     <header>
-        <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+        <h2 class="text-lg font-medium text-gray-900 dark:text-dark-100">
             {{ __('Delete Account') }}
         </h2>
 
@@ -15,11 +15,11 @@
     >{{ __('Delete Account') }}</x-danger-button>
 
     <x-modal name="confirm-user-deletion" :show="$errors->userDeletion->isNotEmpty()" focusable>
-        <form method="post" action="{{ route('profile.destroy') }}" class="p-6">
+        <form method="post" action="{{ route('profile.destroy') }}" class="p-6 bg-white dark:bg-white rounded-lg shadow-sm">
             @csrf
             @method('delete')
 
-            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+            <h2 class="text-lg font-medium text-gray-900 dark:text-dark-100">
                 {{ __('Are you sure you want to delete your account?') }}
             </h2>
 

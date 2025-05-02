@@ -9,6 +9,7 @@ services:
             - 5173:5173
         volumes:
             - .:/var/www:cached
+            - ./hls:/var/www/html/live  # <-- Добавлено: том с HLS
 
     ####################################################################################################
     # Nginx
@@ -21,9 +22,9 @@ services:
             - .:/var/www
             - .docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
             - .docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+            - ./hls:/var/www/html/live  # <-- Добавлено: том с HLS
         depends_on:
             - php
-        
 
     ####################################################################################################
     # PostgreSQL
@@ -52,4 +53,17 @@ services:
             - PGADMIN_DEFAULT_PASSWORD=password
         depends_on:
             - db
-    
+
+    ###################################################################################################
+    # FFmpeg (RTSP to HLS)
+    ###################################################################################################
+    ffmpeg:
+        image: jrottenberg/ffmpeg:latest
+        command: >
+          -re -i rtsp://edwj:7rw5at@192.168.1.10:554/cam/realmonitor?channel=1&subtype=0
+          -c:v libx264 -preset ultrafast -tune zerolatency
+          -f hls -hls_time 2 -hls_list_size 5 -hls_flags delete_segments
+          /output/stream.m3u8
+        volumes:
+            - ./hls:/output
+        restart: always

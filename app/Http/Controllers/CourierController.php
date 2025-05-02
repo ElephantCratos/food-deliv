@@ -2,70 +2,66 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Enums\OrderStatus;
 use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
 
 class CourierController extends Controller
 {
+    // Список заказов для курьера
     public function showOrdersToCourier()
     {
-        $userId = Auth::user()->id;
-
-        $orders = Order::whereIn('status_id', [3, 4, 5, 6])
-            ->where(function ($query) use ($userId) {
-                $query->where('courier_id', $userId)
-                    ->orWhereNull('courier_id');
-            })
-            ->orderBy('id')
-            ->get();
-        foreach ($orders as $order) {
-            if ($order->expected_at === null) {
-                $order->expected_at = 'As soon as possible';
-            }
-        }
-
-        return view('Courier_Orders', compact('orders'));
+        $user = auth()->user();
+    
+        $orders = Order::where('courier_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->each(function ($order) {
+                $order->expected_at_formatted = $order->expected_at ?? 'As soon as possible';
+            });
+    
+        return view('Courier_Orders', [
+            'orders' => $orders,
+            'courier' => $user
+        ]);
     }
 
+    // Принять заказ
+    public function acceptOrder($id)
+    {
+        $order = Order::findOrFail($id);
+        
+        $order->update([
+            'status' => OrderStatus::COURIER_ON_THE_WAY->value
+        ]);
+
+        return back()->with('success', 'Заказ успешно принят');
+    }
+
+    // Подтвердить доставку
     public function confirmDelivery($id)
     {
-        $order = Order::find($id);
+        $order = Order::findOrFail($id);
 
-        if ($order) {
-            $order->status_id = 6;
-            $order->save();
+        $order->update([
+            'status' => OrderStatus::COMPLETED->value,
+        ]);
 
-            return redirect()->back()->with('success', 'Delivery confirmed successfully.');
-        }
-
-        return redirect()->back()->with('error', 'Order not found.');
+        return back()->with('success', 'Доставка подтверждена');
     }
 
-    public function orderHasDelivered($id)
+    // Отменить заказ
+    public function declineOrder(Order $order)
     {
-        $order = Order::find($id);
-
-        if ($order) {
-            $order->status_id = 7;
-            $order->save();
-
-            return redirect()->back()->with('success', 'Delivered');
+        if ($order->courier_id !== Auth::id()) {
+            return back()->with('error', 'Это не ваш заказ');
         }
 
-        return redirect()->back()->with('error', 'Order not found.');
-    }
+        $order->update([
+            'status' => OrderStatus::DECLINED->value,
+            'courier_id' => null
+        ]);
 
-    public function AcceptOrder($id)
-    {
-        $order = Order::find($id);
-
-        if ($order) {
-            $order->courier_id= Auth::user()->id;
-            $order->save();
-
-            return redirect()->back()->with('success', 'Заказ был закреплен за вами');
-        }
-            return redirect()->back()->with('success', 'Произошла ошибка');
+        return back()->with('success', 'Заказ отклонён');
     }
 }
