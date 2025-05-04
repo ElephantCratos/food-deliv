@@ -12,54 +12,59 @@ use Illuminate\Support\Facades\Auth;
 class OrderPositionController extends Controller
 {
     public function updateQuantity(Request $request, PromocodeService $promocodeService, $dishId)
-{
-    $request->validate([
-        'quantity' => 'required|integer|min:0',
-    ]);
+    {
+        $request->validate([
+            'quantity' => 'required|integer|min:0',
+        ]);
 
-    // 1. Получаем корзину и «сырой» промокод из сессии
-    $cart = session()->get('cart', []);
-    $promocode = session()->get('promocode'); 
+        // 1. Получаем корзину и промокод
+        $cart      = session()->get('cart', []);
+        $promoCode = session()->get('promocode');
 
-    $dishRemoved = false;
-    $itemTotal = 0;
+        $dishRemoved = false;
+        $itemTotal   = 0;
 
-    // 2. Обновляем количество или удаляем позицию
-    foreach ($cart as $key => &$item) {
-        if ($item['dish_id'] == $dishId) {
-            if ($request->quantity === 0) {
-                unset($cart[$key]);
-                $dishRemoved = true;
-            } else {
-                $item['quantity'] = $request->quantity;
-                $itemTotal = $item['price'] * $item['quantity'];
+        // 2. Обновляем количество или удаляем позицию
+        foreach ($cart as $key => &$item) {
+            if ($item['dish_id'] == $dishId) {
+                if ((int)$request->quantity === 0) {
+                    unset($cart[$key]);
+                    $dishRemoved = true;
+                } else {
+                    $item['quantity'] = (int)$request->quantity;
+                    $itemTotal        = $item['price'] * $item['quantity'];
+                }
+                break;
             }
-            break;
         }
+        session()->put('cart', $cart);
+
+        // 3. Считаем новый тотал
+        $total = collect($cart)->sum(fn($i) => $i['price'] * $i['quantity']);
+
+        // 4. Применяем промокод, если есть
+        $discountAmount    = 0;
+        $totalWithDiscount = $total;
+        if ($promoCode) {
+            $promo = $promocodeService->validate($promoCode);
+            if ($promo) {
+                // apply возвращает итоговую сумму после скидки
+                $totalWithDiscount = $promocodeService->apply($promo, $total);
+                $discountAmount    = $total - $totalWithDiscount;
+            }
+        }
+
+        // 5. Возвращаем ответ
+        return response()->json([
+            'success'           => true,
+            'dishRemoved'       => $dishRemoved,
+            'itemTotal'         => $itemTotal,
+            'total'             => $total,
+            'discountAmount'    => $discountAmount,
+            'totalWithDiscount' => $totalWithDiscount,
+            'cartCount'         => collect($cart)->sum('quantity'),
+        ]);
     }
-    session()->put('cart', $cart);
-
-  
-    $total = collect($cart)->sum(fn($i) => $i['price'] * $i['quantity']);
-
-    if (session('promocode')) {
-            $totalWithDiscount = $promocodeService->apply($promocode, $total);
-            $discountAmount = $total - $totalWithDiscount;
-    }
-
-
-    $totalWithDiscount = $total - $discountAmount;
-
-    return response()->json([
-        'success'           => true,
-        'dishRemoved'       => $dishRemoved,
-        'itemTotal'         => $itemTotal,
-        'total'             => $total,
-        'discountAmount'    => $discountAmount,
-        'totalWithDiscount' => $totalWithDiscount,
-        'cartCount'         => collect($cart)->sum('quantity'),
-    ]);
-}
 
     
 

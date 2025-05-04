@@ -42,13 +42,14 @@ class DishController extends Controller
 
     public function store(Request $request)
     {
+       
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
             'price' => 'required|numeric|min:0',
             'category_id' => 'required|exists:categories,id'
         ]);
-
+       
         $imagePath = $this->handleImageUpload($request->file('image_path'));
 
         Dish::create([
@@ -108,7 +109,7 @@ class DishController extends Controller
             return null;
         }
 
-        $path = 'images/' . time() . '.' . $imageFile->getClientOriginalExtension();
+        $path = 'Images/' . time() . '.' . $imageFile->getClientOriginalExtension();
         $imageFile->move(public_path('images'), $path);
         
         return $path;

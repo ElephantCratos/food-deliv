@@ -39,6 +39,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     ->name('cart.remove-promocode');
     Route::post('/cart/update/{dish}', [OrderPositionController::class, 'updateQuantity'])->name('cart.update');
     Route::post('send_cart', [OrderController::class, 'sendOrder'])->name('send_order');
+    Route::patch('/cart/positions/{id}/quantity', [OrderPositionController::class, 'updateQuantity'])->name('cart.positions.updateQuantity');
 
     Route::middleware(['can:access to kitchen panel'])->group(function () {
         Route::get('/Kitchen_Orders', [KitchenController::class, 'showOrdersToKitchen'])->name('Kitchen_Orders');

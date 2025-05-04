@@ -5,6 +5,35 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 @endsection
 
+<style>
+    .toggle {
+        position: relative;
+        width: 60px;
+        height: 30px;
+        background: #e2e8f0;
+        border-radius: 9999px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+    .toggle::before {
+        content: '';
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        top: 3px;
+        left: 3px;
+        background: white;
+        border-radius: 50%;
+        transition: left 0.3s ease;
+    }
+    .toggle.active {
+        background: #48bb78;
+    }
+    .toggle.active::before {
+        left: 33px;
+    }
+</style>
+
 @section('title', config('app.name', 'Laravel'))
 
 @section('content')
@@ -13,50 +42,54 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Левый блок: форма -->
         <div class="md:col-span-2 space-y-6">
-            <form action="{{ route('send_order') }}" method="POST" class="space-y-4">
+            <form action="{{ route('send_order') }}" method="POST" class="space-y-4" id="orderForm">
                 @csrf
 
+                <!-- самовывоз / доставка -->
                 <div class="flex items-center space-x-4">
                     <span class="font-medium">Самовывоз</span>
                     <div id="pickupToggle" class="toggle"></div>
                     <span class="font-medium">Доставка</span>
                 </div>
 
-                <div id="adressField">
-                    <label for="adress" class="block font-medium mb-1">Адрес доставки</label>
+                <!-- адрес -->
+                <div id="adressField" class="@error('adress') border-red-500 @enderror">
+                    <label for="adressInput" class="block font-medium mb-1">Адрес доставки</label>
                     <input type="text" name="adress" id="adressInput"
-                           class="w-full p-2 border border-gray-300 rounded-lg" required>
+                           class="w-full p-2 border border-gray-300 rounded-lg @error('adress') border-red-500 @enderror"
+                           value="{{ old('adress') }}" required>
+                    @error('adress')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
                 </div>
 
+                <!-- инфо самовывоза -->
                 <div id="pickupInfo" class="hidden p-4 bg-gray-100 rounded-lg">
-                    <p class="text-sm text-gray-700">Забирайте свой сочный шашлычок здесь, ЙОУ:</p>
+                    <p class="text-sm text-gray-700">Забирайте свой сочный шашлычок здесь:</p>
                     <p class="font-bold mt-1">Ул. Ленина д.3, 0 этаж</p>
                 </div>
 
+                <!-- hidden fast_value -->
+                <input type="hidden" name="fast_value" id="fast_value" value="{{ old('fast_value','1') }}">
+
+                <!-- выбор времени -->
                 <div>
-                    <label class="block font-medium mb-1">Время доставки</label>
-                    <div class="flex flex-wrap gap-2">
-                        <label class="flex items-center space-x-2">
-                            <input type="radio" name="time" value="09:00 - 09:30" class="form-radio" checked>
-                            <span>09:00 - 09:30</span>
-                        </label>
-                        <label class="flex items-center space-x-2">
-                            <input type="radio" name="time" value="09:30 - 10:00" class="form-radio">
-                            <span>09:30 - 10:00</span>
-                        </label>
-                        <label class="flex items-center space-x-2">
-                            <input type="radio" name="time" value="other" class="form-radio">
-                            <span>Другое время</span>
-                        </label>
-                    </div>
+                    <label for="time" class="block font-medium mb-1">Время доставки</label>
+                    <select name="time" id="time" class="w-full p-2 border border-gray-300 rounded-lg @error('time') border-red-500 @enderror">
+                        <option value="null" {{ old('time','null') === 'null' ? 'selected' : '' }}>Не выбрано</option>
+                        @foreach($timeSlots as $slot)
+                            <option value="{{ $slot }}" {{ old('time') === $slot ? 'selected' : '' }}>{{ $slot }}</option>
+                        @endforeach
+                    </select>
+                    @error('time')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
                 </div>
 
+                <!-- комментарий -->
                 <div>
                     <label for="comment" class="block font-medium mb-1">Комментарий к заказу</label>
-                    <textarea name="comment" id="comment"
-                              class="w-full p-2 border border-gray-300 rounded-lg"></textarea>
+                    <textarea name="comment" id="comment" class="w-full p-2 border border-gray-300 rounded-lg @error('comment') border-red-500 @enderror" rows="3">{{ old('comment') }}</textarea>
+                    @error('comment')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
                 </div>
 
+                <!-- промокод -->
                 <div id="promoSection">
                     @if($promocode)
                         <div class="flex justify-between items-center p-3 rounded-lg mb-3 bg-gray-50">
@@ -64,47 +97,37 @@
                                 <span class="font-medium">Промокод:</span>
                                 <span class="text-green-600">{{ $promocode->code }}</span>
                                 <span class="px-2 py-1 bg-green-100 text-green-800 text-sm rounded-lg">
-                                    {{ $promocode->type === 'percent'
-                                        ? $promocode->discount.'%'
-                                        : $promocode->discount.'₽' }}
+                                    {{ $promocode->type === 'percent' ? $promocode->discount.'%' : $promocode->discount.'₽' }}
                                 </span>
                                 <span class="text-green-600">Скидка: {{ $discountAmount }}₽</span>
                             </div>
-                            <button type="button" id="removePromocode"
-                                    class="text-red-500 hover:text-red-700 font-medium text-sm">
-                                Удалить
-                            </button>
+                            <button type="button" id="removePromocode" class="text-red-500 hover:text-red-700 font-medium text-sm">Удалить</button>
                         </div>
                     @else
                         <div>
                             <label class="block font-medium mb-1">Промокод</label>
                             <div class="flex space-x-2">
-                                <input type="text" id="promocodeInput"
-                                       class="flex-1 p-2 border border-gray-300 rounded-lg"
-                                       placeholder="Введите промокод">
-                                <button type="button" onclick="applyPromocode()"
-                                        class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg">
-                                    Применить
-                                </button>
+                                <input type="text" id="promocodeInput" class="flex-1 p-2 border border-gray-300 rounded-lg" placeholder="Введите промокод">
+                                <button type="button" onclick="applyPromocode()" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg">Применить</button>
                             </div>
                         </div>
                     @endif
                 </div>
 
+                <!-- способ оплаты -->
                 <div>
-                    <label class="block font-medium mb-1">Способ оплаты</label>
-                    <select name="payment" class="w-full p-2 border border-gray-300 rounded-lg">
-                        <option value="card_online">Картой на сайте</option>
-                        <option value="card_courier">Картой курьеру</option>
-                        <option value="cash">Наличными</option>
+                    <label for="payment" class="block font-medium mb-1">Способ оплаты</label>
+                    <select name="payment" id="payment" class="w-full p-2 border border-gray-300 rounded-lg @error('payment') border-red-500 @enderror">
+                        <option value="card_online" {{ old('payment')==='card_online'?'selected':'' }}>Картой на сайте</option>
+                        <option value="card_courier" {{ old('payment')==='card_courier'?'selected':'' }}>Картой курьеру</option>
+                        <option value="cash" {{ old('payment')==='cash'?'selected':'' }}>Наличными</option>
                     </select>
+                    @error('payment')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
                 </div>
 
+                <!-- кнопка отправки -->
                 <div class="mt-6 flex justify-between">
-                    <button type="submit"
-                            class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg">
-                        Оформить заказ
-                    </button>
+                    <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg">Оформить заказ</button>
                 </div>
             </form>
         </div>
@@ -113,22 +136,17 @@
         <div class="bg-white p-6 rounded-lg shadow-md space-y-4">
             <h2 class="text-xl font-bold">Состав заказа</h2>
             <div id="cartItems" class="space-y-2">
-                @forelse ($positions as $position)
-                    <div class="flex justify-between items-center border-b pb-2 cart-item"
-                         data-id="{{ $position->dish->id }}">
+                @forelse($positions as $pos)
+                    <div class="flex justify-between items-center border-b pb-2 cart-item" data-id="{{ $pos->dish->id }}">
                         <div class="flex-1">
-                            <span class="font-medium">{{ $position->dish->name }}</span>
-                            <span class="text-gray-500 text-sm">x{{ $position->quantity }}</span>
+                            <span class="font-medium">{{ $pos->dish->name }}</span>
+                            <span class="text-gray-500 text-sm" id="qty-{{ $pos->dish->id }}">x{{ $pos->quantity }}</span>
                         </div>
                         <div class="flex space-x-1 mx-4">
-                            <button class="quantity-btn w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded text-sm font-bold"
-                                    data-id="{{ $position->dish->id }}" data-action="increase">+</button>
-                            <button class="quantity-btn w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded text-sm font-bold"
-                                    data-id="{{ $position->dish->id }}" data-action="decrease">−</button>
+                            <button type="button" class="quantity-btn w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded text-sm font-bold" data-id="{{ $pos->dish->id }}" data-action="increase">+</button>
+                            <button type="button" class="quantity-btn w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded text-sm font-bold" data-id="{{ $pos->dish->id }}" data-action="decrease">−</button>
                         </div>
-                        <div class="w-16 text-right font-medium whitespace-nowrap item-total">
-                            {{ $position->price * $position->quantity }} ₽
-                        </div>
+                        <div class="w-16 text-right font-medium whitespace-nowrap item-total" id="total-{{ $pos->dish->id }}">{{ $pos->price * $pos->quantity }} ₽</div>
                     </div>
                 @empty
                     <p class="text-gray-500">Ваша корзина пуста.</p>
@@ -139,50 +157,50 @@
                         <span>Итого:</span>
                         <span id="cart-total">{{ $totalWithDiscount }} ₽</span>
                     </div>
-                    @if($discountAmount > 0)
-                        <div class="promo-card text-sm text-green-600 mt-1" id="promoCard">
-                            Скидка по промокоду: −{{ $discountAmount }} ₽
-                        </div>
-                    @endif
+                    <div id="summary-discount" class="text-sm text-green-600 mt-1" style="{{ $discountAmount>0?'':'display:none' }}">
+                        Скидка по промокоду: −{{ $discountAmount }} ₽
+                    </div>
                 @endif
+
             </div>
         </div>
     </div>
 </div>
 
-{{-- Скрипты внизу, сразу после контента --}}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // Toggle pickup/delivery
+    // переключатель самовывоз/доставка
     const toggle = document.getElementById('pickupToggle');
     const addressField = document.getElementById('adressField');
     const pickupInfo = document.getElementById('pickupInfo');
     const adressInput = document.getElementById('adressInput');
-
     toggle.addEventListener('click', () => {
         toggle.classList.toggle('active');
-        if (toggle.classList.contains('active')) {
-            addressField.classList.add('hidden');
-            pickupInfo.classList.remove('hidden');
-            adressInput.value = 'ул. Пушкина, д. Колотушкина';
-        } else {
-            addressField.classList.remove('hidden');
-            pickupInfo.classList.add('hidden');
-            adressInput.value = '';
-        }
+        addressField.classList.toggle('hidden');
+        pickupInfo.classList.toggle('hidden');
+        adressInput.value = toggle.classList.contains('active') ? 'ул. Пушкина, д. Колотушкина' : '';
     });
 
-    // Quantity buttons
-    document.querySelectorAll('.quantity-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const dishId = this.dataset.id;
-            const action = this.dataset.action;
-            const cartItem = this.closest('.cart-item');
-            const quantitySpan = cartItem.querySelector('.text-gray-500');
-            let qty = parseInt(quantitySpan.innerText.replace('x',''), 10);
-            qty = action === 'increase' ? qty + 1 : Math.max(0, qty - 1);
+    // обработка изменения времени
+    const timeSelect = document.getElementById('time');
+    const fastValue = document.getElementById('fast_value');
+    if (timeSelect) {
+        fastValue.value = timeSelect.value === 'null' ? '1' : '0';
+        timeSelect.addEventListener('change', () => {
+            fastValue.value = timeSelect.value === 'null' ? '1' : '0';
+        });
+    }
 
-            fetch(`/cart/update/${dishId}`, {
+    // кнопки изменения количества
+    document.querySelectorAll('.quantity-btn').forEach(btn => {
+        btn.addEventListener('click', e => {
+            e.preventDefault();
+            const id = btn.dataset.id;
+            const action = btn.dataset.action;
+            const qtyEl = document.getElementById(`qty-${id}`);
+            let qty = parseInt(qtyEl.textContent.replace('x', ''), 10);
+            qty = action === 'increase' ? qty + 1 : Math.max(0, qty - 1);
+            fetch(`/cart/update/${id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -193,41 +211,29 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(r => r.json())
             .then(data => {
                 if (!data.success) return;
-
                 if (data.dishRemoved) {
-                    cartItem.remove();
-                    if (!document.querySelector('.cart-item')) {
-                        document.getElementById('cartItems').innerHTML =
-                            '<p class="text-gray-500">Ваша корзина пуста.</p>';
-                    }
+                    document.querySelector(`.cart-item[data-id="${id}"]`).remove();
                 } else {
-                    quantitySpan.innerText = 'x' + qty;
-                    cartItem.querySelector('.item-total').textContent =
-                        data.itemTotal + ' ₽';
+                    qtyEl.textContent = 'x' + qty;
+                    document.getElementById(`total-${id}`).textContent = data.itemTotal + ' ₽';
                 }
-
-                // Обновляем итоговую сумму
-                document.getElementById('cart-total').textContent =
-                    data.totalWithDiscount + ' ₽';
-
-                // Обновляем текст скидки
-                const promoText = document.querySelector(
-                    '#promoSection .text-green-600:last-child'
-                );
-                const promoTextCard = document.getElementById('promoCard');
-                if (promoText) {
-                    promoText.textContent = 'Скидка: ' + data.discountAmount + '₽';
-                    promoTextCard.textContent = 'Скидка по промокоду: -' + data.discountAmount + '₽';
+                document.getElementById('cart-total').textContent = data.totalWithDiscount + ' ₽';
+                if (data.discountAmount !== undefined) {
+                    const discEl = document.querySelector('#promoSection .text-green-600:last-child');
+                    if (discEl) discEl.textContent = 'Скидка: ' + data.discountAmount + '₽';
                 }
-
-                // Счётчик в шапке
-                const cartCountEl = document.querySelector('.cart-count');
-                if (cartCountEl) cartCountEl.textContent = data.cartCount;
+                const summaryDisc = document.getElementById('summary-discount');
+                if (data.discountAmount > 0) {
+                    summaryDisc.style.display = 'block';
+                    summaryDisc.textContent = 'Скидка по промокоду: −' + data.discountAmount + ' ₽';
+                } else {
+                    summaryDisc.style.display = 'none';
+                }
             });
         });
     });
 
-    // Применение промокода
+    // промокод
     window.applyPromocode = () => {
         const code = document.getElementById('promocodeInput').value.trim();
         if (!code) return alert('Введите промокод');
@@ -243,8 +249,6 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(d => d.success ? location.reload() : alert('Ошибка применения промокода'))
         .catch(() => alert('Ошибка соединения с сервером'));
     };
-
-    // Удаление промокода
     document.getElementById('removePromocode')?.addEventListener('click', () => {
         fetch('{{ route('cart.remove-promocode') }}', {
             method: 'POST',
