@@ -40,6 +40,24 @@
                     </x-nav-link>
                 @endcan
 
+                @can('access to manager panel')
+                    <x-nav-link :href="route('user-management.index')" :active="request()->routeIs('user-management.index')"> 
+                        {{ __('Добавление менеджера/курьера') }} 
+                    </x-nav-link>
+                @endcan
+
+                @can('access to manager panel')
+                    <x-nav-link :href="route('Manager_Promocodes')" :active="request()->routeIs('Manager_Promocodes')"> 
+                        {{ __('Промокоды') }} 
+                    </x-nav-link>
+                @endcan
+
+                @can('access to manager panel')
+                    <x-nav-link :href="route('chats.index')" :active="request()->routeIs('chats.index')"> 
+                        {{ __('Чат поддержки') }} 
+                    </x-nav-link>
+                @endcan                
+
 
             <!-- Настройки пользователя -->
             <div class="hidden sm:flex items-center space-x-4">

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PromocodeController;
 use App\Http\Controllers\CourierAssignmentController;
 use App\Http\Controllers\CameraController;
+use App\Http\Controllers\UserManagementController;
 
 
 Route::get('/', function () {
@@ -22,7 +23,12 @@ Route::get('/', function () {
 //    return view('catalog');
 //});
 
-
+Route::middleware(['auth', 'can:access to manager panel'])->group(function () {
+    Route::get('/user-management', [UserManagementController::class, 'index'])->name('user-management.index');
+    Route::get('/user-management/create', [UserManagementController::class, 'create'])->name('user-management.create');
+    Route::post('/user-management', [UserManagementController::class, 'store'])->name('user-management.store');
+    Route::delete('/user-management/{user}', [UserManagementController::class, 'destroy'])->name('user-management.destroy');
+});
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
