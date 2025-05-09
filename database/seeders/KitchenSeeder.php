@@ -26,6 +26,7 @@ class KitchenSeeder extends Seeder
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
             'email_verified_at' => Carbon::now(),
+            'phone' => '+79900199422', // Добавьте сюда номер телефона
         ]);
 
         $kitchenRole = Role::create([

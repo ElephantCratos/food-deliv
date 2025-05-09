@@ -25,6 +25,7 @@ class CourierSeeder extends Seeder
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
             'email_verified_at' => Carbon::now(),
+            'phone' => '+79900199488', // Добавьте сюда номер телефона
         ]);
 
         $courierRole = Role::create([

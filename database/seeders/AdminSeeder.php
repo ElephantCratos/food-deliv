@@ -26,6 +26,7 @@ class AdminSeeder extends Seeder
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
             'email_verified_at' => Carbon::now(),
+            'phone' => '+79900199415', // Добавьте сюда номер телефона
         ]);
 
         $superAdminRole = Role::create([

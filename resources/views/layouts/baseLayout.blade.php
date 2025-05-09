@@ -14,7 +14,6 @@
         {{-- Верхняя навигация --}}
         <div class="container mx-auto px-4 lg:px-8 py-2 flex flex-wrap justify-between items-center text-sm text-gray-800">
             <div class="flex items-center gap-4 flex-wrap">
-                <a href="{{ route('kitchen.camera') }}" class="text-red-600 font-semibold hover:underline">🔴 Кухня LIVE</a>
                 <a href="#" class="hover:underline">О нас</a>
                 <a href="#" class="hover:underline">Контакты</a>
                 <a href="#" class="hover:underline">Корпоративные заказы</a>
@@ -24,14 +23,15 @@
         {{-- Основной блок шапки --}}
     <header class="sticky top-0 z-50 bg-white shadow-sm border-b">
         <div class="container mx-auto px-4 lg:px-8 py-4 flex flex-col lg:flex-row justify-between items-center gap-4 lg:gap-12">
-            {{-- Логотип и описание --}}
-            <div class="flex items-center gap-4 min-w-0">
-                <div class="text-5xl lg:text-6xl">🔥</div>
-                <div class="min-w-0">
-                    <h1 class="text-xl lg:text-2xl font-extrabold uppercase leading-5 tracking-wide whitespace-nowrap">ШАШЛЫЧНЫЙ ДВОР</h1>
-                    <p class="text-sm lg:text-base text-red-500 font-medium">Лучшее мясо в г. Нягань</p>
-                </div>
+        {{-- Логотип и описание --}}
+        <a href="{{ route('catalog') }}" class="flex items-center gap-4 min-w-0">
+            <div class="text-5xl lg:text-6xl">🔥</div>
+            <div class="min-w-0">
+                <h1 class="text-xl lg:text-2xl font-extrabold uppercase leading-5 tracking-wide whitespace-nowrap">ШАШЛЫЧНЫЙ ДВОР</h1>
+                <p class="text-sm lg:text-base text-red-500 font-medium">Лучшее мясо в г. Нягань</p>
             </div>
+        </a>
+
 
             {{-- Инфо о доставке --}}
             <div class="text-center lg:text-left text-sm lg:text-base">
@@ -46,10 +46,10 @@
                     <div class="text-2xl lg:text-3xl">🎧</div>
                     <span class="mt-1">Поддержка</span>
                 </a>
-                <a href="#"
+                <a href="{{ route('catalog') }}"
                    class="flex flex-col items-center hover:text-red-600 transition">
-                    <div class="text-2xl lg:text-3xl">🎟️</div>
-                    <span class="mt-1">Мои акции</span>
+                    <div class="text-2xl lg:text-3xl">🍖</div>
+                    <span class="mt-1">Каталог</span>
 
                 </a>
                 <a href="{{ route('profile_custom') }}"
