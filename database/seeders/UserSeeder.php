@@ -26,6 +26,7 @@ class UserSeeder extends Seeder
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
             'email_verified_at' => Carbon::now(),
+            'phone' => '+79900199412', // Добавьте сюда номер телефона
         ]);
 
         $userRole = Role::create([

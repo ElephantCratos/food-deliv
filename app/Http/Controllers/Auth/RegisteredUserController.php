@@ -29,28 +29,36 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        // Добавлена валидация, чтобы гарантировать правильный формат номера телефона
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'first_name' => ['required' , 'string', 'max:30'],
-            'second_name' => ['required' ,'string', 'max:30'],
+            'first_name' => ['required', 'string', 'max:30'],
+            'second_name' => ['required', 'string', 'max:30'],
+            'phone' => ['required', 'string', 'regex:/^\+?\d{1,4}?[\d\s\-\(\)]{3,20}$/'], // Валидация для телефона
         ]);
 
+        // Создание нового пользователя
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'first_name' => $request->first_name,
             'second_name' => $request->second_name,
+            'phone' => $request->phone,  // Сохраняем номер телефона
         ]);
 
-        $user -> assignRole('user');
+        // Присваиваем роль пользователю
+        $user->assignRole('user');
 
+        // Генерируем событие для регистрации
         event(new Registered($user));
 
+        // Логиним пользователя
         Auth::login($user);
 
+        // Перенаправляем на страницу с информацией о пользователе
         return redirect(route('dashboard', absolute: false));
     }
 }

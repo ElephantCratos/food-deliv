@@ -10,7 +10,7 @@
 
             <!-- Навигация -->
             <div class="hidden sm:flex space-x-6">
-                @can('access to user panel')
+                @can('access to manager panel')
                     <x-nav-link :href="route('Customer_Orders')" :active="request()->routeIs('Customer_Orders')">
                         {{ __('Заказы') }}
                     </x-nav-link>
