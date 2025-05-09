@@ -14,30 +14,50 @@ class ChatController extends Controller
     // Единый пользователь-саппорт
     public const SUPPORT_USER_ID = 2;
 
-    /** Список клиентов (не себя и не саппорт) */
     public function index()
     {
-        $me = Auth::id();
-
+        $supportId = self::SUPPORT_USER_ID;
+    
         $users = User::whereHas('roles', fn($q) => $q->where('name', 'user'))
-                     ->where('id', '<>', $me)
+                     ->whereHas('chats', fn($q) =>
+                         $q->where(function ($query) use ($supportId) {
+                             $query->where('user_1_id', $supportId)
+                                   ->orWhere('user_2_id', $supportId);
+                         })
+                     )
+                     ->with(['chats' => function ($q) use ($supportId) {
+                         $q->where(function ($query) use ($supportId) {
+                             $query->where('user_1_id', $supportId)
+                                   ->orWhere('user_2_id', $supportId);
+                         })->with('users');
+                     }, 'roles'])
                      ->get();
-
+    
+        foreach ($users as $user) {
+            $chat = $user->chats->first(); 
+    
+            $pivot = $chat->users->firstWhere('id', $supportId)?->pivot;
+            $lastRead = optional($pivot)->last_read_at ?? now()->subYears(10);
+    
+            $user->unread_count = $chat->messages()
+                ->where('sender_id', $user->id) 
+                ->where('created_at', '>', $lastRead)
+                ->count();
+        }
+    
         return view('custom_components.user-list', compact('users'));
     }
+    
 
-    /** Открыть или создать чат между мной и другим */
     public function openChat(int $otherUserId)
     {
         $me = Auth::user();
         $other = User::findOrFail($otherUserId);
 
-        // Клиенты могут писать ТОЛЬКО саппорту
         if (! $me->hasRole('support') && ! $other->hasRole('support')) {
             abort(403, 'Клиенты могут писать только в поддержку');
         }
 
-        // Определяем пару ID: всегда один из них — SUPPORT_USER_ID
         $clientId  = $me->hasRole('support') ? $other->id : $me->id;
         $supportId = self::SUPPORT_USER_ID;
 
@@ -50,7 +70,6 @@ class ChatController extends Controller
             'user_2_id' => $u2,
         ]);
 
-        // Привязываем участников
         $chat->users()->syncWithoutDetaching([
             $me->id,
             $other->id,
@@ -64,49 +83,41 @@ class ChatController extends Controller
     public function show(Chat $chat)
     {
         $me = Auth::user();
-
-        // Проверяем, что я привязан к этому чату
-        $checkingUserId = $me->hasRole('support')
-            ? self::SUPPORT_USER_ID
-            : $me->id;
-
-        if (! $chat->users->contains(fn($u) => $u->id === $checkingUserId)) {
+    
+        $readerId = $me->hasRole('support') ? self::SUPPORT_USER_ID : $me->id;
+    
+        if (! $chat->users->contains(fn($u) => $u->id === $readerId)) {
             abort(403, 'Доступ запрещён');
         }
-
-        // Помечаем как прочитанное
+    
         $chat->users()->updateExistingPivot(
-            $me->id,
+            $readerId,
             ['last_read_at' => Carbon::now()]
         );
-
-        // Загружаем все сообщения
+    
         $messages = $chat->messages()
-                         ->with('sender.roles') // не нужен operator
+                         ->with('sender.roles')
                          ->orderBy('created_at')
                          ->get();
-
-        // Определяем второго участника (клиента)
-        $otherUserId = $chat->user_1_id === $checkingUserId
+    
+        $otherUserId = $chat->user_1_id === $readerId
             ? $chat->user_2_id
             : $chat->user_1_id;
-
+    
         $otherUser = User::findOrFail($otherUserId);
-
+    
         return view('custom_components.dialogue', compact('chat', 'messages'))
             ->with('client', $otherUser);
     }
+    
 
     public function send(Request $request, Chat $chat)
 {
     $me = Auth::user();
-
-    // Кто я в контексте чата?
     $isSupport = $me->hasRole('support');
     $senderId  = $isSupport ? self::SUPPORT_USER_ID : $me->id;
     $operatorId = $isSupport ? $me->id : null;
 
-    // Проверка доступа
     $checkingUserId = $isSupport ? self::SUPPORT_USER_ID : $me->id;
     if (!$chat->users->contains(fn($u) => $u->id === $checkingUserId)) {
         abort(403, 'Доступ запрещён');
@@ -114,7 +125,6 @@ class ChatController extends Controller
 
     $request->validate(['content' => 'required|string|max:2000']);
 
-    // Получатель — тот, кто не senderId (а не обязательно client!)
     $receiverId = ($chat->user_1_id === $senderId)
         ? $chat->user_2_id
         : $chat->user_1_id;
