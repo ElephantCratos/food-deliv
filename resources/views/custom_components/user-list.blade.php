@@ -39,12 +39,20 @@
                         <li class="user-item mb-4" data-roles="{{ $user->roles->pluck('name')->implode(',') }}">
                             <a
                               href="{{ route('chats.open', $user->id) }}"
-                              class="bg-white hover:bg-gray-300 rounded-lg py-2 px-4 ml-4 flex items-center border border-gray"
+                              class="bg-white hover:bg-gray-300 rounded-lg py-2 px-4 ml-4 flex items-center justify-between border border-gray"
                             >
-                                <span class="mr-3">{{ $user->name }}</span>
-                                <span class="text-sm text-gray-500">
-                                    {{ $user->roles->pluck('name')->implode(', ') }}
-                                </span>
+                                <div>
+                                    <span class="mr-3 font-semibold">{{ $user->name }}</span>
+                                    <span class="text-sm text-gray-500">
+                                        {{ $user->roles->pluck('name')->implode(', ') }}
+                                    </span>
+                                </div>
+
+                                @if (!empty($user->unread_count) && $user->unread_count > 0)
+                                    <span class="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                                        {{ $user->unread_count }}
+                                    </span>
+                                @endif
                             </a>
                         </li>
                     @endforeach

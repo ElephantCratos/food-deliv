@@ -13,6 +13,7 @@ use App\Http\Controllers\PromocodeController;
 use App\Http\Controllers\CourierAssignmentController;
 use App\Http\Controllers\CameraController;
 use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\UserProfileController;
 
 
 Route::get('/', function () {
@@ -22,6 +23,8 @@ Route::get('/', function () {
 //Route::get('/catalog', function () {
 //    return view('catalog');
 //});
+
+Route::get('/profile/custom', [UserProfileController::class, 'index'])->name('profile_custom');
 
 Route::middleware(['auth', 'can:access to manager panel'])->group(function () {
     Route::get('/user-management', [UserManagementController::class, 'index'])->name('user-management.index');

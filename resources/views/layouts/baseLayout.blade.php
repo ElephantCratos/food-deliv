@@ -52,7 +52,7 @@
                     <span class="mt-1">Мои акции</span>
 
                 </a>
-                <a href="{{ route('profile.edit') }}"
+                <a href="{{ route('profile_custom') }}"
                    class="flex flex-col items-center hover:text-red-600 transition">
                     <div class="text-2xl lg:text-3xl">👤</div>
                     <span class="mt-1">Профиль</span>
