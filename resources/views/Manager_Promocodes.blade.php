@@ -1,4 +1,5 @@
 <x-app-layout>
+<div class="pt-24 pb-12">
     <div class="container mx-auto p-4">
         <h1 class="text-2xl font-bold mb-4">Управление промокодами</h1>
         
@@ -36,5 +37,6 @@
                 @endforeach
             </tbody>
         </table>
+    </div>
     </div>
 </x-app-layout>
