@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('category_id');
             $table->decimal('price', 10, 2);
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('order_position', function (Blueprint $table) {

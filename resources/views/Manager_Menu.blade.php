@@ -1,5 +1,5 @@
 <x-app-layout>
-
+<div class="pt-24 pb-12">
             <!-- Основной контент -->
             <div class="bg-white p-6 rounded-lg shadow-md overflow-x-auto py-10">
                 <h1 class="text-3xl font-bold mb-6">Список блюд</h1>
@@ -48,4 +48,5 @@
             </div>
         </div>
     </div>
+</div>
 </x-app-layout>

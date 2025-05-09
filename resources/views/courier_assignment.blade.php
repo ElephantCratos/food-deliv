@@ -10,13 +10,13 @@
             @if ($orders->isEmpty())
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 bg-white border-b border-gray-200">
-                        <p>No orders available for courier assignment.</p>
+                        <p>Нет заказов для назначения курьеру.</p>
                     </div>
                 </div>
             @else
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
                     <div class="p-6 bg-white border-b border-gray-200">
-                        <h3 class="font-semibold text-lg mb-4">Available Couriers</h3>
+                        <h3 class="font-semibold text-lg mb-4">Доступные курьеры</h3>
                         <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             @foreach($couriers as $courier)
                             <li class="p-4 border rounded-lg">
@@ -33,8 +33,8 @@
                     <div class="p-6 bg-white border-b border-gray-200">
                         <div class="flex justify-between items-start">
                             <div>
-                                <h3 class="font-semibold text-lg">Order #{{ $order->id }}</h3>
-                                <p class="text-gray-600">Status: {{ $order->status->label()}}</p>
+                                <h3 class="font-semibold text-lg">Заказ #{{ $order->id }}</h3>
+                                <p class="text-gray-600">Статус: {{ $order->status->toRussian()}}</p>
                             </div>
                             <span class="text-sm text-gray-500">
                                 {{ $order->created_at->format('d.m.Y H:i') }}
@@ -42,12 +42,12 @@
                         </div>
 
                         <div class="mt-4">
-                            <h4 class="font-semibold mb-2">Items:</h4>
+                            <h4 class="font-semibold mb-2">Состав заказа:</h4>
                             <ul class="divide-y divide-gray-200">
                                 @foreach($order->positions as $position)
                                 <li class="py-2 flex justify-between">
                                     <span>{{ $position->dish->name }} x{{ $position->quantity }}</span>
-                                    <span>${{ number_format($position->price * $position->quantity, 2) }}</span>
+                                    <span>{{ number_format($position->price * $position->quantity, 2) }}₽</span>
                                 </li>
                                 @endforeach
                             </ul>
@@ -55,14 +55,14 @@
 
                         <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <p>Address: {{ $order->address }}</p>
-                                <p>Expected: {{ $order->expected_at ?? 'ASAP' }}</p>
-                                <p>Courier: {{ $order->courier_id}}</p>
+                                <p>Адрес: {{ $order->address }}</p>
+                                <p>Доставить к: {{ $order->expected_at ?? 'ASAP' }}</p>
+                                <p>Курьер: {{ $order->courier->name}}</p>
                             </div>
                             
                             <div>
                                 @if($order->courier)
-                                <p class="font-semibold">Current Courier:</p>
+                                <p class="font-semibold">Назначен в данный момент:</p>
                                 <p>{{ $order->courier->name }}</p>
                                 @endif
 
@@ -70,7 +70,7 @@
                                     @csrf
                                     <div class="flex gap-2">
                                         <select name="courier_id" class="rounded-md border-gray-300 shadow-sm">
-                                            <option value="">Select Courier</option>
+                                            <option value="">Выбрать курьера</option>
                                             @foreach($couriers as $courier)
                                             <option value="{{ $courier->id }}" {{ $order->courier_id == $courier->id ? 'selected' : '' }}>
                                                 {{ $courier->name }}
@@ -80,7 +80,7 @@
                                         <button type="submit" 
                                                 class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                                                 aria-label="Assign courier to order #{{ $order->id }}">
-                                            Assign
+                                            Назначить
                                         </button>
                                     </div>
                                 </form>

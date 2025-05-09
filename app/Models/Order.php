@@ -32,6 +32,11 @@ class Order extends Model
         return $this->belongsToMany(OrderPosition::class);
     }
 
+    public function courier()
+    {
+        return $this->belongsTo(User::class, 'courier_id');
+    }
+
     public function promocode()
     {
         return $this->belongsTo(Promocode::class);
@@ -56,7 +61,7 @@ class Order extends Model
     // Форматирование даты
     public function getExpectedAtFormattedAttribute(): string
     {
-        return $this->expected_at ?? 'As soon as possible';
+        return $this->expected_at ?? 'Как можно скорее';
     }
 
     // Проверка, можно ли принять заказ

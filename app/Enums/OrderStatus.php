@@ -23,6 +23,18 @@ enum OrderStatus: int
         };
     }
 
+    public function toRussian() : string
+    {
+        return match($this) { 
+            self::IN_PROGRESS => 'В процессе',
+            self::IN_KITCHEN => 'На кухне',
+            self::WAITING_FOR_COURIER => 'Ожидает курьера',
+            self::COURIER_ON_THE_WAY => 'Курьер в пути',
+            self::COMPLETED => 'Выполнено',
+            self::DECLINED => 'Отклонено',
+        };
+    }
+
     public static function values(): array
     {
         return array_column(self::cases(), 'value');

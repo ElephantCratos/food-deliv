@@ -104,11 +104,11 @@ Route::post('/chats/{chat}/send', [ChatController::class, 'send'])
 
         Route::get('/Edit_menu',[CategoryController::class, 'showCategoriesToCustomer'])->name('Edit_menu');
 
-        Route::get('/dish/{id}/edit', [DishController::class, 'edit'])->name('dish.edit');
+        Route::get('/dish/{dish}/edit', [DishController::class, 'edit'])->name('dish.edit');
 
-        Route::put('/dish/{id}', [DishController::class, 'update'])->name('dish.update');
+        Route::put('/dish/{dish}', [DishController::class, 'update'])->name('dish.update');
 
-        Route::delete('/dish/delete/{id}', [DishController::class, 'delete'])->name('dish.delete');
+        Route::delete('/dish/delete/{dish}', [DishController::class, 'destroy'])->name('dish.delete');
 
         Route::resource('promocodes', App\Http\Controllers\PromocodeController::class)
         ->names('admin.promocodes');
