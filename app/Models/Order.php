@@ -19,7 +19,11 @@ class Order extends Model
         'status',
         'address',
         'comment',
-        'expected_at'
+        'expected_at',
+        'promocode',
+        'discount_amount',
+        'promocode_type',
+        'promocode_discount'
     ];
 
     protected $casts = [
@@ -92,5 +96,10 @@ class Order extends Model
             OrderStatus::IN_PROGRESS->value,
             OrderStatus::IN_KITCHEN->value
         ]);
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo(User::class, 'customer_id');
     }
 }

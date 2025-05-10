@@ -6,6 +6,11 @@
 @endphp
 
 <div class="max-w-7xl mx-auto px-6 py-8">
+  @if (session('status'))
+    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+      <span class="block sm:inline">{{ session('status') }}</span>
+    </div>
+  @endif
 
   {{-- Личные данные --}}
   <div class="mb-12">
@@ -15,12 +20,15 @@
     <div class="mb-4 max-w-md">
       <label class="block text-sm text-gray-700 mb-1">Имя</label>
       <div class="flex items-center space-x-2">
-        <form id="nameForm" action="{{ route('profile.update') }}" method="POST" class="w-full hidden">
+        <form id="nameForm" action="{{ route('profile_custom.update') }}" method="POST" class="w-full hidden">
           @csrf
           @method('PATCH')
           <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" value="{{ old('name', $user->name) }}" required autofocus autocomplete="name" />
           <x-input-error class="mt-2" :messages="$errors->get('name')" />
-          <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg mt-3">Сохранить</button>
+          <div class="flex space-x-2 mt-3">
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Сохранить</button>
+            <button type="button" id="cancelEditButton" class="bg-gray-500 text-white px-4 py-2 rounded-lg">Отмена</button>
+          </div>
         </form>
 
         <div id="nameDisplay" class="flex items-center space-x-2 w-full">

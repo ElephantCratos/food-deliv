@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use App\Models\Order; // Импортируем модель Order
+use App\Models\Order;
 
 class UserProfileController extends Controller
 {
@@ -12,15 +12,27 @@ class UserProfileController extends Controller
     {
         $user = Auth::user();
 
-        // Получаем заказы пользователя (если статус просто поле, убираем 'status' из with)
-        $orders = Order::with(['positions.dish']) // Если статус - это поле, убираем 'status'
-            ->where('customer_id', $user->id) // Проверка на customer_id
-            ->where('created_at', '>=', now()->subDays(90)) // Получаем заказы за последние 90 дней
+        $orders = Order::with(['positions.dish'])
+            ->where('customer_id', $user->id)
+            ->where('created_at', '>=', now()->subDays(90))
             ->get();
 
         return view('user_profile', [
             'user' => $user,
-            'Orders' => $orders, // Передаем заказы в шаблон
+            'Orders' => $orders,
         ]);
+    }
+
+    public function update(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $user = Auth::user();
+        $user->name = $request->name;
+        $user->save();
+
+        return back()->with('status', 'Имя успешно обновлено');
     }
 }
