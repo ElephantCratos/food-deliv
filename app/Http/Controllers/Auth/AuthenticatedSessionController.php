@@ -25,9 +25,9 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request)
 {
     $request->authenticate();
-
     $request->session()->regenerate();
-
+    session()->flash('show_welcome', true);
+    
     if ($request->ajax()) {
         return response()->json(['success' => true, 'redirect' => route('catalog')]);
     }

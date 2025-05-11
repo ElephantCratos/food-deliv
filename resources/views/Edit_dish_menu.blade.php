@@ -16,6 +16,14 @@
                 <label for="foodPrice"  class="block text-gray-700 text-sm font-bold mb-2">Цена:</label>
                 <input type="text" id="foodPrice" name="price" value="{{ $dish->price }}" required class="px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:border-blue-300">
             </div>
+            <select id="category" name="category_id" class="block w-full p-2 border border-gray-300 rounded">
+                <option value="">-- Выберите категорию --</option>
+                @foreach ($categories as $category)
+                    <option value="{{ $category->id }}" {{ $dish->category_id == $category->id ? 'selected' : '' }}>
+                        {{ $category->name }}
+                    </option>
+                @endforeach
+            </select>
             <div class="mb-4">
             </div>
             <button type="submit" name="submitForm" class="px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:border-blue-300">Update</button>

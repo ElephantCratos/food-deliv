@@ -66,7 +66,8 @@ class DishController extends Controller
 
     public function edit(Dish $dish)
     {
-        return view('Edit_dish_menu', compact('dish'));
+        $categories = Category::all();
+        return view('Edit_dish_menu', compact('dish', 'categories'));
     }
 
 

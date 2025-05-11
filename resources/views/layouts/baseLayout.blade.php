@@ -10,6 +10,19 @@
     @yield('head')
 </head>
 
+<style>
+    [x-cloak] { display: none !important; }
+
+    @keyframes bounce-slow {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-4px); }
+    }
+
+    .animate-bounce-slow {
+        animation: bounce-slow 1.5s infinite;
+    }
+</style>
+
 <body class="bg-[#f9f9f9] text-gray-900 font-sans flex flex-col min-h-screen">
         {{-- Верхняя навигация --}}
         <div class="container mx-auto px-4 lg:px-8 py-2 flex flex-wrap justify-between items-center text-sm text-gray-800">
@@ -248,6 +261,38 @@
 </div>
 
 
+
+
+<div
+    x-data="{ show: @json(session('show_welcome')) }" 
+    x-cloak
+    x-show="show"
+    x-transition:enter="transition ease-out duration-500"
+    x-transition:enter-start="opacity-0 translate-y-6 scale-95"
+    x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+    x-transition:leave="transition ease-in duration-600"
+    x-transition:leave-start="opacity-100 scale-100"
+    x-transition:leave-end="opacity-0 scale-90"
+    x-init="setTimeout(() => show = false, 2000)"
+    class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/30"
+>
+    <div class="bg-white rounded-2xl shadow-2xl px-8 py-6 text-center max-w-sm w-full border border-gray-200 relative overflow-hidden">
+        <!-- Glow background shape -->
+        <div class="absolute -top-10 -left-10 w-40 h-40 bg-indigo-500 opacity-20 rounded-full blur-2xl animate-pulse"></div>
+
+        <!-- Icon with bounce -->
+        <div class="mb-4 text-indigo-600 animate-bounce-slow">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+        </div>
+
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">Вы успешно авторизовались</h2>
+        <p class="text-gray-600 text-sm">Добро пожаловать 👋</p>
+    </div>
+</div>
+
+
     {{-- Скрипты --}}
     @yield('scripts')
 
@@ -289,6 +334,15 @@
         @endif
     @endif
 
+    @if (session('show_welcome'))
+    <script>
+        document.addEventListener('alpine:init', () => {
+            const welcomeModal = document.getElementById('welcomeModal');
+            if (welcomeModal) welcomeModal.__x.$data.show = true;
+        });
+    </script>
+    @endif
+    
     // Закрытие модального окна при клике вне его
     document.querySelectorAll('[id$="Modal"]').forEach(modal => {
         modal.addEventListener('click', (e) => {
