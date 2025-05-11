@@ -101,143 +101,152 @@
         @yield('footer')
     </footer>
 
-    <!-- Модальное окно входа -->
-<div id="loginModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
-        </div>
-        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Вход в аккаунт</h3>
-                
-                <!-- Session Status -->
-                <x-auth-session-status class="mb-4" :status="session('status')" />
-                
-                <form id="loginForm" method="POST" action="{{ route('login') }}">
-                    @csrf
+    <div id="loginModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-black bg-opacity-50">
+    <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="w-full max-w-xl bg-white rounded-2xl shadow-2xl p-10 sm:p-12">
+            <h2 class="text-2xl font-bold text-gray-900 text-center mb-8">Вход в аккаунт</h2>
 
-                    <!-- Email Address -->
-                    <div class="mb-4">
-                        <x-input-label for="email" :value="__('Email')" />
-                        <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-                        <x-input-error :messages="$errors->get('email')" class="mt-2" />
-                    </div>
+            <!-- Session Status -->
+            <x-auth-session-status class="mb-6" :status="session('status')" />
 
-                    <!-- Password -->
-                    <div class="mb-4">
-                        <x-input-label for="password" :value="__('Password')" />
-                        <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="current-password" />
-                        <x-input-error :messages="$errors->get('password')" class="mt-2" />
-                    </div>
+            <form method="POST" action="{{ route('login') }}" class="space-y-6">
+                @csrf
 
-                    <!-- Remember Me -->
-                    <div class="block mb-4">
-                        <label for="remember_me" class="inline-flex items-center">
-                            <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                            <span class="ml-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-                        </label>
-                    </div>
+                <!-- Email -->
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Электронная почта</label>
+                    <input id="email" name="email" type="email" autocomplete="email" required
+                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-3 text-base">
+                    <x-input-error :messages="$errors->get('email')" class="mt-2 text-sm text-red-500" />
+                </div>
 
-                    <div class="flex items-center justify-between">
-                        <div>
-                            @if (Route::has('password.request'))
-                                <a class="text-sm text-indigo-600 hover:text-indigo-500" href="{{ route('password.request') }}">
-                                    {{ __('Forgot your password?') }}
-                                </a>
-                            @endif
-                            <button type="button" onclick="switchModal('loginModal', 'registerModal')" 
-                                    class="ml-2 text-sm text-indigo-600 hover:text-indigo-500">
-                                Нет аккаунта? Зарегистрироваться
-                            </button>
-                        </div>
-                        <div>
-                            <button type="button" onclick="closeModal('loginModal')" 
-                                    class="mr-2 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                Отмена
-                            </button>
-                            <x-primary-button type="submit">
-                                {{ __('Log in') }}
-                            </x-primary-button>
-                        </div>
-                    </div>
-                </form>
-            </div>
+                <!-- Password -->
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Пароль</label>
+                    <input id="password" name="password" type="password" autocomplete="current-password" required
+                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-3 text-base">
+                    <x-input-error :messages="$errors->get('password')" class="mt-2 text-sm text-red-500" />
+                </div>
+
+                <!-- Remember Me -->
+                <div class="flex items-center">
+                    <input id="remember_me" name="remember" type="checkbox"
+                        class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                    <label for="remember_me" class="ml-2 block text-sm text-gray-700">
+                        Запомнить меня
+                    </label>
+                </div>
+
+                <!-- Links -->
+                <div class="flex flex-col sm:flex-row sm:justify-between gap-2 text-sm mt-2">
+                    @if (Route::has('password.request'))
+                        <a href="{{ route('password.request') }}" class="text-indigo-600 hover:underline">
+                            Забыли пароль?
+                        </a>
+                    @endif
+                    <button type="button" onclick="switchModal('loginModal', 'registerModal')" class="text-indigo-600 hover:underline">
+                        Нет аккаунта? Зарегистрироваться
+                    </button>
+                </div>
+
+                <!-- Buttons -->
+                <div class="mt-8 flex justify-end gap-4">
+                    <button type="button" onclick="closeModal('loginModal')"
+                        class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                        Отмена
+                    </button>
+                    <button type="submit"
+                        class="px-6 py-2.5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm">
+                        Войти
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
-    <!-- Модальное окно регистрации -->
-    <div id="registerModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
-            </div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Регистрация</h3>
-                    <form id="registerForm" method="POST" action="{{ route('register') }}">
-                        @csrf
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <x-input-label for="first_name" :value="__('First Name')" />
-                                <x-text-input id="first_name" class="block mt-1 w-full" type="text" name="first_name" required autofocus />
-                                <div id="register-first-name-error" class="text-red-500 text-xs mt-1"></div>
-                            </div>
-                            <div>
-                                <x-input-label for="second_name" :value="__('Second Name')" />
-                                <x-text-input id="second_name" class="block mt-1 w-full" type="text" name="second_name" required />
-                                <div id="register-second-name-error" class="text-red-500 text-xs mt-1"></div>
-                            </div>
-                        </div>
-                        <div class="mb-4">
-                            <x-input-label for="name" :value="__('Name')" />
-                            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" required />
-                            <div id="register-name-error" class="text-red-500 text-xs mt-1"></div>
-                        </div>
-                        <div class="mb-4">
-                            <x-input-label for="register_email" :value="__('Email')" />
-                            <x-text-input id="register_email" class="block mt-1 w-full" type="email" name="email" required />
-                            <div id="register-email-error" class="text-red-500 text-xs mt-1"></div>
-                        </div>
-                        <div class="mb-4">
-                            <x-input-label for="phone" :value="__('Phone Number')" />
-                            <x-text-input id="phone" class="block mt-1 w-full" type="text" name="phone" required />
-                            <div id="register-phone-error" class="text-red-500 text-xs mt-1"></div>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <x-input-label for="password" :value="__('Password')" />
-                                <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required />
-                                <div id="register-password-error" class="text-red-500 text-xs mt-1"></div>
-                            </div>
-                            <div>
-                                <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-                                <x-text-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" required />
-                            </div>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <button type="button" onclick="switchModal('registerModal', 'loginModal')" 
-                                    class="text-sm text-indigo-600 hover:text-indigo-500">
-                                Уже есть аккаунт? Войти
-                            </button>
-                            <div>
-                                <button type="button" onclick="closeModal('registerModal')" 
-                                        class="mr-2 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                    Отмена
-                                </button>
-                                <x-primary-button type="submit">
-                                    {{ __('Register') }}
-                                </x-primary-button>
-                            </div>
-                        </div>
-                    </form>
+<!-- Модальное окно регистрации -->
+<div id="registerModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-black bg-opacity-50">
+    <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="w-full max-w-xl bg-white rounded-2xl shadow-2xl p-10 sm:p-12">
+            <h2 class="text-2xl font-bold text-gray-900 text-center mb-8">Регистрация</h2>
+
+            <form id="registerForm" method="POST" action="{{ route('register') }}" class="space-y-6">
+                @csrf
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="first_name" class="block text-sm font-medium text-gray-700 mb-1">Имя</label>
+                        <x-text-input id="first_name" class="block w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                      type="text" name="first_name" required autofocus />
+                        <div id="register-first-name-error" class="text-red-500 text-sm mt-1"></div>
+                    </div>
+                    <div>
+                        <label for="second_name" class="block text-sm font-medium text-gray-700 mb-1">Фамилия</label>
+                        <x-text-input id="second_name" class="block w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                      type="text" name="second_name" required />
+                        <div id="register-second-name-error" class="text-red-500 text-sm mt-1"></div>
+                    </div>
                 </div>
-            </div>
+
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Логин</label>
+                    <x-text-input id="name" class="block w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                  type="text" name="name" required />
+                    <div id="register-name-error" class="text-red-500 text-sm mt-1"></div>
+                </div>
+
+                <div>
+                    <label for="register_email" class="block text-sm font-medium text-gray-700 mb-1">Электронная почта</label>
+                    <x-text-input id="register_email" class="block w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                  type="email" name="email" required />
+                    <div id="register-email-error" class="text-red-500 text-sm mt-1"></div>
+                </div>
+
+                <div>
+                    <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Номер телефона</label>
+                    <x-text-input id="phone" class="block w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                  type="text" name="phone" required />
+                    <div id="register-phone-error" class="text-red-500 text-sm mt-1"></div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Пароль</label>
+                        <x-text-input id="password" class="block w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                      type="password" name="password" required />
+                        <div id="register-password-error" class="text-red-500 text-sm mt-1"></div>
+                    </div>
+                    <div>
+                        <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-1">Повтор пароля</label>
+                        <x-text-input id="password_confirmation" class="block w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                      type="password" name="password_confirmation" required />
+                    </div>
+                </div>
+
+                <!-- Ссылки и кнопки -->
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-4">
+                    <button type="button" onclick="switchModal('registerModal', 'loginModal')" 
+                            class="text-sm text-indigo-600 hover:underline">
+                        Уже есть аккаунт? Войти
+                    </button>
+
+                    <div class="flex gap-3">
+                        <button type="button" onclick="closeModal('registerModal')" 
+                                class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                            Отмена
+                        </button>
+                        <button type="submit" 
+                                class="px-6 py-2.5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm">
+                            Зарегистрироваться
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
+</div>
+
 
     {{-- Скрипты --}}
     @yield('scripts')

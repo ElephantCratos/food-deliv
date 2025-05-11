@@ -35,7 +35,6 @@ class UserSeeder extends Seeder
             'updated_at' => Carbon::now(),
         ]);
 
-        $userRole->givePermissionTo('access to user panel');
         $user->assignRole('user');
     }
 }

@@ -16,67 +16,53 @@
   <div class="mb-12">
     <h2 class="text-2xl font-semibold mb-6">Личные данные</h2>
 
-    {{-- Имя пользователя --}}
-    <div class="mb-4 max-w-md">
-      <label class="block text-sm text-gray-700 mb-1">Имя</label>
-      <div class="flex items-center space-x-2">
-        <form id="nameForm" action="{{ route('profile_custom.update') }}" method="POST" class="w-full hidden">
-          @csrf
-          @method('PATCH')
-          <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" value="{{ old('name', $user->name) }}" required autofocus autocomplete="name" />
-          <x-input-error class="mt-2" :messages="$errors->get('name')" />
-          <div class="flex space-x-2 mt-3">
-            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Сохранить</button>
-            <button type="button" id="cancelEditButton" class="bg-gray-500 text-white px-4 py-2 rounded-lg">Отмена</button>
-          </div>
-        </form>
+    <form action="{{ route('profile_custom.update') }}" method="POST" class="space-y-6 max-w-md">
+      @csrf
+      @method('PATCH')
 
-        <div id="nameDisplay" class="flex items-center space-x-2 w-full">
-          <input type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-100 text-sm" value="{{ $user->name ?? '' }}" disabled />
-          <button id="editNameButton" class="text-blue-500 text-sm hover:underline">Изменить</button>
-        </div>
+      {{-- Имя --}}
+      <div>
+        <label class="block text-sm text-gray-700 mb-1">Имя</label>
+        <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" value="{{ old('name', $user->name) }}" required autofocus autocomplete="name" />
+        <x-input-error class="mt-2" :messages="$errors->get('name')" />
       </div>
-    </div>
 
-    {{-- Email пользователя --}}
-    <div class="mb-4 max-w-md">
-      <label class="block text-sm text-gray-700 mb-1">Email</label>
-      <input type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-100 text-sm" value="{{ $user->email ?? '' }}" disabled />
-    </div>
+      {{-- Email (не редактируется) --}}
+      <div>
+        <label class="block text-sm text-gray-700 mb-1">Email</label>
+        <input type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-100 text-sm" value="{{ $user->email ?? '' }}" disabled />
+      </div>
 
-    {{-- Номер телефона --}}
-    <div class="mb-4 max-w-md">
-      <label class="block text-sm text-gray-700 mb-1">Номер телефона</label>
-      <input type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-100 text-sm" value="{{ $user->phone ?? '+7 ...' }}" disabled />
-    </div>
+      {{-- Телефон --}}
+      <div>
+        <label class="block text-sm text-gray-700 mb-1">Номер телефона</label>
+        <x-text-input id="phone" name="phone" type="text" class="mt-1 block w-full" value="{{ old('phone', $user->phone) }}" autocomplete="tel" />
+        <x-input-error class="mt-2" :messages="$errors->get('phone')" />
+      </div>
 
-    {{-- Дата рождения --}}
-    <div class="mb-4 max-w-xs">
-      <label class="block text-sm text-gray-700 mb-1">Дата рождения</label>
-      <input id="birthdate" type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" placeholder="Выберите дату" />
-    </div>
+      {{-- Дата рождения --}}
+      <div>
+        <label class="block text-sm text-gray-700 mb-1">Дата рождения</label>
+        <input id="birthdate" name="birthdate" type="text"
+               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+               value="{{ old('birthdate', optional($user->birthdate)->format('d.m.Y')) }}"
+               placeholder="Выберите дату" />
+        <x-input-error class="mt-2" :messages="$errors->get('birthdate')" />
+      </div>
 
-    {{-- Пол пользователя --}}
-    <div class="mb-6 max-w-xs">
-      <label class="block text-sm text-gray-700 mb-1">Пол</label>
-      <select class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
-        <option disabled selected>Выберите</option>
-        <option>Мужской</option>
-        <option>Женский</option>
-        <option>Не указывать</option>
-      </select>
-    </div>
+      {{-- Уведомления --}}
+      <div>
+        <label class="inline-flex items-center">
+          <input type="checkbox" name="notifications_enabled"
+                 class="form-checkbox h-4 w-4 text-orange-500 rounded"
+                 {{ old('notifications_enabled', $user->notifications_enabled) ? 'checked' : '' }}>
+          <span class="ml-2 text-sm text-gray-700">Разрешаю уведомления, пуши и пр.</span>
+        </label>
+      </div>
 
-    {{-- Уведомления --}}
-    <div class="mb-6">
-      <label class="inline-flex items-center">
-        <input type="checkbox" class="form-checkbox h-4 w-4 text-orange-500 rounded">
-        <span class="ml-2 text-sm text-gray-700">Разрешаю уведомления, пуши и пр.</span>
-      </label>
-    </div>
-
-    {{-- Кнопка сохранения --}}
-    <button class="bg-orange-500 text-white px-6 py-2 rounded-lg text-sm hover:bg-orange-600">Сохранить</button>
+      {{-- Кнопка сохранения --}}
+      <button type="submit" class="bg-orange-500 text-white px-6 py-2 rounded-lg text-sm hover:bg-orange-600">Сохранить</button>
+    </form>
   </div>
 
   {{-- Кнопка для открытия модалки --}}
@@ -120,7 +106,6 @@
             @if($order->status_id == 1)
               <form action="{{ route('declineByCustomer', ['id' => $order->id]) }}" method="POST" class="mt-3">
                 @csrf
-                @method('POST')
                 <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Decline</button>
               </form>
             @endif
@@ -140,7 +125,6 @@
       </div>
     </div>
   </div>
-
 </div>
 @endsection
 
@@ -148,24 +132,12 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
-
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       flatpickr("#birthdate", {
         dateFormat: "d.m.Y",
         maxDate: "today",
-        defaultDate: "1984-11-15",
         locale: flatpickr.l10ns.ru
-      });
-
-      // Функция для переключения между отображением имени и формой редактирования
-      const editButton = document.getElementById('editNameButton');
-      const nameDisplay = document.getElementById('nameDisplay');
-      const nameForm = document.getElementById('nameForm');
-
-      editButton.addEventListener('click', function () {
-        nameDisplay.classList.add('hidden');
-        nameForm.classList.remove('hidden');
       });
     });
   </script>
