@@ -4,6 +4,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="csrf-token" content="{{ csrf_token() }}">
+
 @section('title')
 Food Delivery Catalog
 @endsection
@@ -12,25 +13,14 @@ Food Delivery Catalog
 <link rel="preconnect" href="https://fonts.bunny.net">
 <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 <!-- Custom Styles -->
-<link rel="stylesheet" href="{{ asset('css/styles.css') }}" />
+<link rel="stylesheet" href="{{ asset('css/app.css') }}" />
 
 <style>
-    .scrollbar-hide {
-        scrollbar-width: none; /* Firefox */
-        -ms-overflow-style: none; /* IE 10+ */
-    }
-    .scrollbar-hide::-webkit-scrollbar {
-        display: none; /* Chrome, Safari, Opera */
-    }
-
-    <style>
-        @keyframes slide-in {
-            0% { transform: translateY(-20px); opacity: 0; }
-            100% { transform: translateY(0); opacity: 1; }
-        }
-        .animate-slide-in {
-            animation: slide-in 0.4s ease-out;
-        }
+    body { background-color: #ffffff !important; }
+    .scrollbar-hide { scrollbar-width: none; -ms-overflow-style: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    @keyframes slide-in { 0% { transform: translateY(-20px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+    .animate-slide-in { animation: slide-in 0.4s ease-out; }
 </style>
 @endsection
 
@@ -41,69 +31,74 @@ Food Delivery Catalog
 @section('content')
 <section id="menu" class="container mx-auto px-4 py-8">
     {{-- Часто заказывают --}}
-    <h2 class="text-2xl font-bold mb-6">Часто заказывают</h2>
-    <div class="relative overflow-x-hidden">
-        <div id="scroll-popular" class="flex space-x-4 py-4 overflow-x-auto scrollbar-hide select-none cursor-grab">
-            @foreach ($dishes as $dish)
-            <div class="dish-card bg-white rounded-2xl shadow-md hover:shadow-lg transition flex-shrink-0 w-60 h-[260px] flex flex-col overflow-hidden select-none">
-                {{-- Картинка --}}
-                <div class="w-full h-32 overflow-hidden">
-                    <img src="{{ asset($dish['image_path']) }}" alt="{{ $dish['name'] }}" class="w-full h-full object-cover">
-                </div>
-                {{-- Контент --}}
-                <div class="flex flex-col justify-between flex-1 p-4 min-h-0">
-                    <div class="text-center">
-                        <h3 class="text-base font-semibold text-gray-900 leading-tight truncate">{{ $dish['name'] }}</h3>
-                        <p class="text-gray-500 text-sm mt-1 mb-2 whitespace-nowrap">от {{ number_format($dish['price'], 2) }}₽</p>
-                    </div>
-                    <form class="add-to-cart-form w-full flex items-center justify-center gap-2 mt-auto">
-                        @csrf
-                        <input type="hidden" name="dish_id" value="{{ $dish['id'] }}">
-                        <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white font-semibold text-sm py-2 px-4 rounded-lg transition whitespace-nowrap">
-                            В корзину
-                        </button>
-                        <input type="number" name="quantity" min="1" value="1" class="w-14 h-10 border-2 border-gray-300 rounded-lg text-center text-sm">
-                    </form>
-                </div>
+    <h2 class="text-2xl mb-6">Часто заказывают</h2>
+        <div class="relative">
+            <!-- Левый внутренний блюр -->
+            <div class="pointer-events-none absolute top-0 left-0 w-[20px] h-full z-10"
+                 style="background: linear-gradient(to right, rgba(255,255,255,1), rgba(255,255,255,0));">
             </div>
-            @endforeach
+
+            <!-- Правый внутренний блюр -->
+            <div class="pointer-events-none absolute top-0 right-0 w-[20px] h-full z-10"
+                 style="background: linear-gradient(to left, rgba(255,255,255,1), rgba(255,255,255,0));">
+            </div>
+
+            <!-- Контент со скроллом -->
+            <div id="scroll-popular" class="flex space-x-[15px] overflow-x-auto scrollbar-hide select-none cursor-grab relative z-0">
+                @foreach ($dishes as $dish)
+                <div class="flex flex-col items-center text-center flex-shrink-0 w-52">
+                    <img src="{{ asset($dish['image_path']) }}" alt="{{ $dish['name'] }}" class="w-48 h-48 object-cover rounded-md" />
+                    <h3 class="mt-3 text-base font-semibold text-gray-900 truncate">{{ $dish['name'] }}</h3>
+                    <p class="text-sm text-gray-500 mt-1 line-clamp-2">{{ $dish['description'] ?? 'Описание пока недоступно Описание пока недоступно' }}</p>
+                    <div class="mt-4 flex flex-col items-center gap-2">
+                        <span class="text-base font-semibold text-gray-900">от {{ number_format($dish['price'], 0) }} ₽</span>
+                        <form class="add-to-cart-form flex items-center gap-2" method="POST" action="{{ route('add_to_cart') }}">
+                            @csrf
+                            <input type="hidden" name="dish_id" value="{{ $dish['id'] }}">
+                            <input type="hidden" name="quantity" min="1" value="1" class="w-16 h-9 border border-gray-300 rounded text-center text-sm" />
+                            <button type="submit" class="px-6 py-1.5 rounded-full text-sm bg-orange-50 text-orange-500 hover:bg-orange-100 transition">
+                                Выбрать
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                @endforeach
+            </div>
         </div>
-    </div>
+
 
     {{-- Категории и блюда --}}
-    @foreach ($categoriesList as $catalog)
+    <div class="pt-24">
+        @foreach ($categoriesList as $catalog)
         <div id="category-{{ Str::slug($catalog->category) }}" class="scroll-mt-24 mb-16">
-            <h3 class="text-3xl font-bold mb-6">{{ $catalog->category }}</h3>
-
-            @if (count($catalog->dishes) > 0)
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                    @foreach ($catalog->dishes as $dish)
-                    <div class="card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition flex flex-col">
-                        {{-- Картинка --}}
-                        <div class="w-full h-48 overflow-hidden">
-                            <img src="{{ asset($dish['image_path']) }}" alt="{{ $dish['name'] }}" class="w-full h-full object-cover">
-                        </div>
-                        {{-- Контент --}}
-                        <div class="p-4 flex flex-col items-center text-center">
-                            <h3 class="text-base font-semibold text-gray-900">{{ $dish['name'] }}</h3>
-                            <p class="text-gray-500 text-sm mt-1 mb-4">от {{ number_format($dish['price'], 2) }}₽</p>
-                            <form class="add-to-cart-form w-full flex items-center justify-center gap-2">
-                                @csrf
-                                <input type="hidden" name="dish_id" value="{{ $dish['id'] }}">
-                                <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white font-semibold text-sm py-2 px-4 rounded-lg transition">
-                                    В корзину
-                                </button>
-                                <input type="number" name="quantity" min="1" value="1" class="w-14 h-10 border-2 border-gray-300 rounded-lg text-center text-sm">
-                            </form>
-                        </div>
+            <h3 class="text-3xl font-semibold">{{ $catalog->category }}</h3>
+            @if(count($catalog->dishes) > 0)
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
+                @foreach($catalog->dishes as $dish)
+                <div class="flex flex-col items-center text-center">
+                    <img src="{{ asset($dish['image_path']) }}" alt="{{ $dish['name'] }}" class="w-[250px] h-[300px] object-cover rounded-md" />
+                    <h3 class="mt-3 text-base font-semibold text-gray-900 truncate">{{ $dish['name'] }}</h3>
+                    <p class="text-sm text-gray-500 mt-1 line-clamp-3">{{ $dish['description'] ?? 'Описание пока недоступно, но скоро станет, шашлык с говядины с яйца с и тд, вот такие дела), ну да норм шашлычок я' }}</p>  {{-- Категории и блюда --}}
+                    <div class="mt-4 flex flex-col items-center gap-2">
+                        <span class="text-base font-semibold text-gray-900">от {{ number_format($dish['price'], 0) }} ₽</span>
+                        <form class="add-to-cart-form flex items-center gap-2" method="POST" action="{{ route('add_to_cart') }}">
+                            @csrf
+                            <input type="hidden" name="dish_id" value="{{ $dish['id'] }}">
+                            <input type="number" name="quantity" min="1" value="1" class="w-16 h-9 border border-gray-300 rounded text-center text-sm" />
+                            <button type="submit" class="px-6 py-1.5 rounded-full text-sm bg-orange-50 text-orange-500 hover:bg-orange-100 transition">
+                                Выбрать
+                            </button>
+                        </form>
                     </div>
-                    @endforeach
                 </div>
+                @endforeach
+            </div>
             @else
-                <p class="text-gray-400">Нет блюд в этой категории.</p>
+            <p class="text-gray-400">Нет блюд в этой категории.</p>
             @endif
         </div>
-    @endforeach
+        @endforeach
+    </div>
 </section>
 @endsection
 
@@ -126,19 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let autoScrollId;
     const velocity = 0.5; // скорость автоскролла
 
-    function autoScroll() {
-        if (!isDragging) {
-            scrollContainer.scrollLeft += velocity;
-            if (scrollContainer.scrollLeft >= originalWidth) {
-                // сразу меняем позицию, без резких дерганий
-                scrollContainer.scrollLeft -= originalWidth;
-            }
-        }
-        autoScrollId = requestAnimationFrame(autoScroll);
-    }
-
-    // Инициализируем автоскролл
-    autoScrollId = requestAnimationFrame(autoScroll);
 
     // Pointer events для поддержки мыши и тача
     scrollContainer.addEventListener('pointerdown', (e) => {

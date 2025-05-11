@@ -54,39 +54,50 @@
 
             {{-- Иконки профиля --}}
             <div class="flex items-center gap-6 text-sm text-gray-800 text-center">
-                <a href="{{ route('chats.open', \App\Http\Controllers\ChatController::SUPPORT_USER_ID) }}"
-                   class="flex flex-col items-center hover:text-red-600 transition">
-                    <div class="text-2xl lg:text-3xl">🎧</div>
-                    <span class="mt-1">Поддержка</span>
-                </a>
                 <a href="{{ route('catalog') }}"
                    class="flex flex-col items-center hover:text-red-600 transition">
                     <div class="text-2xl lg:text-3xl">🍖</div>
                     <span class="mt-1">Каталог</span>
                 </a>
                 @auth
-    @if(auth()->user()->can('access to manager panel') || 
-        auth()->user()->can('access to kitchen panel') || 
-        auth()->user()->can('access to courier panel'))
-        <a href="{{ route('dashboard') }}"
-           class="flex flex-col items-center hover:text-red-600 transition">
-            <div class="text-2xl lg:text-3xl">👤</div>
-            <span class="mt-1">Профиль</span>
-        </a>
-    @else
-        <a href="{{ route('profile_custom') }}"
-           class="flex flex-col items-center hover:text-red-600 transition">
-            <div class="text-2xl lg:text-3xl">👤</div>
-            <span class="mt-1">Профиль</span>
-        </a>
-    @endif
-@else
-    <button onclick="openModal('loginModal')"
-       class="flex flex-col items-center hover:text-red-600 transition">
-        <div class="text-2xl lg:text-3xl">👤</div>
-        <span class="mt-1">Войти</span>
-    </button>
-@endauth
+                    @if(auth()->user()->can('access to manager panel') || 
+                        auth()->user()->can('access to kitchen panel') || 
+                        auth()->user()->can('access to courier panel'))
+                        <a href="{{ route('dashboard') }}"
+                           class="flex flex-col items-center hover:text-red-600 transition">
+                            <div class="text-2xl lg:text-3xl">👤</div>
+                            <span class="mt-1">Профиль</span>
+                        </a>
+                    @else
+                        <a href="{{ route('chats.open', \App\Http\Controllers\ChatController::SUPPORT_USER_ID) }}"
+                           class="flex flex-col items-center hover:text-red-600 transition">
+                            <div class="text-2xl lg:text-3xl">🎧</div>
+                            <span class="mt-1">Поддержка</span>
+                        </a>
+                        <a href="{{ route('profile_custom') }}"
+                           class="flex flex-col items-center hover:text-red-600 transition">
+                            <div class="text-2xl lg:text-3xl">👤</div>
+                            <span class="mt-1">Профиль</span>
+                        </a>
+                    @endif
+
+                    <!-- Кнопка Выход -->
+                    <form method="POST" action="{{ route('logout') }}"
+                          class="flex flex-col items-center hover:text-red-600 transition">
+                        @csrf
+                        <button type="submit" class="text-2xl lg:text-3xl">
+                            🚪
+                        </button>
+                        <span class="mt-1">Выход</span>
+                    </form>
+                @else
+                    <button onclick="openModal('loginModal')"
+                       class="flex flex-col items-center hover:text-red-600 transition">
+                        <div class="text-2xl lg:text-3xl">👤</div>
+                        <span class="mt-1">Войти</span>
+                    </button>
+                @endauth
+
             </div>
         </div>
 

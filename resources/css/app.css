@@ -18,7 +18,7 @@ body {
 
 /* Общие стили */
 body {
-    background-color: #f9fafb;
+    background-color: #ffffff; /* Было #f9fafb */
     color: #333;
     font-family: 'Helvetica', sans-serif;
 }
@@ -26,7 +26,7 @@ body {
 header {
     background-color: #ffffff;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    padding: 20px 0;
+    padding: 0px 0;
 }
 
 a {
@@ -88,94 +88,74 @@ footer a:hover {
     backdrop-filter: blur(10px); /* Размытие фона */
 }
 
-/* Кнопки с пастельными оттенками */
-.btn-light {
-    background-color: #fc6A03; /* Светло-оранжевый (пастельный) */
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.375rem;
-    font-size: 1rem;
-    text-transform: uppercase;
-    font-weight: bold;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
 
-.btn-light:hover {
-    background-color: #ffdb85; /* Более тёмный оранжевый */
-    transform: scale(1.05); /* Немного увеличиваем кнопку при наведении */
-}
-
-.btn-light:active {
-    background-color: #e8b85f; /* Ещё более тёмный оттенок */
-}
-
-/* Кнопки категорий */
-.btn-category {
-    background-color: #ffdb85; /* Светло-оранжевый (пастельный) */
-    color: white;
-    padding: 0.5rem 1.25rem;
-    border-radius: 0.375rem;
-    font-size: 1rem;
-    text-transform: uppercase;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
-}
-
-.btn-category:hover {
-    background-color: #114; /* Более тёмный оранжевый */
-    color: white;
-}
-
-/* Стили для карточек с блюдами */
+/* ========== КАРТОЧКИ БЛЮД ========= */
+.dish-card,
 .card {
-    background-color: #ffffff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 16px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
+  /* полупрозрачный фон + блюр */
+  @apply relative bg-white/50 backdrop-blur-sm
+         flex flex-col justify-between overflow-hidden transition-transform;
+  box-shadow: none;
 }
 
+/* hover-эффект: чуть увеличиваем */
+.dish-card:hover,
 .card:hover {
-    transform: translateY(-5px); /* Немного поднимаем карточку при наведении */
-}
-/* Кнопки в карточках */
-.card button {
-    padding: 0.5rem 1rem; /* Уменьшаем отступы на кнопке */
-    font-size: 0.875rem; /* Меньший шрифт */
-    line-height: 1.25rem; /* Улучшаем вертикальное выравнивание */
+  @apply scale-105;
+  transform-origin: center;
 }
 
-/* Корректируем стили карточек */
-.card {
-    background-color: #ffffff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 16px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-    height: 100%; /* Делаем карточку адаптивной по высоте */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.card .btn-light {
-    width: 100%; /* Делаем кнопку на всю ширину */
-    text-align: center;
-}
-
-/* Уменьшаем размер и отступы для изображений */
+/* картинка */
+.dish-card img,
 .card img {
-    object-fit: cover;
-    width: 100%;
-    height: 180px; /* Уменьшаем высоту изображений */
-    border-radius: 8px;
+  @apply w-full h-40 object-cover;
 }
 
-/* Сделаем отступы внутри карточек меньше */
-.card .flex {
-    margin-bottom: 0.5rem;
+/* контент */
+.dish-card .p-4,
+.card .p-4 {
+  @apply flex flex-col justify-between flex-1;
+}
+
+/* название */
+.dish-card h3,
+.card h3 {
+  @apply text-lg font-semibold text-gray-900 truncate mb-1;
+}
+
+/* описание (затычка) */
+.dish-card p.description,
+.card p.description {
+  @apply text-gray-700 text-sm mb-4;
+}
+/* если description пуст — ставим “—” */
+.dish-card p.description:empty::before,
+.card p.description:empty::before {
+  content: "—";
+  @apply text-gray-400;
+}
+
+/* футер карточки: цена + кнопка */
+.dish-card .card-footer,
+.card .card-footer {
+  @apply flex items-center justify-between mt-auto;
+}
+.dish-card .price,
+.card .price {
+  @apply text-lg font-bold text-gray-900;
+}
+.dish-card form,
+.card form {
+  @apply flex items-center gap-2;
+}
+.dish-card input[type="number"],
+.card input[type="number"] {
+  @apply w-14 h-8 border border-gray-300 text-center text-sm;
+}
+.dish-card button,
+.card button {
+  @apply px-3 py-1.5 text-sm font-medium transition
+         bg-orange-500 hover:bg-orange-600 text-white;
 }
 
 /* серый цвет текста при наведении(футер) */
@@ -185,3 +165,5 @@ a {
 a:hover {
   color: gray;
 }
+
+
