@@ -63,14 +63,14 @@ class OrderController extends Controller
 
 public function showOrders($statusId = null)
 {
-    $orders = Order::query()
+    $orders = Order::with(['customer', 'positions.dish'])
         ->when($statusId, fn($query) => $query->where('status', $statusId))
         ->orderBy('id')
         ->get();
 
     foreach ($orders as $order) {
         $order->status_name = $order->status->label();
-        $order->expected_at = $order->expected_at ?? 'As soon as possible';
+        $order->expected_at = $order->expected_at ?? 'Как можно скорее';
     }
     
     return view('All_Orders', ['Order' => $orders]);
@@ -140,6 +140,10 @@ public function showOrders($statusId = null)
         ? $validatedData['time']
         : null;
     $order->price       = $totalWithDiscount;
+    $order->promocode = $promocode ? $promocode->code : null;
+    $order->promocode_type = $promocode ? $promocode->type : null;
+    $order->promocode_discount = $promocode ? $promocode->discount : null;
+    $order->discount_amount = $discountAmount;
     $order->save();
 
     // 7) Позиции

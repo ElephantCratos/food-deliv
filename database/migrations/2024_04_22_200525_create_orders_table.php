@@ -40,6 +40,10 @@ return new class extends Migration
             $table->string('address')->nullable();
             $table->string('comment')->nullable();
             $table->time('expected_at')->nullable();
+            $table->string('promocode')->nullable();
+            $table->decimal('discount_amount', 10, 2)->nullable();
+            $table->string('promocode_type')->nullable(); // 'percent' или 'fixed'
+            $table->decimal('promocode_discount', 10, 2)->nullable(); // величина скидки (процент или сумма)
             $table->timestamps();
         });
     }

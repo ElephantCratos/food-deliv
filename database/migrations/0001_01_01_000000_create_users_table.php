@@ -19,7 +19,9 @@ return new class extends Migration
             $table->string('password');
             $table->string('first_name');
             $table->string('second_name');
-            $table->string('phone')->unique(); // Добавляем столбец для телефона
+            $table->string('phone')->unique();
+            $table->date('birthdate')->nullable();
+            $table->boolean('notifications_enabled')->default(false);
             $table->rememberToken();
             $table->timestamps();
         });

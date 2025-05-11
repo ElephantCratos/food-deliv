@@ -25,6 +25,7 @@ Route::get('/', function () {
 //});
 
 Route::get('/profile/custom', [UserProfileController::class, 'index'])->name('profile_custom');
+Route::patch('/profile/custom', [UserProfileController::class, 'update'])->name('profile_custom.update');
 
 Route::middleware(['auth', 'can:access to manager panel'])->group(function () {
     Route::get('/user-management', [UserManagementController::class, 'index'])->name('user-management.index');
