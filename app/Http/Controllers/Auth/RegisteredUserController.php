@@ -51,6 +51,8 @@ class RegisteredUserController extends Controller
     event(new Registered($user));
     Auth::login($user);
 
+    session()->flash('show_welcome', true);
+
     if ($request->ajax()) {
         return response()->json(['success' => true, 'redirect' => route('dashboard')]);
     }

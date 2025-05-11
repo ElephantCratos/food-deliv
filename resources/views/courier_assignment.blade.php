@@ -20,7 +20,7 @@
                         <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             @foreach($couriers as $courier)
                             <li class="p-4 border rounded-lg">
-                                <p class="font-medium">{{ $courier->name }}</p>
+                                <p class="font-medium">{{ $courier?->name }}</p>
                                 <p class="text-sm text-gray-600">{{ $courier->email }}</p>
                             </li>
                             @endforeach
@@ -57,13 +57,13 @@
                             <div>
                                 <p>Адрес: {{ $order->address }}</p>
                                 <p>Доставить к: {{ $order->expected_at ?? 'ASAP' }}</p>
-                                <p>Курьер: {{ $order->courier->name}}</p>
+                                <p>Курьер: {{ $order->courier?->name}}</p>
                             </div>
                             
                             <div>
                                 @if($order->courier)
                                 <p class="font-semibold">Назначен в данный момент:</p>
-                                <p>{{ $order->courier->name }}</p>
+                                <p>{{ $order->courier?->name }}</p>
                                 @endif
 
                                 <form action="{{ route('courier.assign', $order->id) }}" method="POST" class="mt-2">
@@ -72,8 +72,8 @@
                                         <select name="courier_id" class="rounded-md border-gray-300 shadow-sm">
                                             <option value="">Выбрать курьера</option>
                                             @foreach($couriers as $courier)
-                                            <option value="{{ $courier->id }}" {{ $order->courier_id == $courier->id ? 'selected' : '' }}>
-                                                {{ $courier->name }}
+                                            <option value="{{ $courier?->id }}" {{ $order->courier_id == $courier->id ? 'selected' : '' }}>
+                                                {{ $courier?->name }}
                                             </option>
                                             @endforeach
                                         </select>

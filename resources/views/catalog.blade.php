@@ -22,6 +22,15 @@ Food Delivery Catalog
     .scrollbar-hide::-webkit-scrollbar {
         display: none; /* Chrome, Safari, Opera */
     }
+
+    <style>
+        @keyframes slide-in {
+            0% { transform: translateY(-20px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        .animate-slide-in {
+            animation: slide-in 0.4s ease-out;
+        }
 </style>
 @endsection
 
@@ -209,5 +218,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 2000);
     }
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    @if(session('welcome'))
+        showWelcomeToast("{{ session('welcome') }}");
+    @endif
+
+    function showWelcomeToast(message) {
+        const toast = document.createElement('div');
+        toast.innerHTML = `
+            <div class="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2l4-4m5 2a9 9 0 11-18 0a9 9 0 0118 0z" />
+                </svg>
+                <span>${message}</span>
+            </div>
+        `;
+        toast.className = 'fixed top-6 right-6 bg-orange-500 text-white font-medium px-6 py-3 rounded-xl shadow-lg z-50 animate-slide-in';
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.classList.add('opacity-0');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+});
+</script>
+
+
+
 </script>
 @endsection
