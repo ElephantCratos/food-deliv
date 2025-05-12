@@ -11,6 +11,7 @@
                             <th class="p-3 border-b font-medium text-gray-700">Название блюда</th>
                             <th class="p-3 border-b font-medium text-gray-700">Изображение</th>
                             <th class="p-3 border-b font-medium text-gray-700">Категория</th>
+                            <th class="p-3 border-b font-medium text-gray-700">Описание</th>
                             <th class="p-3 border-b font-medium text-gray-700">Цена</th>
                             <th class="p-3 border-b font-medium text-gray-700">Действия</th>
                         </tr>
@@ -24,6 +25,7 @@
                                     <img src="{{ asset($dish->image_path) }}" alt="Фото блюда" class="w-16 h-16 object-cover rounded">
                                 </td>
                                 <td class="p-3 border-b">{{ $dish->category->name }}</td>
+                                <td class="p-3 border-b">{{ $dish->description }}</td>
                                 <td class="p-3 border-b">{{ $dish->price }} ₽</td>
                                 <td class="p-3 border-b space-y-1">
                                     <form method="GET" action="{{ route('dish.edit', $dish->id) }}">

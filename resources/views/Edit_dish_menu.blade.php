@@ -24,6 +24,12 @@
                     </option>
                 @endforeach
             </select>
+           <div class="mb-4">
+                <label for="foodDescription" class="block text-gray-700 text-sm font-bold mb-2">Описание:</label>
+                <textarea id="foodDescription" name="description" 
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:border-blue-300" 
+                        rows="4" required>{{ $dish->description }}</textarea>
+            </div>
             <div class="mb-4">
             </div>
             <button type="submit" name="submitForm" class="px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:border-blue-300">Update</button>

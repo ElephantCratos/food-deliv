@@ -17,6 +17,7 @@ class Dish extends Model
         'image_path',
         'price',
         'category_id',
+        'description'
     ];
 
     // Отношения

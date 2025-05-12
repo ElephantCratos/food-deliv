@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('image_path');
             $table->unsignedBigInteger('category_id');
             $table->decimal('price', 10, 2);
+            $table->text('description');
             $table->timestamps();
             $table->softDeletes();
         });

@@ -26,7 +26,10 @@
                     @endforeach
                 </select>
             </div>
-            
+            <div class="mb-4">
+                <label for="foodDescription" class="block text-gray-700 text-sm font-bold mb-2">Описание:</label>
+                <input type="text" id="foodDescription" name="description" value="" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:border-blue-300" rows="4" required>
+            </div>
            
             <button class="px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:border-blue-300" type="submit" name="submitForm" class="bg-gradient-to-r from-indigo-500 from-10% via-sky-500 via-30% to-emerald-500 to-90%">Submit</button>
 
