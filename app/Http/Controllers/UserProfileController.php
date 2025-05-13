@@ -16,13 +16,15 @@ class UserProfileController extends Controller
         $orders = Order::with(['positions.dish'])
             ->where('customer_id', $user->id)
             ->where('created_at', '>=', now()->subDays(90))
+            ->orderByDesc('created_at')
             ->get();
 
         return view('user_profile', [
-            'user' => $user,
-            'Orders' => $orders,
+            'user'   => $user,
+            'orders' => $orders, 
         ]);
     }
+
 
     public function update(Request $request)
     {
