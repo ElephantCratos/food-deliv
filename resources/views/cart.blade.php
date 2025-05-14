@@ -234,107 +234,33 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // промокод
-    window.applyPromocode = () => {
+     window.applyPromocode = () => {
         const code = document.getElementById('promocodeInput').value.trim();
         if (!code) return alert('Введите промокод');
-        
         fetch('{{ route('cart.apply-promocode') }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Accept': 'application/json'
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
             },
             body: JSON.stringify({ promocode: code })
         })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(err => { throw err; });
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success && data.promocode) { // Добавлена проверка на существование data.promocode
-                // Обновляем итоговую сумму
-                document.getElementById('cart-total').textContent = data.totalWithDiscount + ' ₽';
-                
-                // Обновляем блок скидки
-                const summaryDisc = document.getElementById('summary-discount');
-                summaryDisc.style.display = 'block';
-                summaryDisc.textContent = 'Скидка по промокоду: −' + data.discountAmount + ' ₽';
-                
-                // Обновляем блок промокода
-                document.getElementById('promoSection').innerHTML = `
-                    <div class="flex justify-between items-center p-3 rounded-lg mb-3 bg-gray-50">
-                        <div class="flex items-center space-x-3">
-                            <span class="font-medium">Промокод:</span>
-                            <span class="text-green-600">${data.promocode.code}</span>
-                            <span class="px-2 py-1 bg-green-100 text-green-800 text-sm rounded-lg">
-                                ${data.promocode.type === 'percent' ? data.promocode.discount+'%' : data.promocode.discount+'₽'}
-                            </span>
-                            <span class="text-green-600">Скидка: ${data.discountAmount}₽</span>
-                        </div>
-                        <button type="button" id="removePromocode" class="text-red-500 hover:text-red-700 font-medium text-sm">Удалить</button>
-                    </div>
-                `;
-                
-                // Добавляем обработчик для новой кнопки
-                document.getElementById('removePromocode').addEventListener('click', removePromocode);
-            } else {
-                alert(data.message || 'Промокод не найден или недействителен');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert(error.message || 'Ошибка сервера при применении промокода');
-        });
+        .then(r => r.json())
+        .then(d => d.success ? location.reload() : alert('Ошибка применения промокода'))
+        .catch(() => alert('Ошибка соединения с сервером'));
     };
-
-    function removePromocode() {
+    document.getElementById('removePromocode')?.addEventListener('click', () => {
         fetch('{{ route('cart.remove-promocode') }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Accept': 'application/json'
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
             }
         })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(err => { throw err; });
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                // Обновляем итоговую сумму
-                document.getElementById('cart-total').textContent = data.total + ' ₽';
-                
-                // Скрываем блок скидки
-                document.getElementById('summary-discount').style.display = 'none';
-                
-                // Возвращаем исходную форму промокода
-                document.getElementById('promoSection').innerHTML = `
-                    <div>
-                        <label class="block font-medium mb-1">Промокод</label>
-                        <div class="flex space-x-2">
-                            <input type="text" id="promocodeInput" class="flex-1 p-2 border border-gray-300 rounded-lg" placeholder="Введите промокод">
-                            <button type="button" onclick="applyPromocode()" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg">Применить</button>
-                        </div>
-                    </div>
-                `;
-            } else {
-                alert(data.message || 'Ошибка при удалении промокода');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert(error.message || 'Ошибка сервера при удалении промокода');
-        });
-    }
-
-    // Инициализация обработчика удаления (если промокод уже применён)
-    document.getElementById('removePromocode')?.addEventListener('click', removePromocode);
+        .then(r => r.json())
+        .then(d => d.success ? location.reload() : alert('Ошибка при удалении промокода'))
+        .catch(() => alert('Ошибка соединения с сервером'));
+    });
 });
 </script>
 @endsection
