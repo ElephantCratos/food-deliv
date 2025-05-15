@@ -18,6 +18,11 @@
             </div>
 
             <div class="mb-4">
+                <label>Телефон</label>
+                <input type="text" name="phone" class="border rounded w-full" placeholder="+7 (999) 123-45-67" required>
+            </div>
+
+            <div class="mb-4">
                 <label>Пароль</label>
                 <input type="password" name="password" class="border rounded w-full" required>
             </div>
@@ -26,7 +31,7 @@
                 <label>Подтверждение пароля</label>
                 <input type="password" name="password_confirmation" class="border rounded w-full" required>
             </div>
-
+            
             <div class="mb-4">
                 <label>Фамилия</label>
                 <input type="text" name="first_name" class="border rounded w-full" required>

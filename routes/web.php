@@ -8,6 +8,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DishController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Middleware\EnsureAuthenticated;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PromocodeController;
 use App\Http\Controllers\CourierAssignmentController;
@@ -34,6 +35,9 @@ Route::middleware(['auth', 'can:access to manager panel'])->group(function () {
     Route::delete('/user-management/{user}', [UserManagementController::class, 'destroy'])->name('user-management.destroy');
 });
 
+Route::get('/Cart', [OrderController::class,'showCart'])->name('Cart')->middleware(EnsureAuthenticated::class);
+
+
 Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/dashboard', function () {
@@ -42,7 +46,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/kitchen-camera', [CameraController::class, 'showCamera'])->name('kitchen.camera');
     Route::delete('/order_position/delete/{id}',[OrderPositionController::class, 'destroy']) ->name('delete-order-position');
     Route::post('/add_to_cart', [OrderPositionController::class, 'store']) -> name('add_to_cart');
-    Route::get('/Cart', [OrderController::class,'showCart'])->name('Cart');
+
     Route::post('/cart/apply-promocode', [OrderController::class, 'applyPromocode'])
     ->name('cart.apply-promocode');
     Route::post('/cart/remove-promocode', [OrderController::class, 'removePromocode'])
@@ -73,11 +77,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/chats', [ChatController::class, 'index'])
     ->name('chats.index');
 
-// Создать или открыть чат с конкретным клиентом
+
 Route::get('/chats/open/{userId}', [ChatController::class, 'openChat'])
     ->name('chats.open');
 
-// Просмотр конкретного чата (интерфейс диалога)
+
 Route::get('/chats/{chat}', [ChatController::class, 'show'])
     ->name('chats.show');
 

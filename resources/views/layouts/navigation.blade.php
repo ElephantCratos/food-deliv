@@ -11,11 +11,6 @@
             <!-- Навигация -->
             <div class="hidden sm:flex space-x-6">
                 @auth
-                    @can('access to manager panel')
-                        <x-nav-link :href="route('Customer_Orders')" :active="request()->routeIs('Customer_Orders')">
-                            {{ __('Заказы') }}
-                        </x-nav-link>
-                    @endcan
 
                     @can('access to kitchen panel')
                         <x-nav-link :href="route('Kitchen_Orders')" :active="request()->routeIs('Kitchen_Orders')">
@@ -35,6 +30,11 @@
                         </x-nav-link>
                     @endcan
 
+                    @can('access to manager panel')
+                        <x-nav-link :href="route('courier.assignment')" :active="request()->routeIs('courier.assignment')">
+                            {{ __('Назначение курьера') }}
+                        </x-nav-link>
+                    @endcan
                     @can('access to manager panel')
                         <x-nav-link :href="route('Manager_Menu')" :active="request()->routeIs('Manager_Menu')">
                             {{ __('Меню') }}
@@ -147,11 +147,6 @@
 
         <!-- Мобильные ссылки для меню -->
         @auth
-            @can('access to manager panel')
-                <x-responsive-nav-link :href="route('Customer_Orders')" :active="request()->routeIs('Customer_Orders')">
-                    {{ __('Заказы') }}
-                </x-responsive-nav-link>
-            @endcan
 
             @can('access to kitchen panel')
                 <x-responsive-nav-link :href="route('Kitchen_Orders')" :active="request()->routeIs('Kitchen_Orders')">

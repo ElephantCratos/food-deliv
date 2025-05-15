@@ -169,29 +169,86 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // переключатель самовывоз/доставка
+    const form = document.getElementById('orderForm');
+
     const toggle = document.getElementById('pickupToggle');
     const addressField = document.getElementById('adressField');
     const pickupInfo = document.getElementById('pickupInfo');
     const adressInput = document.getElementById('adressInput');
-    toggle.addEventListener('click', () => {
-        toggle.classList.toggle('active');
-        addressField.classList.toggle('hidden');
-        pickupInfo.classList.toggle('hidden');
-        adressInput.value = toggle.classList.contains('active') ? 'ул. Пушкина, д. Колотушкина' : '';
-    });
-
-    // обработка изменения времени
     const timeSelect = document.getElementById('time');
     const fastValue = document.getElementById('fast_value');
-    if (timeSelect) {
+    const commentInput = document.getElementById('comment');
+    const paymentSelect = document.getElementById('payment');
+
+    const LS_KEYS = {
+        pickup:   'order_pickup',
+        adress:   'order_adress',
+        time:     'order_time',
+        comment:  'order_comment',
+        payment:  'order_payment'
+    };
+
+    function restore() {
+        const isPickup = localStorage.getItem(LS_KEYS.pickup) === 'true';
+        if (isPickup) {
+            toggle.classList.remove('active');
+            addressField.classList.remove('hidden');
+            pickupInfo.classList.add('hidden');
+            adressInput.readOnly = false;
+            adressInput.value = localStorage.getItem(LS_KEYS.adress) || '{{ old('adress') }}' || '';
+        } else {
+            toggle.classList.add('active');
+            addressField.classList.add('hidden');
+            pickupInfo.classList.remove('hidden');
+            adressInput.readOnly = true;
+            adressInput.value = 'ул. Пушкина, д. Колотушкина';
+        }
+
+        timeSelect.value    = localStorage.getItem(LS_KEYS.time)    || timeSelect.value;
+        commentInput.value  = localStorage.getItem(LS_KEYS.comment) || '{{ old('comment') }}';
+        paymentSelect.value = localStorage.getItem(LS_KEYS.payment) || paymentSelect.value;
+
         fastValue.value = timeSelect.value === 'null' ? '1' : '0';
-        timeSelect.addEventListener('change', () => {
-            fastValue.value = timeSelect.value === 'null' ? '1' : '0';
-        });
     }
 
-    // кнопки изменения количества
+    function bindSave(el, key) {
+        el.addEventListener('change', () => {
+            localStorage.setItem(key, el.value);
+        });
+    }
+    bindSave(adressInput,  LS_KEYS.adress);
+    bindSave(timeSelect,   LS_KEYS.time);
+    bindSave(commentInput, LS_KEYS.comment);
+    bindSave(paymentSelect, LS_KEYS.payment);
+
+    toggle.addEventListener('click', () => {
+        const isPickupNow = !toggle.classList.toggle('active');
+
+        if (isPickupNow) {
+            // Самовывоз — адрес вводится вручную
+            addressField.classList.remove('hidden');
+            pickupInfo.classList.add('hidden');
+            adressInput.readOnly = false;
+            adressInput.value = localStorage.getItem(LS_KEYS.adress) || '';
+        } else {
+            // Доставка — адрес фиксированный и readonly
+            addressField.classList.add('hidden');
+            pickupInfo.classList.remove('hidden');
+            adressInput.readOnly = true;
+            adressInput.value = 'Самовывоз';
+            localStorage.setItem(LS_KEYS.adress, adressInput.value);
+        }
+
+        localStorage.setItem(LS_KEYS.pickup, isPickupNow.toString());
+    });
+
+    restore();
+
+    timeSelect.addEventListener('change', () => {
+        fastValue.value = timeSelect.value === 'null' ? '1' : '0';
+        localStorage.setItem(LS_KEYS.time, timeSelect.value);
+    });
+
     document.querySelectorAll('.quantity-btn').forEach(btn => {
         btn.addEventListener('click', e => {
             e.preventDefault();
@@ -200,6 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const qtyEl = document.getElementById(`qty-${id}`);
             let qty = parseInt(qtyEl.textContent.replace('x', ''), 10);
             qty = action === 'increase' ? qty + 1 : Math.max(0, qty - 1);
+
             fetch(`/cart/update/${id}`, {
                 method: 'POST',
                 headers: {
@@ -218,10 +276,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById(`total-${id}`).textContent = data.itemTotal + ' ₽';
                 }
                 document.getElementById('cart-total').textContent = data.totalWithDiscount + ' ₽';
-                if (data.discountAmount !== undefined) {
-                    const discEl = document.querySelector('#promoSection .text-green-600:last-child');
-                    if (discEl) discEl.textContent = 'Скидка: ' + data.discountAmount + '₽';
-                }
                 const summaryDisc = document.getElementById('summary-discount');
                 if (data.discountAmount > 0) {
                     summaryDisc.style.display = 'block';
@@ -229,114 +283,53 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     summaryDisc.style.display = 'none';
                 }
+                const promoDisc = document.querySelector('#promoSection .text-green-600:last-child');
+                if (promoDisc && data.discountAmount !== undefined) {
+                    promoDisc.textContent = 'Скидка: ' + data.discountAmount + '₽';
+                }
             });
         });
     });
 
-    // промокод
     window.applyPromocode = () => {
         const code = document.getElementById('promocodeInput').value.trim();
         if (!code) return alert('Введите промокод');
-        
         fetch('{{ route('cart.apply-promocode') }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Accept': 'application/json'
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
             },
             body: JSON.stringify({ promocode: code })
         })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(err => { throw err; });
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success && data.promocode) { // Добавлена проверка на существование data.promocode
-                // Обновляем итоговую сумму
-                document.getElementById('cart-total').textContent = data.totalWithDiscount + ' ₽';
-                
-                // Обновляем блок скидки
-                const summaryDisc = document.getElementById('summary-discount');
-                summaryDisc.style.display = 'block';
-                summaryDisc.textContent = 'Скидка по промокоду: −' + data.discountAmount + ' ₽';
-                
-                // Обновляем блок промокода
-                document.getElementById('promoSection').innerHTML = `
-                    <div class="flex justify-between items-center p-3 rounded-lg mb-3 bg-gray-50">
-                        <div class="flex items-center space-x-3">
-                            <span class="font-medium">Промокод:</span>
-                            <span class="text-green-600">${data.promocode.code}</span>
-                            <span class="px-2 py-1 bg-green-100 text-green-800 text-sm rounded-lg">
-                                ${data.promocode.type === 'percent' ? data.promocode.discount+'%' : data.promocode.discount+'₽'}
-                            </span>
-                            <span class="text-green-600">Скидка: ${data.discountAmount}₽</span>
-                        </div>
-                        <button type="button" id="removePromocode" class="text-red-500 hover:text-red-700 font-medium text-sm">Удалить</button>
-                    </div>
-                `;
-                
-                // Добавляем обработчик для новой кнопки
-                document.getElementById('removePromocode').addEventListener('click', removePromocode);
-            } else {
-                alert(data.message || 'Промокод не найден или недействителен');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert(error.message || 'Ошибка сервера при применении промокода');
-        });
+        .then(r => r.json())
+        .then(d => d.success ? location.reload() : alert('Ошибка применения промокода'))
+        .catch(() => alert('Ошибка соединения с сервером'));
     };
 
-    function removePromocode() {
+    document.getElementById('removePromocode')?.addEventListener('click', () => {
         fetch('{{ route('cart.remove-promocode') }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Accept': 'application/json'
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
             }
         })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(err => { throw err; });
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                // Обновляем итоговую сумму
-                document.getElementById('cart-total').textContent = data.total + ' ₽';
-                
-                // Скрываем блок скидки
-                document.getElementById('summary-discount').style.display = 'none';
-                
-                // Возвращаем исходную форму промокода
-                document.getElementById('promoSection').innerHTML = `
-                    <div>
-                        <label class="block font-medium mb-1">Промокод</label>
-                        <div class="flex space-x-2">
-                            <input type="text" id="promocodeInput" class="flex-1 p-2 border border-gray-300 rounded-lg" placeholder="Введите промокод">
-                            <button type="button" onclick="applyPromocode()" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg">Применить</button>
-                        </div>
-                    </div>
-                `;
-            } else {
-                alert(data.message || 'Ошибка при удалении промокода');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert(error.message || 'Ошибка сервера при удалении промокода');
-        });
-    }
+        .then(r => r.json())
+        .then(d => d.success ? location.reload() : alert('Ошибка при удалении промокода'))
+        .catch(() => alert('Ошибка соединения с сервером'));
+    });
 
-    // Инициализация обработчика удаления (если промокод уже применён)
-    document.getElementById('removePromocode')?.addEventListener('click', removePromocode);
+    form.addEventListener('submit', () => {
+        Object.values(LS_KEYS).forEach(k => localStorage.removeItem(k));
+    });
 });
+
+
 </script>
+
+
+
 @endsection
 
 @section('footer')
