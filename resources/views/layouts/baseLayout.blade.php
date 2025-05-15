@@ -81,15 +81,13 @@
                         </a>
                     @endif
 
-                    <!-- Кнопка Выход -->
-                    <form method="POST" action="{{ route('logout') }}"
-                          class="flex flex-col items-center hover:text-red-600 transition">
-                        @csrf
-                        <button type="submit" class="text-2xl lg:text-3xl">
-                            🚪
-                        </button>
+                    <a href="#" 
+                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();" 
+                    class="flex flex-col items-center hover:text-red-600 transition">
+                        <div class="text-2xl lg:text-3xl leading-none">🚪</div>
                         <span class="mt-1">Выход</span>
-                    </form>
+                    </a>
+
                 @else
                     <button onclick="openModal('loginModal')"
                        class="flex flex-col items-center hover:text-red-600 transition">
@@ -124,6 +122,11 @@
     <footer class="bg-gray-100 text-center py-4">
         @yield('footer')
     </footer>
+
+    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
+    @csrf
+    </form>
+
 
     <div id="loginModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-black bg-opacity-50">
     <div class="flex items-center justify-center min-h-screen px-4">
@@ -362,6 +365,9 @@
             }
         });
     });
+
+
+
     </script>
 </body>
 </html>
