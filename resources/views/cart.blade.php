@@ -171,7 +171,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('orderForm');
 
-    // Элементы формы
     const toggle = document.getElementById('pickupToggle');
     const addressField = document.getElementById('adressField');
     const pickupInfo = document.getElementById('pickupInfo');
@@ -181,7 +180,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const commentInput = document.getElementById('comment');
     const paymentSelect = document.getElementById('payment');
 
- 
     const LS_KEYS = {
         pickup:   'order_pickup',
         adress:   'order_adress',
@@ -190,61 +188,67 @@ document.addEventListener('DOMContentLoaded', () => {
         payment:  'order_payment'
     };
 
-   
     function restore() {
         const isPickup = localStorage.getItem(LS_KEYS.pickup) === 'true';
         if (isPickup) {
             toggle.classList.remove('active');
             addressField.classList.remove('hidden');
             pickupInfo.classList.add('hidden');
+            adressInput.readOnly = false;
+            adressInput.value = localStorage.getItem(LS_KEYS.adress) || '{{ old('adress') }}' || '';
         } else {
             toggle.classList.add('active');
             addressField.classList.add('hidden');
             pickupInfo.classList.remove('hidden');
+            adressInput.readOnly = true;
+            adressInput.value = 'ул. Пушкина, д. Колотушкина';
         }
 
-        adressInput.value   = localStorage.getItem(LS_KEYS.adress)  || '{{ old('adress') }}';
         timeSelect.value    = localStorage.getItem(LS_KEYS.time)    || timeSelect.value;
         commentInput.value  = localStorage.getItem(LS_KEYS.comment) || '{{ old('comment') }}';
         paymentSelect.value = localStorage.getItem(LS_KEYS.payment) || paymentSelect.value;
 
-     
         fastValue.value = timeSelect.value === 'null' ? '1' : '0';
     }
 
-    // Сохранение в localStorage при change
     function bindSave(el, key) {
         el.addEventListener('change', () => {
             localStorage.setItem(key, el.value);
         });
     }
     bindSave(adressInput,  LS_KEYS.adress);
-    bindSave(timeSelect,    LS_KEYS.time);
-    bindSave(commentInput,  LS_KEYS.comment);
+    bindSave(timeSelect,   LS_KEYS.time);
+    bindSave(commentInput, LS_KEYS.comment);
     bindSave(paymentSelect, LS_KEYS.payment);
 
- 
     toggle.addEventListener('click', () => {
-        const isNowPickup = !toggle.classList.toggle('active');
-        addressField.classList.toggle('hidden');
-        pickupInfo.classList.toggle('hidden');
-        localStorage.setItem(LS_KEYS.pickup, isNowPickup.toString());
-        if (!isNowPickup) {
-            adressInput.value = '';
-            localStorage.setItem(LS_KEYS.adress, '');
-        }
-    });
+        const isPickupNow = !toggle.classList.toggle('active');
 
+        if (isPickupNow) {
+            // Самовывоз — адрес вводится вручную
+            addressField.classList.remove('hidden');
+            pickupInfo.classList.add('hidden');
+            adressInput.readOnly = false;
+            adressInput.value = localStorage.getItem(LS_KEYS.adress) || '';
+        } else {
+            // Доставка — адрес фиксированный и readonly
+            addressField.classList.add('hidden');
+            pickupInfo.classList.remove('hidden');
+            adressInput.readOnly = true;
+            adressInput.value = 'Самовывоз';
+            localStorage.setItem(LS_KEYS.adress, adressInput.value);
+        }
+
+        localStorage.setItem(LS_KEYS.pickup, isPickupNow.toString());
+    });
 
     restore();
 
-    // Обновление fast_value и сохранение времени
     timeSelect.addEventListener('change', () => {
         fastValue.value = timeSelect.value === 'null' ? '1' : '0';
         localStorage.setItem(LS_KEYS.time, timeSelect.value);
     });
 
-    // Количество в корзине
     document.querySelectorAll('.quantity-btn').forEach(btn => {
         btn.addEventListener('click', e => {
             e.preventDefault();
@@ -287,7 +291,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Промокод
     window.applyPromocode = () => {
         const code = document.getElementById('promocodeInput').value.trim();
         if (!code) return alert('Введите промокод');
@@ -303,6 +306,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(d => d.success ? location.reload() : alert('Ошибка применения промокода'))
         .catch(() => alert('Ошибка соединения с сервером'));
     };
+
     document.getElementById('removePromocode')?.addEventListener('click', () => {
         fetch('{{ route('cart.remove-promocode') }}', {
             method: 'POST',
@@ -316,12 +320,15 @@ document.addEventListener('DOMContentLoaded', () => {
         .catch(() => alert('Ошибка соединения с сервером'));
     });
 
-   
     form.addEventListener('submit', () => {
         Object.values(LS_KEYS).forEach(k => localStorage.removeItem(k));
     });
 });
+
+
 </script>
+
+
 
 @endsection
 
