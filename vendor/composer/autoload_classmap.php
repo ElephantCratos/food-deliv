@@ -29,6 +29,7 @@ return array(
     'App\\Http\\Controllers\\ProfileController' => $baseDir . '/app/Http/Controllers/ProfileController.php',
     'App\\Http\\Controllers\\PromocodeController' => $baseDir . '/app/Http/Controllers/PromocodeController.php',
     'App\\Http\\Controllers\\UserManagementController' => $baseDir . '/app/Http/Controllers/UserManagementController.php',
+    'App\\Http\\Controllers\\UserProfileController' => $baseDir . '/app/Http/Controllers/UserProfileController.php',
     'App\\Http\\Requests\\Auth\\LoginRequest' => $baseDir . '/app/Http/Requests/Auth/LoginRequest.php',
     'App\\Http\\Requests\\ProfileUpdateRequest' => $baseDir . '/app/Http/Requests/ProfileUpdateRequest.php',
     'App\\Models\\Category' => $baseDir . '/app/Models/Category.php',

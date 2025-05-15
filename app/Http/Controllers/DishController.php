@@ -48,7 +48,7 @@ class DishController extends Controller
             'image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
             'price' => 'required|numeric|min:0',
             'category_id' => 'required|exists:categories,id',
-            'description' => 'required|string|max:255'
+            'description' => 'required|string|max:114'
         ]);
        
         $imagePath = $this->handleImageUpload($request->file('image_path'));
@@ -80,7 +80,7 @@ class DishController extends Controller
             'image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'price' => 'required|numeric|min:0',
             'category_id' => 'required|exists:categories,id',
-            'description' => 'required|string|max:255'
+            'description' => 'required|string|max:114'
         ]);
 
         if ($request->hasFile('image_path')) {

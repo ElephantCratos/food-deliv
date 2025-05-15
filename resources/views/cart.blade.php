@@ -47,9 +47,9 @@
 
                 <!-- самовывоз / доставка -->
                 <div class="flex items-center space-x-4">
-                    <span class="font-medium">Самовывоз</span>
-                    <div id="pickupToggle" class="toggle"></div>
                     <span class="font-medium">Доставка</span>
+                    <div id="pickupToggle" class="toggle"></div>
+                    <span class="font-medium">Самовызов</span>
                 </div>
 
                 <!-- адрес -->
@@ -340,5 +340,54 @@ document.addEventListener('DOMContentLoaded', () => {
 @endsection
 
 @section('footer')
-    2024 Food Delivery Catalog. All rights reserved.
+<footer class="bg-gray-100 text-gray-800 py-8 mt-10 border-t">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row justify-between gap-12">
+
+            <!-- О НАС -->
+            <div id="about" class="md:w-1/2 space-y-4">
+                <h2 class="text-lg font-semibold">О нас</h2>
+                <p>
+                    <strong>«Шашлычный двор»</strong> – это сочное мясо, приготовленное на мангале по традиционным армянским рецептам. Мы используем только свежие продукты, фирменные маринады и проверенные временем техники приготовления.
+                </p>
+                <p>
+                    Приглашаем насладиться вкусом настоящего шашлыка в уютной атмосфере или закажите с доставкой — мы работаем, чтобы вы ели вкусно!
+                </p>
+            </div>
+
+            <!-- КОНТАКТЫ -->
+            <div id="contacts" class="md:w-1/2 space-y-4">
+                <h2 class="text-lg font-semibold">Контакты</h2>
+                <ul class="space-y-1 text-sm">
+                    <li>📍 <strong>График:</strong> Вторник – Воскресенье, с 11:00 до 23:00</li>
+                    <li>📞 <strong>Телефон для заказа:</strong> <a href="tel:+79090353545" class="text-blue-600 hover:underline">+7 909 035 35 45</a></li>
+                    <li>🗺️ <strong>Яндекс.Карты:</strong> 
+                        <a href="https://yandex.ru/maps/org/shashlychny_dvor/81098053171/?ll=65.435334%2C62.140169" 
+                           target="_blank" class="text-blue-600 hover:underline">
+                            Перейти
+                        </a>
+                    </li>
+                    <li>📍 <strong>2ГИС:</strong> 
+                        <a href="https://2gis.ru/nyagan/firm/70000001094977366" 
+                           target="_blank" class="text-blue-600 hover:underline">
+                            Посмотреть
+                        </a>
+                    </li>
+                    <li>💬 <strong>ВКонтакте:</strong> 
+                        <a href="https://vk.com/shashliknya?from=groups" 
+                           target="_blank" class="text-blue-600 hover:underline">
+                            vk.com/shashliknya
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+        <!-- НИЖНЯЯ СТРОКА -->
+        <div class="mt-8 border-t pt-4 text-xs text-gray-500 text-center">
+            &copy; {{ date('Y') }} Шашлычный двор. Все права защищены.
+        </div>
+
+</footer>
 @endsection

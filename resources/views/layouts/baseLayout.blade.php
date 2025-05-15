@@ -27,9 +27,8 @@
         {{-- Верхняя навигация --}}
         <div class="container mx-auto px-4 lg:px-8 py-2 flex flex-wrap justify-between items-center text-sm text-gray-800">
             <div class="flex items-center gap-4 flex-wrap">
-                <a href="#" class="hover:underline">О нас</a>
-                <a href="#" class="hover:underline">Контакты</a>
-                <a href="#" class="hover:underline">Корпоративные заказы</a>
+                <a href="#about" class="hover:underline">О нас</a>
+                <a href="#contacts" class="hover:underline">Контакты</a>
             </div>
         </div>
 
